@@ -62,6 +62,11 @@ ECS.Components.WorldCollider = function WorldCollider() {
 }
 ECS.Components.WorldCollider.prototype.name = "worldcollider";
 
+ECS.Components.WorldFacingCollider = function WorldFacingCollider() {
+
+}
+ECS.Components.WorldFacingCollider.prototype.name = "worldfacingcollider";
+
 ECS.Components.WorldLargeCollision = function WorldLargeCollision(_w, _h, _x, _y) {
 	//Some things are large, and collidable.
 	this.width = _w;
@@ -99,8 +104,8 @@ ECS.Components.WorldPortal.prototype.name = "worldportal";
 /*
 	AI Components
 */
-ECS.Components.WorldPusher = function WorldPusher() {
-
+ECS.Components.WorldPusher = function WorldPusher(_type) {
+	this.type = _type || "spinning";
 }
 ECS.Components.WorldPusher.prototype.name = "worldpusher";
 

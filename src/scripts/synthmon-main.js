@@ -35,16 +35,6 @@ function init() {
 		}
 	}
 
-	
-
-
-	
-	
-
-	
-
-
-
 	var xobj = new XMLHttpRequest();
 	xobj.overrideMimeType("application/json");
 	xobj.open('get', './src/json/theworld.json', true);

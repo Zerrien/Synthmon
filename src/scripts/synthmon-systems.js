@@ -36,7 +36,7 @@ function checkCollision(_e, _x, _y, _ex) {
 		if(entity != _ex) {
 			var wP = entity.c("worldposition");
 			var wM = entity.c("worldmoves");
-			if(wP && entity.c("worldcollider")) {
+			if(wP && (entity.c("worldcollider") || entity.c("worldfacingcollider"))) {
 				if(wM) {
 					if((wP.x == _x && wP.y == _y && wM.curCycle < wM.curSpeed / 2) || (wP.x + wM.destX == _x && wP.y + wM.destY == _y)) {
 						return entity;
@@ -204,16 +204,17 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 		if(entity.c("worldpusher")) {
 			var wPu = entity.c("worldpusher");
 			var wP = entity.c("worldposition");
-			
-			var result = checkCollision(_e, wP.x, wP.y);
+			var result = checkCollision(_e, wP.x, wP.y, entity);
 			if(result) {
 				var rwM = result.c("worldmoves");
 				var rF = result.c("worldfaces");
 				var rcP = result.c("worldcanpush");
 				if(rwM.state == "standing") {
 					if(wPu.pushTime >= rwM.curSpeed && result.c("worldkeyboardcontrolled")) {
-
 					} else {
+						/*
+							Rewrite this switch. It's 2 messy.
+						*/
 						switch(entity.c("worldfaces").facing) {
 							case "north":
 								if(rF) {
@@ -222,7 +223,8 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 								if(rcP) {
 									rcP.curStrength = rcP.strength;
 								}
-								rwM.state = "spinning";
+
+								rwM.state = wPu.type;
 								rwM.destX = 0;
 								rwM.destY = -1;
 								rwM.curCycle = 0;
@@ -241,7 +243,7 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 								if(rcP) {
 									rcP.curStrength = rcP.strength;
 								}
-								rwM.state = "spinning";
+								rwM.state = wPu.type;
 								rwM.destX = 0;
 								rwM.destY = 1;
 								rwM.curCycle = 0;
@@ -256,7 +258,7 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 								if(rF) {
 									rF.facing = "east";
 								}
-								rwM.state = "spinning";
+								rwM.state = wPu.type;
 								rwM.destX = 1;
 								rwM.destY = 0;
 								rwM.curCycle = 0;
@@ -274,7 +276,7 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 								if(rF) {
 									rF.facing = "west";
 								}
-								rwM.state = "spinning";
+								rwM.state = wPu.type;
 								rwM.destX = -1;
 								rwM.destY = 0;
 								rwM.curCycle = 0;
@@ -376,6 +378,15 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 						wP.zone = rwP.destination;
 
 						loadZone(rwP.destination);
+					}
+				} else if (result.c("worldfacingcollider")) {
+					if(result.c("worldfaces").facing != entity.c("worldfaces").facing) {
+						wM.state = "standing";
+						wM.destX = 0;
+						wM.destY = 0;
+						wM.curCycle = 0;
+					} else {
+
 					}
 				} else {
 					wM.state = "standing";
@@ -505,6 +516,14 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			var shiftX, shiftY;
 			shiftX = shiftY = 0;
 
+			if(wM) {
+				shiftX = wM.curCycle / wM.curSpeed * TILE_SIZE * wM.destX;
+				shiftY = wM.curCycle / wM.curSpeed * TILE_SIZE * wM.destY;
+				if(wM.state == "jumping") {
+					shiftY -= Math.sin(wM.curCycle / wM.curSpeed * Math.PI) * 16;
+				}
+			}
+
 			if(wF) {
 				if(wM && wM.state == "spinning") {
 					sourceX = Math.floor(tTime / 120) % 4 * TILE_SIZE;
@@ -531,10 +550,7 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 				sourceY *= TILE_SIZE;
 			}
 
-			if(wM) {
-				shiftX = wM.curCycle / wM.curSpeed * TILE_SIZE * wM.destX;
-				shiftY = wM.curCycle / wM.curSpeed * TILE_SIZE * wM.destY;
-			}
+
 
 			ctx.drawImage(wS.img,
 				//Source Corner

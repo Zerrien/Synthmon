@@ -9,7 +9,8 @@
 		"bigtree":"./src/assets/img/object_tiles/3x2tree.png",
 		"shoppe":"./src/assets/img/object_tiles/shoppe.png",
 		"tallgrass":"./src/assets/img/object_tiles/bush.png",
-		"chatter":"./src/assets/img/object_tiles/genericNPC.png"
+		"chatter":"./src/assets/img/object_tiles/genericNPC.png",
+		"cliffs":"./src/assets/img/object_tiles/cliffs.png"
 	},
 	"chunks":{
 		"0,0":{
@@ -31,6 +32,24 @@
 					},
 					"WorldChatty":{
 						"saying":"Shorts! Shorts! I love shorts!"
+					}
+				},
+				"cliffFace":{
+					"WorldSprite":{
+						"name":"cliffs"
+					},
+					"WorldPosition":{
+						"x":3,
+						"y":0
+					},
+					"WorldPusher":{
+						"type":"jumping"
+					},
+					"WorldFaces":{
+						"facing":"east"
+					},
+					"WorldFacingCollider":{
+
 					}
 				},
 				"mainStore":{
