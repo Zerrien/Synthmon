@@ -177,6 +177,10 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 					var result = checkCollision(_e, wP.x + facingXY.x, wP.y + facingXY.y);
 					if(result) {
 						if(result.c("worldchatty")) {
+							if(result.c("worldfaces")) {
+								result.c("worldfaces").facing = wF.inverseFace();
+							}
+
 							gameState = 1;
 							var box = new ECS.Entity();
 							box.addComponent(new ECS.Components.UIPosition(0, 0));

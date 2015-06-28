@@ -27,6 +27,7 @@ var faces_xy = {
 }
 ECS.Components.WorldFaces.prototype = {
 	inverseFace : function(_facing) {
+		_facing = _facing || this.facing;
 		return faces_inverse[_facing];
 	},
 	facingTile : function() {
