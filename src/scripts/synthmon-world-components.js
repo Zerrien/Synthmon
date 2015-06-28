@@ -19,9 +19,18 @@ var faces_inverse = {
 	"east":"west",
 	"west":"east"
 }
+var faces_xy = {
+	"north":{x:0, y:-1},
+	"south":{x:0, y:1},
+	"east":{x:1, y:0},
+	"west":{x:-1, y:0},
+}
 ECS.Components.WorldFaces.prototype = {
 	inverseFace : function(_facing) {
 		return faces_inverse[_facing];
+	},
+	facingTile : function() {
+		return faces_xy[this.facing];
 	}
 }
 ECS.Components.WorldFaces.prototype.name = "worldfaces";
@@ -78,11 +87,6 @@ ECS.Components.WorldCanPush = function WorldCanPush(_val) {
 }
 ECS.Components.WorldCanPush.prototype.name = "worldcanpush";
 
-ECS.Components.WorldPusher = function WorldPusher() {
-
-}
-ECS.Components.WorldPusher.prototype.name = "worldpusher";
-
 ECS.Components.WorldPortal = function WorldPortal(_dest, _params, _xOff, _yOff) {
 	this.destination = _dest;
 	this.params = _params;
@@ -90,3 +94,16 @@ ECS.Components.WorldPortal = function WorldPortal(_dest, _params, _xOff, _yOff) 
 	this.yOff = _yOff;
 }
 ECS.Components.WorldPortal.prototype.name = "worldportal";
+
+/*
+	AI Components
+*/
+ECS.Components.WorldPusher = function WorldPusher() {
+
+}
+ECS.Components.WorldPusher.prototype.name = "worldpusher";
+
+ECS.Components.WorldChatty = function WorldChatty(_saying) {
+	this.saying = _saying;
+}
+ECS.Components.WorldChatty.prototype.name = "worldchatty";

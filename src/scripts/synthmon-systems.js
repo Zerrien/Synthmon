@@ -58,19 +58,79 @@ function checkCollision(_e, _x, _y, _ex) {
 }
 
 ECS.Systems.UIKeyboard = function UIKeyboard(_e) {
-
+	var curIndex;
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var uiZI = entity.c("uizindex");
+		if(uiZI) {
+			if(!curIndex) {
+				curIndex = uiZI.zindex;
+			} else {
+				if(curIndex < uiZI.zindex) {
+					curIndex = uiZI.zindex;
+				}
+			}
+		}
+	}
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var uiZI = entity.c("uizindex");
+		if(!curIndex || (uiZI && uiZI.zindex == curIndex)) {
+			if(entity.c("uilist")) {
+				var uiL = entity.c("uilist");
+				if(keyboardKeys[87]) {
+					keyboardKeys[87] = false;
+					uiL.up();
+				} else if (keyboardKeys[83]) {
+					keyboardKeys[83] = false;
+					uiL.down();
+				} else if (keyboardKeys[32]) {
+				} else if (keyboardKeys[69]) {
+					keyboardKeys[69] = false;
+					uiL.options[uiL.curIndex].action();
+				}
+			} else if(entity.c("uidialoguebox")) {
+				if(keyboardKeys[32]) {
+					keyboardKeys[32] = false;
+					ECS.entities.splice(ECS.entities.indexOf(entity));
+					gameState = 0;
+				}
+			}
+		}
+	}
 }
 ECS.Systems.WorldUI = function WorldUI(_e) {
+	ctx.save();
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var uiP = entity.c("uiposition");
 		if(uiP && entity.c("uilist")) {
 			var uiL = entity.c("uilist");
+			ctx.font = "20px Consolas";
+			ctx.textBaseline = "top"
+			ctx.fillStyle = "white"
+			ctx.fillRect(uiP.x - 10, uiP.y - 10, 2000, uiL.options.length * 20 + 20);
+			ctx.strokeStyle = "black";
+			ctx.strokeRect(uiP.x - 10, uiP.y - 10, 2000, uiL.options.length * 20 + 20);
 			for(var i = 0; i < uiL.options.length; i++) {
-				ctx.fillText(uiL.options[i], 10, 10 + i * 10)
+				if(uiL.curIndex == i) {
+					ctx.fillStyle = "red";
+				} else {
+					ctx.fillStyle = "black";
+				}
+				ctx.fillText(uiL.options[i].name, uiP.x, uiP.y + i * 20);
 			}
+		} else if (uiP && entity.c("uidialoguebox")) {
+			var uiDB = entity.c("uidialoguebox");
+			ctx.font = "20px Consolas";
+			ctx.textBaseline = "top"
+			ctx.fillStyle = "white"
+			ctx.fillRect(canvas.width / 8, canvas.height * 4 / 5, canvas.width * 6 / 8, canvas.height / 5 - 20);
+			ctx.fillStyle = "black";
+			ctx.fillText(uiDB.string, canvas.width / 8, canvas.height * 4 / 5);
 		}
  	}
+ 	ctx.restore();
 }
 
 ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
@@ -106,15 +166,24 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 					wM.destX = 1;
 					isMove = true;
 				} else if (keyboardKeys[69]) {
+					keyboardKeys[69] = false;
 					gameState = 1;
-					var menu = new ECS.Entity();
-					menu.addComponent(new ECS.Components.UIPosition(0, 0));
-					menu.addComponent(new ECS.Components.UIList([
-						"Eat",
-						"Drink",
-						"Be ANGRY"
-					]));
+
+					var menu = worldMenuController.worldmainmenu.make();
 					ECS.entities.push(menu);
+				} else if (keyboardKeys[32]) {
+					keyboardKeys[32] = false;
+					var facingXY = wF.facingTile();
+					var result = checkCollision(_e, wP.x + facingXY.x, wP.y + facingXY.y);
+					if(result) {
+						if(result.c("worldchatty")) {
+							gameState = 1;
+							var box = new ECS.Entity();
+							box.addComponent(new ECS.Components.UIPosition(0, 0));
+							box.addComponent(new ECS.Components.UIDialogueBox("helllo!"));
+							ECS.entities.push(box);
+						}
+					}
 				}
 				if(isMove) {
 					wM.state = "walking";

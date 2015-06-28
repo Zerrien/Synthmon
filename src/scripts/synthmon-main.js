@@ -4,35 +4,6 @@ var gameState = 0;
 
 var player, world;
 
-/*
-var explorer = new Image();
-explorer.src = "./explorer32.png";
-
-var doorSprite = new Image();
-doorSprite.src = "./door.png";
-
-var boulderSprite = new Image();
-boulderSprite.src = "./boulder.png";
-
-var pushSprite = new Image();
-pushSprite.src = "./pushtile.png";
-
-var boxSprite = new Image();
-boxSprite.src = "./cardboardBox.png";
-
-var boxTiles = new Image();
-boxTiles.src = "./cardboardBoxTiles.png"
-
-var bigtree = new Image();
-bigtree.src = "./3x2tree.png"
-
-var shoppe = new Image();
-shoppe.src = "./shoppe.png";
-
-var grass = new Image();
-grass.src = "./bush.png";
-*/
-
 var keyPress = [];
 var keyboardKeys = [];
 
@@ -85,14 +56,26 @@ function init() {
 			images = new ImageController();
 
 			player = new ECS.Entity();
+
+			//World-components
 			player.addComponent(new ECS.Components.WorldSprite(images.images.explorer));
 			player.addComponent(new ECS.Components.WorldPosition(0, 0));
 			player.addComponent(new ECS.Components.WorldFaces("north"));
 			player.addComponent(new ECS.Components.WorldMoves());
-		//player.c("worldmoves").curSpeed =
-			player.addComponent(new ECS.Components.WorldKeyboardControlled());
 			player.addComponent(new ECS.Components.WorldCollider());
 			player.addComponent(new ECS.Components.WorldCanPush(1));
+
+			//Control-components
+			player.addComponent(new ECS.Components.WorldKeyboardControlled());
+
+			//Meta-components.
+			player.addComponent(new ECS.Components.Inventory());
+			player.c('inventory').items.push("Item1");
+			player.c('inventory').items.push("Item1");
+			player.c('inventory').items.push("Item1");
+			player.c('inventory').items.push("Item1");
+			player.addComponent(new ECS.Components.Trainer());
+
 			ECS.entities.push(player);
 
 			loadZone(0);
