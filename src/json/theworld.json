@@ -10,12 +10,35 @@
 		"shoppe":"./src/assets/img/object_tiles/shoppe.png",
 		"tallgrass":"./src/assets/img/object_tiles/bush.png",
 		"chatter":"./src/assets/img/object_tiles/genericNPC.png",
-		"cliffs":"./src/assets/img/object_tiles/cliffs.png"
+		"cliffs":"./src/assets/img/object_tiles/cliffs.png",
+		"iceyground":"./src/assets/img/object_tiles/iceyground.png"
 	},
 	"chunks":{
 		"0,0":{
 			"source":"./src/assets/img/chunk_backgrounds/map2.png",
 			"objects":{
+				"sliding1":{
+					"WorldSprite":{
+						"name":"iceyground"
+					},
+					"WorldPosition":{
+						"x":4,
+						"y":4
+					},
+					"WorldSlippery":{
+					}
+				},
+				"sliding2":{
+					"WorldSprite":{
+						"name":"iceyground"
+					},
+					"WorldPosition":{
+						"x":5,
+						"y":4
+					},
+					"WorldSlippery":{
+					}
+				},
 				"chatter":{
 					"WorldSprite":{
 						"name":"chatter"

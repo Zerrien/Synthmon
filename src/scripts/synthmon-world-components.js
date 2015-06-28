@@ -113,3 +113,7 @@ ECS.Components.WorldChatty = function WorldChatty(_saying) {
 	this.saying = _saying;
 }
 ECS.Components.WorldChatty.prototype.name = "worldchatty";
+
+ECS.Components.WorldSlippery = function WorldSlippery() {
+}
+ECS.Components.WorldSlippery.prototype.name = "worldslippery";

@@ -212,92 +212,34 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 				if(rwM.state == "standing") {
 					if(wPu.pushTime >= rwM.curSpeed && result.c("worldkeyboardcontrolled")) {
 					} else {
-						/*
-							Rewrite this switch. It's 2 messy.
-						*/
-						switch(entity.c("worldfaces").facing) {
-							case "north":
-								if(rF) {
-									rF.facing = "north";
-								}
-								if(rcP) {
-									rcP.curStrength = rcP.strength;
-								}
-
-								rwM.state = wPu.type;
-								rwM.destX = 0;
-								rwM.destY = -1;
-								rwM.curCycle = 0;
-								if(wPu.lastPush != result) {
-									wPu.lastPush = result;
-									wPu.pushTime = 0;
-								} else {
-									wPu.pushTime += dTime;
-								}
-								
-								break;
-							case "south":
-								if(rF) {
-									rF.facing = "south";
-								}
-								if(rcP) {
-									rcP.curStrength = rcP.strength;
-								}
-								rwM.state = wPu.type;
-								rwM.destX = 0;
-								rwM.destY = 1;
-								rwM.curCycle = 0;
-								if(wPu.lastPush != result) {
-									wPu.lastPush = result;
-									wPu.pushTime = 0;
-								} else {
-									wPu.pushTime += dTime;
-								}
-								break;
-							case "east":
-								if(rF) {
-									rF.facing = "east";
-								}
-								rwM.state = wPu.type;
-								rwM.destX = 1;
-								rwM.destY = 0;
-								rwM.curCycle = 0;
-								if(wPu.lastPush != result) {
-									wPu.lastPush = result;
-									wPu.pushTime = 0;
-								} else {
-									wPu.pushTime += dTime;
-								}
-								if(rcP) {
-									rcP.curStrength = rcP.strength;
-								}
-								break;
-							case "west":
-								if(rF) {
-									rF.facing = "west";
-								}
-								rwM.state = wPu.type;
-								rwM.destX = -1;
-								rwM.destY = 0;
-								rwM.curCycle = 0;
-								if(wPu.lastPush != result) {
-									wPu.lastPush = result;
-									wPu.pushTime = 0;
-								} else {
-									wPu.pushTime += dTime;
-								}
-								if(rcP) {
-									rcP.curStrength = rcP.strength;
-								}
-								break;
+						if(rF) {
+							rF.facing = entity.c("worldfaces").facing;
+						}
+						if(rcP) {
+							rcP.curStrength = rcP.strength;
+						}
+						rwM.state = wPu.type;
+						var facingXY = entity.c("worldfaces").facingTile();
+						rwM.destX = facingXY.x;
+						rwM.destY = facingXY.y;
+						if(wPu.lastPust != result) {
+							wPu.lastPush = result;
+							wPu.pushTime = 0;
+						} else {
+							wPu.pusTime += dTime;
 						}
 					}
-					
 				}
 			} else {
-
 				wPu.lastPush = null;
 				wPu.pushTime = 0;
+			}
+		} else if (entity.c("worldslippery")) {
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				var rwM = result.c("worldmoves");
+				rwM.state = "sliding";
 			}
 		}
 	}
@@ -394,35 +336,6 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 					wM.destY = 0;
 					wM.curCycle = 0;
 				}
-
-
-				/*
-				if(rwM) {
-
-					if(result.c("worldpushable") && rwM.state == "standing" && wCP && wCP.strength >= 1) {
-						rwM.state = "walking";
-						rwM.curSpeed = 500;
-						rwM.destX = wM.destX;
-						rwM.destY = wM.destY;
-						rwM.curCycle = 0;
-
-						if(result.c("worldcanpush")) {
-							result.c("worldcanpush").strength = wCP.strength - 1;
-						}
-					}
-					if(wM.curCycle <= rwM.curCycle) {
-						wM.state = "standing";
-						wM.destX = 0;
-						wM.destY = 0;
-						wM.curCycle = 0;
-					}
-				} else {
-					wM.state = "standing";
-					wM.destX = 0;
-					wM.destY = 0;
-					wM.curCycle = 0;
-				}
-				*/
 				
 			}
 		}
@@ -439,12 +352,17 @@ ECS.Systems.WorldLogic = function WorldLogic(_e) {
 				wM.curCycle += dTime;
 				if(wM.curCycle >= wM.curSpeed) {
 					wM.curCycle = 0;
-					wM.state = "standing";
 					wP.x += wM.destX;
 					wP.y += wM.destY;
-					wM.destX = 0;
-					wM.destY = 0;
+					if(wM.state != "sliding") {
+						wM.destX = 0;
+						wM.destY = 0;
+					}
+					wM.state = "standing";
 				}
+			} else {
+				wM.destX = 0;
+				wM.destY = 0;
 			}
 		}
 	}
