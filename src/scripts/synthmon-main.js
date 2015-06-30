@@ -7,6 +7,8 @@ var player, world;
 var keyPress = [];
 var keyboardKeys = [];
 
+var IS_DEBUG = true;
+
 function init() {
 	canvas = document.getElementById("game");
 	canvas.width = 800;

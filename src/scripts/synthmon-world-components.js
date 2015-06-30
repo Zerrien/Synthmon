@@ -69,15 +69,15 @@ ECS.Components.WorldFacingCollider.prototype.name = "worldfacingcollider";
 
 ECS.Components.WorldLargeCollision = function WorldLargeCollision(_w, _h, _x, _y) {
 	//Some things are large, and collidable.
-	this.width = _w;
-	this.height = _h;
+	this.width = _w || 1;
+	this.height = _h || 1;
 	this.xOffset = _x || 0;
 	this.yOffset = _y || 0;
 }
 ECS.Components.WorldLargeCollision.prototype.name = "worldlargecollision";
 ECS.Components.WorldSize = function WorldSize(_w, _h, _x, _y) {
-	this.width = _w;
-	this.height = _h;
+	this.width = _w || 1;
+	this.height = _h || 1;
 	this.xAnchor = _x || 0;
 	this.yAnchor = _y || 0;
 }

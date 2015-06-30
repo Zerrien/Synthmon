@@ -92,7 +92,7 @@ ECS.Systems.UIKeyboard = function UIKeyboard(_e) {
 			} else if(entity.c("uidialoguebox")) {
 				if(keyboardKeys[32]) {
 					keyboardKeys[32] = false;
-					ECS.entities.splice(ECS.entities.indexOf(entity));
+					ECS.entities.splice(ECS.entities.indexOf(entity), 1);
 					gameState = 0;
 				}
 			}
@@ -152,23 +152,26 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 				if(keyboardKeys[87]) {
 					wF.facing = "north";
 					wM.destY = -1;
+					wM.destX = 0;
 					isMove = true;
 				} else if (keyboardKeys[83]) {
 					wF.facing = "south";
 					wM.destY = 1;
+					wM.destX = 0;
 					isMove = true;
 				} else if (keyboardKeys[65]) {
 					wF.facing = "west";
 					wM.destX = -1;
+					wM.destY = 0;
 					isMove = true;
 				} else if (keyboardKeys[68]) {
 					wF.facing = "east";
 					wM.destX = 1;
+					wM.destY = 0;
 					isMove = true;
 				} else if (keyboardKeys[69]) {
 					keyboardKeys[69] = false;
 					gameState = 1;
-
 					var menu = worldMenuController.worldmainmenu.make();
 					ECS.entities.push(menu);
 				} else if (keyboardKeys[32]) {
@@ -360,9 +363,6 @@ ECS.Systems.WorldLogic = function WorldLogic(_e) {
 					}
 					wM.state = "standing";
 				}
-			} else {
-				wM.destX = 0;
-				wM.destY = 0;
 			}
 		}
 	}
@@ -411,6 +411,7 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
 		var wS = entity.c("worldsprite");
+
 		if(wP && wS) {
 			var wF = entity.c("worldfaces");
 			var wM = entity.c("worldmoves");
@@ -468,8 +469,6 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 				sourceY *= TILE_SIZE;
 			}
 
-
-
 			ctx.drawImage(wS.img,
 				//Source Corner
 				sourceX, sourceY,
@@ -479,6 +478,20 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 				destX + shiftX, destY + shiftY,
 				//World Size
 				TILE_SIZE * width, TILE_SIZE * height);
+		}
+		if(wP && IS_DEBUG) {
+			ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
+			ctx.beginPath();
+			ctx.arc(wP.x * 32 + 16, wP.y * 32 + 16, 16, 0, Math.PI * 2);
+			ctx.stroke();
+
+			ctx.strokeStyle = "rgba(255, 0, 0, 0.75)";
+			if(entity.c("worldcollider")) {
+				ctx.strokeRect(wP.x * 32 + 4, wP.y * 32 + 4, 32 - 8, 32 - 8);
+			} else if (entity.c("worldlargecollision")) {
+				var wLC = entity.c("worldlargecollision");
+				ctx.strokeRect((wP.x + wLC.xOffset) * 32 + 4, (wP.y + wLC.yOffset) * 32 + 4, 32 * wLC.width - 8, 32 * wLC.height - 8);
+			}
 		}
 	}
 

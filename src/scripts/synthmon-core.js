@@ -33,3 +33,24 @@ ECS.Entity.prototype.removeComponent = function removeComponent ( _c ) {
 ECS.Entity.prototype.c = function c(_c) {
 	return this.components[_c];
 }
+
+function findComponent(_name) {
+	for(var _component in ECS.Components) {
+		if(_component.toLowerCase() == _name) {
+			return _component;
+		}
+	}
+	return null;
+}
+
+ECS.Entity.prototype.dupe = function() {
+	var entity = new ECS.Entity();
+	for(var _components in this.components) {
+		var component = findComponent(_components);
+		entity.addComponent(new ECS.Components[component]());
+		for(var _variables in this.components[_components]) {
+			entity.c(_components)[_variables] = this.c(_components)[_variables];
+		}
+	}
+	return entity;
+}
