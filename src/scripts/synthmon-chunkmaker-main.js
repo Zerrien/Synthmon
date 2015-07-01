@@ -188,6 +188,20 @@ function makeTooltip() {
 				makeImageSelect();
 			} else {
 				curSelect.addComponent(new ECS.Components[this.value]());
+
+				var obj = {};
+				obj[this.value] = {};
+				worldData.chunks["1,0"]["objects"][curSelect.id] = obj;
+	
+				var xObj = new XMLHttpRequest();
+				xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
+				xObj.onreadystatechange = function() {
+					if(xObj.readyState == 4 && xObj.status == "200") {
+					}
+				}
+				xObj.send();
+
+
 				makeTooltip();
 			}
 		} else {
@@ -231,6 +245,24 @@ function makeImageSelect() {
 		newDiv.appendChild(img);
 		img.onclick = function(_e) {
 			curSelect.addComponent(new ECS.Components.WorldSprite(this.ref));
+			/****
+	!!!!!!!!!!!!!!!!!!!!
+			*/
+			worldData.chunks["1,0"]["objects"][curSelect.id] = {
+				"WorldSprite":{
+					"name":"boulder"
+				}
+			};
+
+			var xObj = new XMLHttpRequest();
+			xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
+			//console.log("?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]));
+			xObj.onreadystatechange = function() {
+				if(xObj.readyState == 4 && xObj.status == "200") {
+				}
+			}
+			xObj.send();
+
 			makeTooltip();
 		}
 	}
@@ -255,14 +287,22 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 				var entity = new ECS.Entity();
 				entity.addComponent(new ECS.Components.WorldPosition(curX, curY));
 
-				worldData.chunks["1,0"][entity.id] = {
+				worldData.chunks["1,0"]["objects"][entity.id] = {
 					"WorldPosition":{
 						"x":curX,
 						"y":curY
 					}
 				};
 
-				//console.log(chrome.runtime.getManifest());
+				var xObj = new XMLHttpRequest();
+				xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
+				//console.log("?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]));
+				xObj.onreadystatechange = function() {
+					if(xObj.readyState == 4 && xObj.status == "200") {
+					}
+				}
+				xObj.send();
+
 				ECS.entities.push(entity);
 			}
 		} else {
@@ -282,6 +322,16 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 		var entity = _e[entityID];
 	}
 }
+
+function createEntity() {
+
+}
+
+function editComponent() {
+	
+}
+
+
 
 ECS.Systems.ChunkMakerUI = function ChunkMakerUI(_e) {
 	ctx.save();
