@@ -54,8 +54,7 @@ function init() {
 		if(xobj.readyState == 4 && xobj.status == "200") {
 			worldData = JSON.parse(xobj.responseText);
 			images = new ImageController();
-			
-
+			loadZone();
 			setInterval(logic, 10);
 		}
 	};
@@ -64,6 +63,37 @@ function init() {
 
 }
 
+function loadZone() {
+	var k = 0;
+	/*
+	var pPos = player.c("worldposition");
+	var pChunkX = pPos.x >> 5;
+	var pChunkY = pPos.y >> 5;
+	*/
+	var pChunkX = 1;
+	var pChunkY = 0;
+	for(var obj in worldData.chunks[pChunkX+","+pChunkY].objects) {
+		var object = worldData.chunks[pChunkX+","+pChunkY].objects[obj];
+		var entity = new ECS.Entity();
+		for(var componentID in object) {
+			var details = object[componentID];
+			if(ECS.Components[componentID]) {
+				var component = new ECS.Components[componentID];
+				if(componentID == "WorldSprite") {
+					component.img = images.images[details.name];
+				} else {
+					for(var value in details) {
+						component[value] = details[value];
+					}
+				}
+				entity.addComponent(component);
+			} else {
+				console.warn("Unable to find component of type:" + componentID)
+			}
+		}
+		ECS.entities.push(entity);
+	}
+}
 
 
 function logic() {
@@ -224,6 +254,15 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 			} else {
 				var entity = new ECS.Entity();
 				entity.addComponent(new ECS.Components.WorldPosition(curX, curY));
+
+				worldData.chunks["1,0"][entity.id] = {
+					"WorldPosition":{
+						"x":curX,
+						"y":curY
+					}
+				};
+
+				//console.log(chrome.runtime.getManifest());
 				ECS.entities.push(entity);
 			}
 		} else {

@@ -143,7 +143,18 @@
 			}
 		},
 		"1,0":{
-			"source":"./src/assets/img/chunk_backgrounds/map3.png"
+			"source":"./src/assets/img/chunk_backgrounds/map3.png",
+			"objects":{
+				"theGra5ss":{
+					"WorldSprite":{
+						"name":"tallgrass"
+					},
+					"WorldPosition":{
+						"x":2,
+						"y":1
+					}
+				}
+			}
 		},
 		"-1,0":{
 			"source":"./src/assets/img/chunk_backgrounds/map4.png"
