@@ -174,6 +174,9 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 					gameState = 1;
 					var menu = worldMenuController.worldmainmenu.make();
 					ECS.entities.push(menu);
+				} else if (keyboardKeys[75]) {
+					keyboardKeys[75] = false;
+					configureBattle();
 				} else if (keyboardKeys[32]) {
 					keyboardKeys[32] = false;
 					var facingXY = wF.facingTile();
@@ -201,11 +204,13 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 	}
 }
 
+
+
 ECS.Systems.WorldAI = function WorldAI(_e) {
 	for(var entityID in _e) {
 		var entity = _e[entityID];
-		if(entity.c("worldpusher")) {
-			var wPu = entity.c("worldpusher");
+		if(entity.c("worldconveyor")) {
+			var wC = entity.c("worldconveyor");
 			var wP = entity.c("worldposition");
 			var result = checkCollision(_e, wP.x, wP.y, entity);
 			if(result) {
@@ -213,7 +218,7 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 				var rF = result.c("worldfaces");
 				var rcP = result.c("worldcanpush");
 				if(rwM.state == "standing") {
-					if(wPu.pushTime >= rwM.curSpeed && result.c("worldkeyboardcontrolled")) {
+					if(wC.pushTime >= rwM.curSpeed && result.c("worldkeyboardcontrolled")) {
 					} else {
 						if(rF) {
 							rF.facing = entity.c("worldfaces").facing;
@@ -221,21 +226,21 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 						if(rcP) {
 							rcP.curStrength = rcP.strength;
 						}
-						rwM.state = wPu.type;
+						rwM.state = wC.type;
 						var facingXY = entity.c("worldfaces").facingTile();
 						rwM.destX = facingXY.x;
 						rwM.destY = facingXY.y;
-						if(wPu.lastPust != result) {
-							wPu.lastPush = result;
-							wPu.pushTime = 0;
+						if(wC.lastPust != result) {
+							wC.lastPush = result;
+							wC.pushTime = 0;
 						} else {
-							wPu.pusTime += dTime;
+							wC.pusTime += dTime;
 						}
 					}
 				}
 			} else {
-				wPu.lastPush = null;
-				wPu.pushTime = 0;
+				wC.lastPush = null;
+				wC.pushTime = 0;
 			}
 		} else if (entity.c("worldslippery")) {
 			var wP = entity.c("worldposition");
@@ -282,8 +287,6 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 						wM.curCycle = 0;
 					}
 				} else if (rwP && entity == player) {
-					//console.log("Portal hit!");
-					//ECS.entityStack.push(ECS.entities);
 					if(rwP.xOff && rwP.yOff) {
 						if(result.c("worldposition").x + rwP.xOff == wP.x + wM.destX && result.c("worldposition").y + rwP.yOff == wP.y + wM.destY) {
 							ECS.entities = [];
@@ -371,15 +374,11 @@ ECS.Systems.WorldLogic = function WorldLogic(_e) {
 var worldScale = 1;
 
 ECS.Systems.WorldRender = function WorldRender(_e) {
-
-
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = "rgba(0, 0, 0, 0.125)";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = "black";
 	ctx.save();
-
-
 	if(player) {
 		var pPos = player.c("worldposition");
 		var pShift = player.c("worldmoves");
@@ -405,8 +404,6 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			ctx.drawImage(world.images.interiors["houseA"], 0, 0);
 		}
 	}
-	
-	
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
@@ -417,6 +414,7 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			var wM = entity.c("worldmoves");
 			var wSh = entity.c("worldsheet");
 			var wSi = entity.c("worldsize");
+			var wA = entity.c("worldanimation");
 
 			var TILE_SIZE = 32;
 			var width, height;
@@ -444,6 +442,13 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			}
 
 			if(wF) {
+				if(wA && wM) {
+					if(wA.params[wM.state]) {
+						sourceY = wA.params[wM.state][Math.floor(tTime / 120) % wA.params[wM.state].length] * TILE_SIZE;
+					} else {
+						console.warn("There is no WorldAnimation parameter for: " + wM.state);
+					}
+				}
 				if(wM && wM.state == "spinning") {
 					sourceX = Math.floor(tTime / 120) % 4 * TILE_SIZE;
 				} else {
@@ -479,6 +484,7 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 				//World Size
 				TILE_SIZE * width, TILE_SIZE * height);
 		}
+
 		if(wP && IS_DEBUG) {
 			ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
 			ctx.beginPath();
@@ -498,6 +504,126 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 	ctx.restore();
 }
 
+var BattleController = {
+	"protagonist":null,
+	"antagonist":null,
+	"proCur":null,
+	"antCur":null,
+
+	"state":null,
+
+	"action":{},
+	"events":[],
+	"connections":{
+		"proMonSprite":null,
+		"antMonSprite":null
+	}
+}
+
+function configureBattle() {
+	BattleController.protagonist = player;
+
+	var enemy = new ECS.Entity();
+	enemy.addComponent(new ECS.Components.Trainer());
+	enemy.c('trainer').synthmon.push(new Synthmon());
+	enemy.c('trainer').synthmon.push(new Synthmon());
+	enemy.c('trainer').synthmon.push(new Synthmon());
+	enemy.c('trainer').synthmon.push(new Synthmon());
+
+	BattleController.antagonist = enemy;
+
+	BattleController.proCur = 0;
+	BattleController.antCur = 0;
+
+	BattleController.state = 0;
+
+	//Events.
+
+	var proMonsterSprite = new ECS.Entity();
+	proMonsterSprite.addComponent(new ECS.Components.UIPosition(0, 0));
+	proMonsterSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_back));
+	ECS.entities2.push(proMonsterSprite)
+
+	var antMonsterSprite = new ECS.Entity();
+	antMonsterSprite.addComponent(new ECS.Components.UIPosition(128, 0));
+	antMonsterSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_front));
+	ECS.entities2.push(antMonsterSprite)
+
+	BattleController.connections.proMonSprite = proMonsterSprite;
+	BattleController.connections.antMonSprite = antMonsterSprite;
+
+
+	var battleMenu = new ECS.Entity();
+	battleMenu.addComponent(new ECS.Components.UIPosition(128 * 2, 0));
+	battleMenu.addComponent(new ECS.Components.UIList([
+		{
+			"name":"Attack",
+			"action":function() {
+
+			}
+		},
+		{
+			"name":"Items",
+			"action":function() {
+				
+			}
+		},
+		{
+			"name":"Synthmon",
+			"action":function() {
+				
+			}
+		},
+		{
+			"name":"Run",
+			"action":function() {
+				
+			}
+		}
+	], function() {
+
+	}));
+	ECS.entities2.push(battleMenu);
+
+
+	gameState = 2;
+}
+
+
+ECS.Systems.BattleControl = function BattleControl(_e) {
+
+}
+ECS.Systems.BattleLogic = function BattleLogic(_e) {
+
+}
+
+ECS.Systems.BattleRender = function BattleRender(_e) {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "rgba(0, 0, 0, 0.125)";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "black";
+	ctx.save();
+
+
+
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var uiP = entity.c("uiposition");
+		if(uiP) {
+			if(entity.c("battlesprite")) {
+				ctx.drawImage(entity.c("battlesprite").img, uiP.x, uiP.y);
+			}
+		}
+	}
+
+
+
+	ctx.restore();
+
+}
+ECS.Systems.BattleUI = function BattleUI(_e) {
+
+}
 
 /*
 ECS.Systems.KeyboardControl = function KeyboardControl(_e) {

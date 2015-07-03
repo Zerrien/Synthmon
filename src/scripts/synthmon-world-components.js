@@ -53,6 +53,11 @@ ECS.Components.WorldMoves = function WorldMoves() {
 }
 ECS.Components.WorldMoves.prototype.name = "worldmoves";
 
+ECS.Components.WorldAnimation = function WorldAnimation(_params) {
+	this.params = _params || {};
+}
+ECS.Components.WorldAnimation.prototype.name = "worldanimation";
+
 ECS.Components.WorldKeyboardControlled = function WorldKeyboardControlled() {
 }
 ECS.Components.WorldKeyboardControlled.prototype.name = "worldkeyboardcontrolled";
@@ -104,10 +109,17 @@ ECS.Components.WorldPortal.prototype.name = "worldportal";
 /*
 	AI Components
 */
-ECS.Components.WorldPusher = function WorldPusher(_type) {
+ECS.Components.WorldConveyor = function WorldConveyor(_type) {
 	this.type = _type || "spinning";
 }
-ECS.Components.WorldPusher.prototype.name = "worldpusher";
+ECS.Components.WorldConveyor.prototype.name = "worldconveyor";
+
+ECS.Components.WorldSuperPusher = function WorldSuperPusher() {
+
+}
+ECS.Components.WorldStopper = function WorldStopper() {
+	
+}
 
 ECS.Components.WorldChatty = function WorldChatty(_saying) {
 	this.saying = _saying;

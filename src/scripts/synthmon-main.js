@@ -1,13 +1,13 @@
 var canvas, ctx;
 var curTime, prevTime, tTime, dTime;
-var gameState = 0;
+
 
 var player, world;
 
 var keyPress = [];
 var keyboardKeys = [];
 
-var IS_DEBUG = true;
+var IS_DEBUG = false;
 
 function init() {
 	canvas = document.getElementById("game");
@@ -54,6 +54,14 @@ function init() {
 			player.addComponent(new ECS.Components.WorldPosition(0, 0));
 			player.addComponent(new ECS.Components.WorldFaces("north"));
 			player.addComponent(new ECS.Components.WorldMoves());
+			player.addComponent(new ECS.Components.WorldAnimation({
+				"standing":[0],
+				"spinning":[0, 1],
+				"jumping":[0, 1],
+				"sliding":[0, 1],
+				"walking":[0, 1],
+				"floating":[2, 3]
+			}));
 			player.addComponent(new ECS.Components.WorldCollider());
 			player.addComponent(new ECS.Components.WorldCanPush(1));
 
@@ -67,6 +75,10 @@ function init() {
 			player.c('inventory').items.push("Item1");
 			player.c('inventory').items.push("Item1");
 			player.addComponent(new ECS.Components.Trainer());
+			player.c('trainer').synthmon.push(new Synthmon());
+			player.c('trainer').synthmon.push(new Synthmon());
+			player.c('trainer').synthmon.push(new Synthmon());
+			player.c('trainer').synthmon.push(new Synthmon());
 
 			ECS.entities.push(player);
 
@@ -82,15 +94,17 @@ function init() {
 	xobj.send(null);
 }
 
-var systems = [
+ECS.States = {};
+
+ECS.States.WorldControl = [
 	ECS.Systems.WorldAI,
 	ECS.Systems.WorldKeyboard,
 	ECS.Systems.WorldCollision,
 	ECS.Systems.WorldLogic,
 	ECS.Systems.WorldRender
-];
+]
 
-var systems2 = [
+ECS.States.WorldUI = [
 	ECS.Systems.WorldAI,
 	ECS.Systems.UIKeyboard,
 	ECS.Systems.WorldCollision,
@@ -98,6 +112,18 @@ var systems2 = [
 	ECS.Systems.WorldRender,
 	ECS.Systems.WorldUI
 ]
+
+ECS.States.Battle = [
+	ECS.Systems.BattleControl,
+	ECS.Systems.BattleLogic,
+	ECS.Systems.BattleRender,
+	ECS.Systems.WorldUI
+]
+
+var gameState = 0;
+
+ECS.entities2 = [];
+
 
 
 
@@ -155,13 +181,18 @@ function gameLoop() {
 
 	switch(gameState) {
 		case 0:
-			for(var i = 0; i < systems.length; i++) {
-				systems[i](ECS.entities);
+			for(var i = 0; i < ECS.States.WorldControl.length; i++) {
+				ECS.States.WorldControl[i](ECS.entities);
 			}
 			break;
 		case 1:
-			for(var i = 0; i < systems2.length; i++) {
-				systems2[i](ECS.entities);
+			for(var i = 0; i < ECS.States.WorldUI.length; i++) {
+				ECS.States.WorldUI[i](ECS.entities);
+			}
+			break;
+		case 2:
+			for(var i = 0; i < ECS.States.Battle.length; i++) {
+				ECS.States.Battle[i](ECS.entities2);
 			}
 			break;
 	}
