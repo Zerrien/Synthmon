@@ -5,7 +5,7 @@
 		"boulder":"./src/assets/img/object_tiles/boulder.png",
 		"pushtile":"./src/assets/img/object_tiles/pushtile.png?",
 		"superpush":"./src/assets/img/object_tiles/superPushTile.png",
-		"stoppad":"./src/assets/img/object_tiles/stopTile.png",
+		"stoppad":"./src/assets/img/object_tiles/stopTile.png?",
 		"box":"./src/assets/img/object_tiles/cardboardBox.png",
 		"boxtiles":"./src/assets/img/object_tiles/cardboardBoxTiles.png",
 		"bigtree":"./src/assets/img/object_tiles/3x2tree.png",
@@ -25,6 +25,33 @@
 		"0,0":{
 			"source":"./src/assets/img/chunk_backgrounds/map2.png",
 			"objects":{
+				"superPush":{
+					"WorldSprite":{
+						"name":"superpush"
+					},
+					"WorldPosition":{
+						"x":5,
+						"y":0
+					},
+					"WorldFaces":{
+						"facing":"east"
+					},
+					"WorldSuperPusher":{
+
+					}
+				},
+				"stopper":{
+					"WorldSprite":{
+						"name":"stoppad"
+					},
+					"WorldPosition":{
+						"x":10,
+						"y":0
+					},
+					"WorldStopper":{
+						
+					}
+				},
 				"sliding1":{
 					"WorldSprite":{
 						"name":"iceyground"

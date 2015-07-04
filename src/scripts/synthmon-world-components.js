@@ -117,9 +117,11 @@ ECS.Components.WorldConveyor.prototype.name = "worldconveyor";
 ECS.Components.WorldSuperPusher = function WorldSuperPusher() {
 
 }
+ECS.Components.WorldSuperPusher.prototype.name = "worldsuperpusher";
 ECS.Components.WorldStopper = function WorldStopper() {
-	
+
 }
+ECS.Components.WorldStopper.prototype.name = "worldstopper";
 
 ECS.Components.WorldChatty = function WorldChatty(_saying) {
 	this.saying = _saying;

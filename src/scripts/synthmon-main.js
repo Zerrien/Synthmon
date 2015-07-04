@@ -60,7 +60,8 @@ function init() {
 				"jumping":[0, 1],
 				"sliding":[0, 1],
 				"walking":[0, 1],
-				"floating":[2, 3]
+				"floating":[2, 3],
+				"superpushed":[0,1]
 			}));
 			player.addComponent(new ECS.Components.WorldCollider());
 			player.addComponent(new ECS.Components.WorldCanPush(1));

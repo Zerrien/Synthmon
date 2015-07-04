@@ -249,6 +249,31 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 				var rwM = result.c("worldmoves");
 				rwM.state = "sliding";
 			}
+		} else if (entity.c("worldsuperpusher")) {
+			var wP = entity.c("worldposition");
+			var wF = entity.c("worldfaces");
+			var facingXY = wF.facingTile();
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				var rwM = result.c("worldmoves");
+				if(rwM.state == "standing") {
+					rwM.state = "superpushed";
+					rwM.destX = facingXY.x;
+					rwM.destY = facingXY.y;
+				}
+			}
+		} else if (entity.c("worldstopper")) {
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				var rwM = result.c("worldmoves");
+				if(rwM.state == "superpushed") {
+					rwM.state = "walking"
+				} else {
+					
+				}
+				
+			}
 		}
 	}
 }
@@ -360,11 +385,15 @@ ECS.Systems.WorldLogic = function WorldLogic(_e) {
 					wM.curCycle = 0;
 					wP.x += wM.destX;
 					wP.y += wM.destY;
-					if(wM.state != "sliding") {
+					if(!(wM.state == "sliding" || wM.state == "superpushed")) {
 						wM.destX = 0;
 						wM.destY = 0;
 					}
-					wM.state = "standing";
+					if(wM.state != "superpushed") {
+						wM.state = "standing";
+					} else {
+					}
+					
 				}
 			}
 		}
@@ -449,7 +478,7 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 						console.warn("There is no WorldAnimation parameter for: " + wM.state);
 					}
 				}
-				if(wM && wM.state == "spinning") {
+				if(wM && (wM.state == "spinning" || wM.state == "superpushed")) {
 					sourceX = Math.floor(tTime / 120) % 4 * TILE_SIZE;
 				} else {
 					switch(wF.facing) {
