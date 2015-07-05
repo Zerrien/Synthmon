@@ -45,3 +45,4 @@ ECS.Components.UIDialogueBox = function UIDialogueBox(_string) {
 	this.string = _string;
 }
 ECS.Components.UIDialogueBox.prototype.name = "uidialoguebox";
+

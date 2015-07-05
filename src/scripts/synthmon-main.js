@@ -164,7 +164,7 @@ function loadZone(_name) {
 		door.addComponent(new ECS.Components.WorldCollider());
 		door.addComponent(new ECS.Components.WorldPortal(0, {
 			"x":12,
-			"y":5,
+			"y":2,
 			"facing":"south"
 		}));
 		ECS.entities.push(door);

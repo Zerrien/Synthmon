@@ -48,8 +48,15 @@ function checkCollision(_e, _x, _y, _ex) {
 				}
 			} else if (wP && entity.c("worldlargecollision")) {
 				var wLC = entity.c("worldlargecollision")
-				if(wP.x + wLC.xOffset <= _x && wP.x + wLC.xOffset + wLC.width > _x && wP.y + wLC.yOffset <= _y && wP.y + wLC.yOffset + wLC.height > _y) {
-					return entity;
+				var wO = entity.c("worldoffset");
+				if(wO) {
+					if(wP.x + wLC.xOffset + wO.xOffset <= _x && wP.x + wLC.xOffset + wLC.width + wO.xOffset > _x && wP.y + wLC.yOffset + wO.yOffset <= _y && wP.y + wLC.yOffset + wLC.height + wO.yOffset > _y) {
+						return entity;
+					}
+				} else {
+					if(wP.x + wLC.xOffset <= _x && wP.x + wLC.xOffset + wLC.width > _x && wP.y + wLC.yOffset <= _y && wP.y + wLC.yOffset + wLC.height > _y) {
+						return entity;
+					}
 				}
 			}
 		}
@@ -270,7 +277,7 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 				if(rwM.state == "superpushed") {
 					rwM.state = "walking"
 				} else {
-					
+
 				}
 				
 			}
@@ -279,6 +286,57 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 }
 
 ECS.Systems.WorldCollision = function WorldCollision(_e) {
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var wP = entity.c("worldposition");
+		var wM = entity.c("worldmoves");
+		if(wP && wM) {
+			if(wP.state != "standing") {
+				var result = checkCollision(_e, wP.x + wM.destX, wP.y + wM.destY, entity);
+				if(result) {
+					if(result.c("worldpushable") && result.c("worldmoves")) {
+						var rwM = result.c("worldmoves");
+						if(rwM.state == "standing") {
+							rwM.state = "walking";
+							rwM.curSpeed = 500;
+							rwM.destX = wM.destX;
+							rwM.destY = wM.destY;
+							rwM.curCycle = 0;
+						}
+					} else if (result.c("worldportal")) {
+						var rwP = result.c("worldposition");
+						var rwPo = result.c("worldportal");
+						var rwO = result.c("worldoffset");
+						var xOff = (rwPo.xOff || 0) + (rwO ? rwO.xOffset : 0);
+						var yOff = (rwPo.yOff || 0) + (rwO ? rwO.yOffset : 0);
+						if(rwP.x + xOff == wP.x + wM.destX && rwP.y + yOff == wP.y + wM.destY) {
+							ECS.entities = [];
+							ECS.entities.push(player);
+
+							for(var keyID in keyboardKeys) {
+								keyboardKeys[keyID] = false;
+							}
+
+							wP.x = rwPo.params.x;
+							wP.y = rwPo.params.y;
+							wP.zone = rwPo.destination;
+
+							loadZone(rwPo.destination);
+						}
+					} else if (result.c("worldfacingcollider")) {
+						if(result.c("worldfaces").facing == entity.c("worldfaces").facing) {
+							return;
+						}
+					}
+					wM.state = "standing";
+					wM.destX = 0;
+					wM.destY = 0;
+					wM.curCycle = 0;
+				}
+			}
+		}
+	}
+	/*
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
@@ -371,6 +429,7 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 			}
 		}
 	}
+	*/
 }
 
 ECS.Systems.WorldLogic = function WorldLogic(_e) {
@@ -415,9 +474,6 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 		var pShiftY = pShift.curCycle / pShift.curSpeed * 32 * pShift.destY;
 		ctx.scale(worldScale, worldScale);
 		ctx.translate(canvas.width / 2 / worldScale - pPos.x * 32 - pShiftX - 16, canvas.height / 2 / worldScale - pPos.y * 32 - pShiftY - 16);
-
-
-
 		if(pPos.zone == 0) {
 			var pChunkX = pPos.x >> 5;
 			var pChunkY = pPos.y >> 5;
@@ -433,8 +489,38 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			ctx.drawImage(world.images.interiors["houseA"], 0, 0);
 		}
 	}
+
+
+	var anArray = [];
 	for(var entityID in _e) {
 		var entity = _e[entityID];
+		var wP = entity.c("worldposition");
+		var wS = entity.c("worldsprite");
+		if(wP && wS) {
+			anArray.push(entity);
+		}
+	}
+
+	anArray.sort(function(_a, _b) {
+		var aP = _a.c("worldfloor");
+		var bP = _b.c("worldfloor");
+
+		if(aP && bP) {
+			return 0;
+		} else if (aP) {
+			return -1;
+		} else if (bP) {
+			return 1;
+		} else {
+			return 0;
+		}
+
+
+	});
+
+
+	for(var entityID in anArray) {
+		var entity = anArray[entityID];
 		var wP = entity.c("worldposition");
 		var wS = entity.c("worldsprite");
 
@@ -444,6 +530,7 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			var wSh = entity.c("worldsheet");
 			var wSi = entity.c("worldsize");
 			var wA = entity.c("worldanimation");
+			var wO = entity.c("worldoffset");
 
 			var TILE_SIZE = 32;
 			var width, height;
@@ -458,6 +545,10 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 
 			destX = wP.x * TILE_SIZE;
 			destY = wP.y * TILE_SIZE;
+			if(wO) {
+				destX += wO.xOffset * TILE_SIZE;
+				destY += wO.yOffset * TILE_SIZE;
+			}
 
 			var shiftX, shiftY;
 			shiftX = shiftY = 0;
@@ -525,7 +616,12 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 				ctx.strokeRect(wP.x * 32 + 4, wP.y * 32 + 4, 32 - 8, 32 - 8);
 			} else if (entity.c("worldlargecollision")) {
 				var wLC = entity.c("worldlargecollision");
-				ctx.strokeRect((wP.x + wLC.xOffset) * 32 + 4, (wP.y + wLC.yOffset) * 32 + 4, 32 * wLC.width - 8, 32 * wLC.height - 8);
+				var wO = entity.c("worldoffset");
+				if(wO) {
+					ctx.strokeRect((wP.x + wLC.xOffset + wO.xOffset) * 32 + 4, (wP.y + wLC.yOffset + wO.yOffset) * 32 + 4, 32 * wLC.width - 8, 32 * wLC.height - 8);
+				} else {
+					ctx.strokeRect((wP.x + wLC.xOffset) * 32 + 4, (wP.y + wLC.yOffset) * 32 + 4, 32 * wLC.width - 8, 32 * wLC.height - 8);
+				}
 			}
 		}
 	}

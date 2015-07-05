@@ -25,6 +25,25 @@
 		"0,0":{
 			"source":"./src/assets/img/chunk_backgrounds/map2.png",
 			"objects":{
+				"boulder":{
+					"WorldSprite":{
+						"name":"boulder"
+					},
+					"WorldPosition":{
+						"x":0,
+						"y":5
+					},
+					"WorldCollider":{
+
+					},
+					"WorldPushable":{
+
+					},
+					"WorldMoves":{
+						
+					}
+				},
+
 				"superPush":{
 					"WorldSprite":{
 						"name":"superpush"
@@ -38,6 +57,9 @@
 					},
 					"WorldSuperPusher":{
 
+					},
+					"WorldFloor":{
+
 					}
 				},
 				"stopper":{
@@ -45,10 +67,13 @@
 						"name":"stoppad"
 					},
 					"WorldPosition":{
-						"x":10,
+						"x":9,
 						"y":0
 					},
 					"WorldStopper":{
+						
+					},
+					"WorldFloor":{
 						
 					}
 				},
@@ -61,6 +86,9 @@
 						"y":4
 					},
 					"WorldSlippery":{
+					},
+					"WorldFloor":{
+						
 					}
 				},
 				"sliding2":{
@@ -72,6 +100,9 @@
 						"y":4
 					},
 					"WorldSlippery":{
+					},
+					"WorldFloor":{
+						
 					}
 				},
 				"conveyor":{
@@ -86,6 +117,9 @@
 						"facing":"south"
 					},
 					"WorldConveyor":{
+					},
+					"WorldFloor":{
+						
 					}
 
 				},
@@ -101,6 +135,9 @@
 						"facing":"east"
 					},
 					"WorldConveyor":{
+					},
+					"WorldFloor":{
+						
 					}
 
 				},
@@ -116,6 +153,9 @@
 						"facing":"north"
 					},
 					"WorldConveyor":{
+					},
+					"WorldFloor":{
+						
 					}
 
 				},
@@ -153,6 +193,9 @@
 					},
 					"WorldFacingCollider":{
 
+					},
+					"WorldFloor":{
+						
 					}
 				},
 				"mainStore":{
@@ -177,6 +220,10 @@
 						"width":5,
 						"height":4
 					},
+					"WorldOffset":{
+						"xOffset":0,
+						"yOffset":-3
+					},
 					"WorldLargeCollision":{
 						"width":5,
 						"height":3,
@@ -191,6 +238,9 @@
 					"WorldPosition":{
 						"x":1,
 						"y":2
+					},
+					"WorldFloor":{
+						
 					}
 				},
 				"theGrass3":{
@@ -200,6 +250,9 @@
 					"WorldPosition":{
 						"x":2,
 						"y":2
+					},
+					"WorldFloor":{
+						
 					}
 				},
 				"theGras4s":{
@@ -209,6 +262,9 @@
 					"WorldPosition":{
 						"x":1,
 						"y":1
+					},
+					"WorldFloor":{
+						
 					}
 				},
 				"theGra5ss":{
@@ -218,6 +274,9 @@
 					"WorldPosition":{
 						"x":2,
 						"y":1
+					},
+					"WorldFloor":{
+						
 					}
 				}
 			}

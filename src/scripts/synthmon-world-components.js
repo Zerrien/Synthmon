@@ -80,13 +80,21 @@ ECS.Components.WorldLargeCollision = function WorldLargeCollision(_w, _h, _x, _y
 	this.yOffset = _y || 0;
 }
 ECS.Components.WorldLargeCollision.prototype.name = "worldlargecollision";
-ECS.Components.WorldSize = function WorldSize(_w, _h, _x, _y) {
+
+ECS.Components.WorldSize = function WorldSize(_w, _h) {
 	this.width = _w || 1;
 	this.height = _h || 1;
-	this.xAnchor = _x || 0;
-	this.yAnchor = _y || 0;
 }
 ECS.Components.WorldSize.prototype.name = "worldsize";
+
+
+ECS.Components.WorldOffset = function WorldOffset(_x, _y) {
+	this.xOffset = _x || 0;
+	this.yOffset = _y || 0;
+}
+
+ECS.Components.WorldOffset.prototype.name = "worldoffset";
+
 
 ECS.Components.WorldPushable = function WorldPushable() {
 }
@@ -131,3 +139,8 @@ ECS.Components.WorldChatty.prototype.name = "worldchatty";
 ECS.Components.WorldSlippery = function WorldSlippery() {
 }
 ECS.Components.WorldSlippery.prototype.name = "worldslippery";
+
+ECS.Components.WorldFloor = function WorldFloor() {
+
+}
+ECS.Components.WorldFloor.prototype.name = "worldfloor";
