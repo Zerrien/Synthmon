@@ -19,7 +19,7 @@
 
 	
 	$fHandle = fopen("../json/theworld.json", 'w') or die("Can't open file.");
-	fwrite($fHandle, json_encode($world));
+	fwrite($fHandle, json_encode($world, JSON_PRETTY_PRINT));
 	fClose($fHandle);
 	
 ?>

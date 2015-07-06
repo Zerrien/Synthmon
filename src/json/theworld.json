@@ -1,336 +1,335 @@
 {
-	"images":{
-		"explorer":"./src/assets/img/object_tiles/explorer32.png?a=d",
-		"door":"./src/assets/img/object_tiles/door.png",
-		"boulder":"./src/assets/img/object_tiles/boulder.png",
-		"pushtile":"./src/assets/img/object_tiles/pushtile.png?",
-		"superpush":"./src/assets/img/object_tiles/superPushTile.png",
-		"stoppad":"./src/assets/img/object_tiles/stopTile.png?",
-		"box":"./src/assets/img/object_tiles/cardboardBox.png",
-		"boxtiles":"./src/assets/img/object_tiles/cardboardBoxTiles.png",
-		"bigtree":"./src/assets/img/object_tiles/3x2tree.png",
-		"shoppe":"./src/assets/img/object_tiles/shoppe.png",
-		"tallgrass":"./src/assets/img/object_tiles/bush.png",
-		"chatter":"./src/assets/img/object_tiles/genericNPC.png",
-		"cliffs":"./src/assets/img/object_tiles/cliffs.png",
-		"iceyground":"./src/assets/img/object_tiles/iceyground.png",
+    "images": {
+        "explorer": ".\/src\/assets\/img\/object_tiles\/explorer32.png?a=d",
+        "door": ".\/src\/assets\/img\/object_tiles\/door.png",
+        "boulder": ".\/src\/assets\/img\/object_tiles\/boulder.png",
+        "pushtile": ".\/src\/assets\/img\/object_tiles\/pushtile.png?",
+        "superpush": ".\/src\/assets\/img\/object_tiles\/superPushTile.png",
+        "stoppad": ".\/src\/assets\/img\/object_tiles\/stopTile.png?",
+        "box": ".\/src\/assets\/img\/object_tiles\/cardboardBox.png",
+        "boxtiles": ".\/src\/assets\/img\/object_tiles\/cardboardBoxTiles.png",
+        "bigtree": ".\/src\/assets\/img\/object_tiles\/3x2tree.png",
+        "shoppe": ".\/src\/assets\/img\/object_tiles\/shoppe.png",
+        "tallgrass": ".\/src\/assets\/img\/object_tiles\/bush.png",
+        "chatter": ".\/src\/assets\/img\/object_tiles\/genericNPC.png",
+        "cliffs": ".\/src\/assets\/img\/object_tiles\/cliffs.png",
+        "iceyground": ".\/src\/assets\/img\/object_tiles\/iceyground.png",
+        "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
+        "player": ".\/src\/assets\/img\/characters\/player.png",
+        "piggen_front": ".\/src\/assets\/img\/synthmon\/piggen.png",
+        "piggen_back": ".\/src\/assets\/img\/synthmon\/piggen2.png"
+    },
+    "chunks": {
+        "0,0": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png",
+            "objects": {
+                "boulder": {
+                    "WorldSprite": {
+                        "name": "boulder"
+                    },
+                    "WorldPosition": {
+                        "x": 0,
+                        "y": 5
+                    },
+                    "WorldCollider": [
 
-		"opponent":"./src/assets/img/characters/opponent.png",
-		"player":"./src/assets/img/characters/player.png",
+                    ],
+                    "WorldPushable": [
 
-		"piggen_front":"./src/assets/img/synthmon/piggen.png",
-		"piggen_back":"./src/assets/img/synthmon/piggen2.png"
-	},
-	"chunks":{
-		"0,0":{
-			"source":"./src/assets/img/chunk_backgrounds/map2.png",
-			"objects":{
-				"boulder":{
-					"WorldSprite":{
-						"name":"boulder"
-					},
-					"WorldPosition":{
-						"x":0,
-						"y":5
-					},
-					"WorldCollider":{
+                    ],
+                    "WorldMoves": [
 
-					},
-					"WorldPushable":{
+                    ]
+                },
+                "superPush": {
+                    "WorldSprite": {
+                        "name": "superpush"
+                    },
+                    "WorldPosition": {
+                        "x": 5,
+                        "y": 0
+                    },
+                    "WorldFaces": {
+                        "facing": "east"
+                    },
+                    "WorldSuperPusher": [
 
-					},
-					"WorldMoves":{
-						
-					}
-				},
+                    ],
+                    "WorldFloor": [
 
-				"superPush":{
-					"WorldSprite":{
-						"name":"superpush"
-					},
-					"WorldPosition":{
-						"x":5,
-						"y":0
-					},
-					"WorldFaces":{
-						"facing":"east"
-					},
-					"WorldSuperPusher":{
+                    ]
+                },
+                "stopper": {
+                    "WorldSprite": {
+                        "name": "stoppad"
+                    },
+                    "WorldPosition": {
+                        "x": 9,
+                        "y": 0
+                    },
+                    "WorldStopper": [
 
-					},
-					"WorldFloor":{
+                    ],
+                    "WorldFloor": [
 
-					}
-				},
-				"stopper":{
-					"WorldSprite":{
-						"name":"stoppad"
-					},
-					"WorldPosition":{
-						"x":9,
-						"y":0
-					},
-					"WorldStopper":{
-						
-					},
-					"WorldFloor":{
-						
-					}
-				},
-				"sliding1":{
-					"WorldSprite":{
-						"name":"iceyground"
-					},
-					"WorldPosition":{
-						"x":4,
-						"y":4
-					},
-					"WorldSlippery":{
-					},
-					"WorldFloor":{
-						
-					}
-				},
-				"sliding2":{
-					"WorldSprite":{
-						"name":"iceyground"
-					},
-					"WorldPosition":{
-						"x":5,
-						"y":4
-					},
-					"WorldSlippery":{
-					},
-					"WorldFloor":{
-						
-					}
-				},
-				"conveyor":{
-					"WorldSprite":{
-						"name":"pushtile"
-					},
-					"WorldPosition": {
-						"x":5,
-						"y":7
-					},
-					"WorldFaces":{
-						"facing":"south"
-					},
-					"WorldConveyor":{
-					},
-					"WorldFloor":{
-						
-					}
+                    ]
+                },
+                "sliding1": {
+                    "WorldSprite": {
+                        "name": "iceyground"
+                    },
+                    "WorldPosition": {
+                        "x": 4,
+                        "y": 4
+                    },
+                    "WorldSlippery": [
 
-				},
-				"conveyor2":{
-					"WorldSprite":{
-						"name":"pushtile"
-					},
-					"WorldPosition": {
-						"x":5,
-						"y":8
-					},
-					"WorldFaces":{
-						"facing":"east"
-					},
-					"WorldConveyor":{
-					},
-					"WorldFloor":{
-						
-					}
+                    ],
+                    "WorldFloor": [
 
-				},
-				"conveyor3":{
-					"WorldSprite":{
-						"name":"pushtile"
-					},
-					"WorldPosition": {
-						"x":6,
-						"y":8
-					},
-					"WorldFaces":{
-						"facing":"north"
-					},
-					"WorldConveyor":{
-					},
-					"WorldFloor":{
-						
-					}
+                    ]
+                },
+                "sliding2": {
+                    "WorldSprite": {
+                        "name": "iceyground"
+                    },
+                    "WorldPosition": {
+                        "x": 5,
+                        "y": 4
+                    },
+                    "WorldSlippery": [
 
-				},
-				"chatter":{
-					"WorldSprite":{
-						"name":"chatter"
-					},
-					"WorldPosition":{
-						"x":1,
-						"y":0
-					},
-					"WorldFaces":{
-						"facing":"south"
-					},
-					"WorldCollider":{
+                    ],
+                    "WorldFloor": [
 
-					},
-					"WorldChatty":{
-						"saying":"Shorts! Shorts! I love shorts!"
-					}
-				},
-				"cliffFace":{
-					"WorldSprite":{
-						"name":"cliffs"
-					},
-					"WorldPosition":{
-						"x":3,
-						"y":0
-					},
-					"WorldConveyor":{
-						"type":"jumping"
-					},
-					"WorldFaces":{
-						"facing":"east"
-					},
-					"WorldFacingCollider":{
+                    ]
+                },
+                "conveyor": {
+                    "WorldSprite": {
+                        "name": "pushtile"
+                    },
+                    "WorldPosition": {
+                        "x": 5,
+                        "y": 7
+                    },
+                    "WorldFaces": {
+                        "facing": "south"
+                    },
+                    "WorldConveyor": [
 
-					},
-					"WorldFloor":{
-						
-					}
-				},
-				"mainStore":{
-					"WorldSprite":{
-						"name":"shoppe"
-					},
-					"WorldPosition":{
-						"x":10,
-						"y":1
-					},
-					"WorldPortal":{
-						"dest":"houseA",
-						"xOff":2,
-						"yOff":3,
-						"params":{
-							"x":6,
-							"y":11,
-							"facing":"north"
-						}
-					},
-					"WorldSize":{
-						"width":5,
-						"height":4
-					},
-					"WorldOffset":{
-						"xOffset":0,
-						"yOffset":-3
-					},
-					"WorldLargeCollision":{
-						"width":5,
-						"height":3,
-						"xOffset":0,
-						"yOffset":1
-					}
-				},
-				"theGrass":{
-					"WorldSprite":{
-						"name":"tallgrass"
-					},
-					"WorldPosition":{
-						"x":1,
-						"y":2
-					},
-					"WorldFloor":{
-						
-					}
-				},
-				"theGrass3":{
-					"WorldSprite":{
-						"name":"tallgrass"
-					},
-					"WorldPosition":{
-						"x":2,
-						"y":2
-					},
-					"WorldFloor":{
-						
-					}
-				},
-				"theGras4s":{
-					"WorldSprite":{
-						"name":"tallgrass"
-					},
-					"WorldPosition":{
-						"x":1,
-						"y":1
-					},
-					"WorldFloor":{
-						
-					}
-				},
-				"theGra5ss":{
-					"WorldSprite":{
-						"name":"tallgrass"
-					},
-					"WorldPosition":{
-						"x":2,
-						"y":1
-					},
-					"WorldFloor":{
-						
-					}
-				}
-			}
-		},
-		"1,0":{
-			"source":"./src/assets/img/chunk_backgrounds/map3.png",
-			"objects":{
-				"theGra5ss":{
-					"WorldSprite":{
-						"name":"tallgrass"
-					},
-					"WorldPosition":{
-						"x":2,
-						"y":1
-					}
-				}
-			}
-		},
-		"-1,0":{
-			"source":"./src/assets/img/chunk_backgrounds/map4.png"
-		},
-		"-1,-1":{
-			"source":"./src/assets/img/chunk_backgrounds/map2.png"
-		},
-		"0,-1":{
-			"source":"./src/assets/img/chunk_backgrounds/map3.png"
-		},
-		"1,-1":{
-			"source":"./src/assets/img/chunk_backgrounds/map4.png"
-		},
-		"-1,1":{
-			"source":"./src/assets/img/chunk_backgrounds/map2.png"
-		},
-		"0,1":{
-			"source":"./src/assets/img/chunk_backgrounds/map3.png"
-		},
-		"1,1":{
-			"source":"./src/assets/img/chunk_backgrounds/map4.png"
-		}
-	},
-	"interior":{
-		"houseA":{
-			"source":"./src/assets/img/chunk_backgrounds/map5.png",
-			"objects":[
-				{
-					"source":"door",
-					"components":[
-						"",
-						"",
-						"",
-						""
-					]
-				}
-			]
-		}
-	}
+                    ],
+                    "WorldFloor": [
+
+                    ]
+                },
+                "conveyor2": {
+                    "WorldSprite": {
+                        "name": "pushtile"
+                    },
+                    "WorldPosition": {
+                        "x": 5,
+                        "y": 8
+                    },
+                    "WorldFaces": {
+                        "facing": "east"
+                    },
+                    "WorldConveyor": [
+
+                    ],
+                    "WorldFloor": [
+
+                    ]
+                },
+                "conveyor3": {
+                    "WorldSprite": {
+                        "name": "pushtile"
+                    },
+                    "WorldPosition": {
+                        "x": 6,
+                        "y": 8
+                    },
+                    "WorldFaces": {
+                        "facing": "north"
+                    },
+                    "WorldConveyor": [
+
+                    ],
+                    "WorldFloor": [
+
+                    ]
+                },
+                "chatter": {
+                    "WorldSprite": {
+                        "name": "chatter"
+                    },
+                    "WorldPosition": {
+                        "x": 1,
+                        "y": 0
+                    },
+                    "WorldFaces": {
+                        "facing": "south"
+                    },
+                    "WorldCollider": [
+
+                    ],
+                    "WorldChatty": {
+                        "saying": "Shorts! Shorts! I love shorts!"
+                    }
+                },
+                "cliffFace": {
+                    "WorldSprite": {
+                        "name": "cliffs"
+                    },
+                    "WorldPosition": {
+                        "x": 3,
+                        "y": 0
+                    },
+                    "WorldConveyor": {
+                        "type": "jumping"
+                    },
+                    "WorldFaces": {
+                        "facing": "east"
+                    },
+                    "WorldFacingCollider": [
+
+                    ],
+                    "WorldFloor": [
+
+                    ]
+                },
+                "mainStore": {
+                    "WorldSprite": {
+                        "name": "shoppe"
+                    },
+                    "WorldPosition": {
+                        "x": 10,
+                        "y": 1
+                    },
+                    "WorldPortal": {
+                        "dest": "houseA",
+                        "xOff": 2,
+                        "yOff": 3,
+                        "params": {
+                            "x": 6,
+                            "y": 11,
+                            "facing": "north"
+                        }
+                    },
+                    "WorldSize": {
+                        "width": 5,
+                        "height": 4
+                    },
+                    "WorldOffset": {
+                        "xOffset": 0,
+                        "yOffset": -3
+                    },
+                    "WorldLargeCollision": {
+                        "width": 5,
+                        "height": 3,
+                        "xOffset": 0,
+                        "yOffset": 1
+                    }
+                },
+                "theGrass": {
+                    "WorldSprite": {
+                        "name": "tallgrass"
+                    },
+                    "WorldPosition": {
+                        "x": 1,
+                        "y": 2
+                    },
+                    "WorldFloor": [
+
+                    ]
+                },
+                "theGrass3": {
+                    "WorldSprite": {
+                        "name": "tallgrass"
+                    },
+                    "WorldPosition": {
+                        "x": 2,
+                        "y": 2
+                    },
+                    "WorldFloor": [
+
+                    ]
+                },
+                "theGras4s": {
+                    "WorldSprite": {
+                        "name": "tallgrass"
+                    },
+                    "WorldPosition": {
+                        "x": 1,
+                        "y": 1
+                    },
+                    "WorldFloor": [
+
+                    ]
+                },
+                "theGra5ss": {
+                    "WorldSprite": {
+                        "name": "tallgrass"
+                    },
+                    "WorldPosition": {
+                        "x": 2,
+                        "y": 1
+                    },
+                    "WorldFloor": [
+
+                    ]
+                }
+            }
+        },
+        "1,0": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map3.png",
+            "objects": {
+                "theGra5ss": {
+                    "WorldSprite": {
+                        "name": "tallgrass"
+                    },
+                    "WorldPosition": {
+                        "x": 2,
+                        "y": 1
+                    }
+                }
+            }
+        },
+        "-1,0": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map4.png"
+        },
+        "-1,-1": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png"
+        },
+        "0,-1": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map3.png"
+        },
+        "1,-1": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map4.png"
+        },
+        "-1,1": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png"
+        },
+        "0,1": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map3.png"
+        },
+        "1,1": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map4.png"
+        }
+    },
+    "interior": {
+        "houseA": {
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map5.png",
+            "objects": [
+                {
+                    "source": "door",
+                    "components": [
+                        "",
+                        "",
+                        "",
+                        ""
+                    ]
+                }
+            ]
+        }
+    }
 }

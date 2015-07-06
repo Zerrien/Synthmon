@@ -19,6 +19,7 @@ function ImageController() {
 	}
 }
 
+
 var worldMenuController = {
 	"worldmainmenu":{
 		"make":function() {

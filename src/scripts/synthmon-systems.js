@@ -294,11 +294,11 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 			if(wP.state != "standing") {
 				var result = checkCollision(_e, wP.x + wM.destX, wP.y + wM.destY, entity);
 				if(result) {
-					if(result.c("worldpushable") && result.c("worldmoves")) {
+					if(result.c("worldpushable") && result.c("worldmoves") && entity.c("worldcanpush")) {
 						var rwM = result.c("worldmoves");
 						if(rwM.state == "standing") {
 							rwM.state = "walking";
-							rwM.curSpeed = 500;
+							rwM.curSpeed = 250;
 							rwM.destX = wM.destX;
 							rwM.destY = wM.destY;
 							rwM.curCycle = 0;
@@ -307,7 +307,7 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 						var rwP = result.c("worldposition");
 						var rwPo = result.c("worldportal");
 						var rwO = result.c("worldoffset");
-						var xOff = (rwPo.xOff || 0) + (rwO ? rwO.xOffset : 0);
+						var xOff = (rwPo.xOff || 0) + (rwO ? rwO.xOffset : 0); //Mmm ternary
 						var yOff = (rwPo.yOff || 0) + (rwO ? rwO.yOffset : 0);
 						if(rwP.x + xOff == wP.x + wM.destX && rwP.y + yOff == wP.y + wM.destY) {
 							ECS.entities = [];
@@ -336,100 +336,6 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 			}
 		}
 	}
-	/*
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var wP = entity.c("worldposition");
-		var wM = entity.c("worldmoves");
-		var wCP = entity.c("worldcanpush");
-		if(wP && wM && wM.state != "standing") {
-			var result = checkCollision(_e, wP.x + wM.destX, wP.y + wM.destY, entity);
-			if(result) {
-				var rwM = result.c("worldmoves");
-				var rwP = result.c("worldportal");
-				if(rwM) {
-					if(result.c("worldpushable") && rwM.state == "standing" && wCP && wCP.curStrength >= 1) {
-						rwM.state = "walking";
-						rwM.curSpeed = 500;
-						rwM.destX = wM.destX;
-						rwM.destY = wM.destY;
-						rwM.curCycle = 0;
-
-						wM.state = "standing";
-						wM.destX = 0;
-						wM.destY = 0;
-						wM.curCycle = 0;
-
-						if(result.c("worldcanpush")) {
-							result.c("worldcanpush").curStrength = wCP.curStrength - 1;
-						}
-					} else {
-						wM.state = "standing";
-						wM.destX = 0;
-						wM.destY = 0;
-						wM.curCycle = 0;
-					}
-				} else if (rwP && entity == player) {
-					if(rwP.xOff && rwP.yOff) {
-						if(result.c("worldposition").x + rwP.xOff == wP.x + wM.destX && result.c("worldposition").y + rwP.yOff == wP.y + wM.destY) {
-							ECS.entities = [];
-							ECS.entities.push(player);
-
-							for(var keyID in keyboardKeys) {
-								keyboardKeys[keyID] = false;
-							}
-
-							wP.x = rwP.params.x;
-							wP.y = rwP.params.y;
-							wP.zone = rwP.destination;
-
-							loadZone(rwP.destination);
-						}
-
-
-						wM.state = "standing";
-						wM.destX = 0;
-						wM.destY = 0;
-						wM.curCycle = 0;
-					} else {
-						ECS.entities = [];
-						ECS.entities.push(player);
-
-						wM.state = "standing";
-						wM.destX = 0;
-						wM.destY = 0;
-						wM.curCycle = 0;
-
-						for(var keyID in keyboardKeys) {
-							keyboardKeys[keyID] = false;
-						}
-
-						wP.x = rwP.params.x;
-						wP.y = rwP.params.y;
-						wP.zone = rwP.destination;
-
-						loadZone(rwP.destination);
-					}
-				} else if (result.c("worldfacingcollider")) {
-					if(result.c("worldfaces").facing != entity.c("worldfaces").facing) {
-						wM.state = "standing";
-						wM.destX = 0;
-						wM.destY = 0;
-						wM.curCycle = 0;
-					} else {
-
-					}
-				} else {
-					wM.state = "standing";
-					wM.destX = 0;
-					wM.destY = 0;
-					wM.curCycle = 0;
-				}
-				
-			}
-		}
-	}
-	*/
 }
 
 ECS.Systems.WorldLogic = function WorldLogic(_e) {
@@ -495,27 +401,44 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
-		var wS = entity.c("worldsprite");
-		if(wP && wS) {
+		if(wP) {
 			anArray.push(entity);
 		}
 	}
 
 	anArray.sort(function(_a, _b) {
-		var aP = _a.c("worldfloor");
-		var bP = _b.c("worldfloor");
-
-		if(aP && bP) {
+		var aF = _a.c("worldfloor");
+		var bF = _b.c("worldfloor");
+		if(aF && bF) {
 			return 0;
-		} else if (aP) {
+		} else if (aF) {
 			return -1;
-		} else if (bP) {
+		} else if (bF) {
 			return 1;
 		} else {
-			return 0;
+			var aP = _a.c("worldposition");
+			var bP = _b.c("worldposition");
+			if(aP.y < bP.y) {
+				return -1;
+			} else if (aP.y > bP.y ) {
+				return 1;
+			} else {
+				var aM = _a.c("worldmoves");
+				var bM = _b.c("worldmoves");
+				if(aM && bM) {
+					if(aP.y + aM.destY < bP.y + bM.destY) {
+						return -1;
+					} else if (aP.y + aM.destY > bP.y + bM.destY) {
+						return 1;
+					} else {
+						return 0;
+					}
+				} else {
+					return 0;
+				}
+			}
+
 		}
-
-
 	});
 
 

@@ -91,6 +91,7 @@ function loadZone() {
 				console.warn("Unable to find component of type:" + componentID)
 			}
 		}
+		entity.id = obj;
 		ECS.entities.push(entity);
 	}
 }
@@ -126,9 +127,31 @@ function checkXY(_e, _x, _y) {
 var curSelect = null;
 
 function makeTooltip() {
-	clearTooltip();
+	var prevPos = clearTooltip();
 
 	var tooltip = document.createElement("div");
+	tooltip.onmousedown = function(_e) {
+		if(_e.layerY < 10) {
+			this.isclicked = true;
+			this.xOffset = _e.layerX;
+			this.yOffset = _e.layerY;
+		}
+	}
+	tooltip.onmousemove = function(_e) {
+		if(_e.layerY < 10) {
+			this.style.cursor = "pointer";
+		} else {
+			this.style.cursor = "default";
+		}
+		if(this.isclicked) {
+			tooltip.style.left = _e.clientX - this.xOffset;
+			tooltip.style.top = _e.clientY - this.yOffset;
+		}
+	}
+	tooltip.onmouseup = function() {
+		this.isclicked = false;
+	}
+
 	tooltip.id = "tooltip";
 	tooltip.style.width = "400px"
 	tooltip.innerHTML = "Entity";
@@ -136,8 +159,8 @@ function makeTooltip() {
 	tooltip.style.backgroundColor = "#444444";
 	tooltip.style.color = "white";
 	tooltip.style.padding = "8px";
-	tooltip.style.left = mousePos2.x + 32;
-	tooltip.style.top = mousePos2.y - 32;
+	tooltip.style.left = prevPos ? prevPos.x : mousePos.x + 32;
+	tooltip.style.top = prevPos ? prevPos.y : mousePos.y - 32;
 
 	for(var _component in curSelect.components) {
 		var component = document.createElement("div");
@@ -172,9 +195,6 @@ function makeTooltip() {
 				component.appendChild(variable);
 			}
 		}
-
-		
-
 		tooltip.appendChild(component);
 	}
 	var blankDiv = document.createElement("div");
@@ -191,8 +211,9 @@ function makeTooltip() {
 
 				var obj = {};
 				obj[this.value] = {};
-				worldData.chunks["1,0"]["objects"][curSelect.id] = obj;
+				worldData.chunks["1,0"]["objects"][curSelect.id][this.value] = obj;
 	
+				/*
 				var xObj = new XMLHttpRequest();
 				xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
 				xObj.onreadystatechange = function() {
@@ -200,6 +221,7 @@ function makeTooltip() {
 					}
 				}
 				xObj.send();
+				*/
 
 
 				makeTooltip();
@@ -223,8 +245,11 @@ function clearTooltip() {
 	}
 	var tooltip = document.getElementById("tooltip");
 	if(tooltip) {
+
 		tooltip.parentNode.removeChild(tooltip);
+		return {x:tooltip.style.left, y:tooltip.style.top};
 	}
+	return null;
 }
 
 function makeImageSelect() {
@@ -248,12 +273,12 @@ function makeImageSelect() {
 			/****
 	!!!!!!!!!!!!!!!!!!!!
 			*/
-			worldData.chunks["1,0"]["objects"][curSelect.id] = {
-				"WorldSprite":{
-					"name":"boulder"
-				}
+			worldData.chunks["1,0"]["objects"][curSelect.id].WorldSprite = {
+				"name":"boulder"
 			};
+			
 
+			/*
 			var xObj = new XMLHttpRequest();
 			xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
 			//console.log("?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]));
@@ -262,6 +287,7 @@ function makeImageSelect() {
 				}
 			}
 			xObj.send();
+			*/
 
 			makeTooltip();
 		}
@@ -279,6 +305,12 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 		var result = checkXY(_e, curX, curY);
 		if (keyboardKeys[17] && result) {
 			ECS.entities.splice(ECS.entities.indexOf(result), 1);
+
+			/*
+				Add delete code.
+			*/
+
+
 		} else if(!curSelect) {
 			if(result) {
 				curSelect = result;
@@ -294,23 +326,19 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 					}
 				};
 
-				var xObj = new XMLHttpRequest();
-				xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
-				//console.log("?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]));
-				xObj.onreadystatechange = function() {
-					if(xObj.readyState == 4 && xObj.status == "200") {
-					}
-				}
-				xObj.send();
+				
 
 				ECS.entities.push(entity);
 			}
 		} else {
 			if(keyboardKeys[16] && !result) {
+				duplicateEntity(curX, curY);
+				/*
 				var entity = curSelect.dupe();
 				entity.c("worldposition").x = curX;
 				entity.c("worldposition").y = curY;
 				ECS.entities.push(entity);
+				*/
 			}  else {
 				curSelect = null;
 				clearTooltip();
@@ -323,15 +351,61 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 	}
 }
 
-function createEntity() {
+function deleteEntity() {
 
+}
+
+function createEntity() {
+	var entity = new ECS.Entity();
+	entity.addComponent(new ECS.Components.WorldPosition(curX, curY));
+
+	worldData.chunks["1,0"]["objects"][entity.id] = {
+		"WorldPosition":{
+			"x":curX,
+			"y":curY
+		}
+	};
+
+	updateWorld();
+	ECS.entities.push(entity);
+}
+
+
+
+function duplicateEntity(curX, curY) {
+	var entity = curSelect.dupe();
+	entity.c("worldposition").x = curX;
+	entity.c("worldposition").y = curY;
+
+
+	console.log(entity);
+	var result = JSON.stringify(worldData.chunks["1,0"]["objects"][curSelect.id]);
+	console.log(worldData.chunks["1,0"]["objects"][curSelect.id]);
+	console.log(result);
+	worldData.chunks["1,0"]["objects"][entity.id] = JSON.parse(result);
+
+	console.log(worldData.chunks["1,0"]["objects"][entity.id]);
+	worldData.chunks["1,0"]["objects"][entity.id].WorldPosition.x = curX;
+	worldData.chunks["1,0"]["objects"][entity.id].WorldPosition.y = curY;
+
+	updateWorld();
+
+	ECS.entities.push(entity);
 }
 
 function editComponent() {
 	
 }
 
-
+function updateWorld() {
+	var xObj = new XMLHttpRequest();
+	xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
+	xObj.onreadystatechange = function() {
+		if(xObj.readyState == 4 && xObj.status == "200") {
+		}
+	}
+	xObj.send();
+}
 
 ECS.Systems.ChunkMakerUI = function ChunkMakerUI(_e) {
 	ctx.save();
