@@ -23,6 +23,8 @@ function Synthmon() {
 	this.curHP = this.maxHP;
 }
 
-function Ability() {
+var abilityNames = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"]
 
+function Ability() {
+	this.name = abilityNames[Math.floor(Math.random() * abilityNames.length)]
 }

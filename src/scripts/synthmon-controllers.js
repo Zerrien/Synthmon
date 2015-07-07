@@ -20,7 +20,7 @@ function ImageController() {
 }
 
 
-var worldMenuController = {
+var MenuController = {
 	"worldmainmenu":{
 		"make":function() {
 			var menu = new ECS.Entity();
@@ -29,7 +29,7 @@ var worldMenuController = {
 				{
 					"name":"Inventory",
 					"action":function() {
-						var inventoryMenu = worldMenuController.inventoryMenu.make();
+						var inventoryMenu = MenuController.inventoryMenu.make();
 						inventoryMenu.addComponent(new ECS.Components.UIZIndex(1));
 						ECS.entities.push(inventoryMenu);
 					}
@@ -89,6 +89,76 @@ var worldMenuController = {
 					"name":"Close",
 					"action":function() {
 						ECS.entities.splice(ECS.entities.indexOf(menu));
+					}
+				}
+			);
+
+			return menu;
+		}
+	},
+	"combatMenu":{
+		"make":function() {
+			var menu = new ECS.Entity();
+			menu.addComponent(new ECS.Components.UIPosition(128 * 3, 0));
+			menu.addComponent(new ECS.Components.UIList([
+				{
+					"name":"Attack",
+					"action":function() {
+						var abilityMenu = MenuController.abilityMenu.make();
+						abilityMenu.addComponent(new ECS.Components.UIZIndex(1));
+						ECS.entities2.push(abilityMenu);
+					}
+				},
+				{
+					"name":"Synthmon",
+					"action":function() {
+						
+					}
+				},
+				{
+					"name":"Items",
+					"action":function() {
+						
+					}
+				},
+				{
+					"name":"Run",
+					"action":function() {
+						
+					}
+				}
+			], function() {
+				console.log("Tried to close... Naughty, naughty.");
+			}));
+			return menu;
+		}
+	},
+	"abilityMenu":{
+		"make":function(_abilities) {
+			var menu = new ECS.Entity();
+			menu.addComponent(new ECS.Components.UIPosition(128 * 4, 0));
+			menu.addComponent(new ECS.Components.UIList([], function() {
+				ECS.entities2.splice(ECS.entities2.indexOf(menu));
+			}));
+			for(var i = 0; i < BattleController.getPro().abilities.length; i++) {
+				var ability = BattleController.getPro().abilities[i];
+				menu.c("uilist").options.push(
+					{
+						"name":ability.name,
+						"action":function() {
+							BattleController.action = {
+								"type":"attack",
+								"use":ability
+							}
+						}
+					}
+				);
+			}
+			menu.c("uilist").options.push(
+				{
+					"name":"Back",
+					"action":function() {
+							ECS.entities2.splice(ECS.entities2.indexOf(menu));
 					}
 				}
 			);

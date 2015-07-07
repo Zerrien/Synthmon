@@ -1,35 +1,3 @@
-/*
-function checkCollision(_e, _x, _y) {
-	//Collision currently: BAD
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var wP = entity.c("worldposition");
-		var wM = entity.c("worldmoves");
-		if(entity.c("worldcollision") && wP) {
-			if(wM) {
-				if((wP.x == _x && wP.y == _y && wM.curCycle < wM.speed / 2) || (wP.x + wM.destX == _x && wP.y + wM.destY == _y)) {
-					return entity;
-				}
-			} else {
-				if(wP.x == _x && wP.y == _y) {
-					return entity;
-				}
-			}
-		} else if (entity.c("worldlargecollision")&& wP) {
-			var wLC = entity.c("worldlargecollision")
-			var colWidth = wLC.width;
-			var colHeight = wLC.height;
-			var xOff = wLC.xOffset;
-			var yOff = wLC.yOffset;
-			//Assume no wM
-			if(wP.x + xOff <= _x && wP.x + xOff + colWidth > _x && wP.y + yOff <= _y && wP.y + yOff +  colHeight > _y) {
-				return entity;
-			}
-		}
-	}
-	return false;
-}
-*/
 function checkCollision(_e, _x, _y, _ex) {
 	for(var entityID in _e) {
 		var entity = _e[entityID];
@@ -179,7 +147,7 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 				} else if (keyboardKeys[69]) {
 					keyboardKeys[69] = false;
 					gameState = 1;
-					var menu = worldMenuController.worldmainmenu.make();
+					var menu = MenuController.worldmainmenu.make();
 					ECS.entities.push(menu);
 				} else if (keyboardKeys[75]) {
 					keyboardKeys[75] = false;
@@ -193,7 +161,6 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 							if(result.c("worldfaces")) {
 								result.c("worldfaces").facing = wF.inverseFace();
 							}
-
 							gameState = 1;
 							var box = new ECS.Entity();
 							box.addComponent(new ECS.Components.UIPosition(0, 0));
@@ -560,11 +527,17 @@ var BattleController = {
 
 	"state":null,
 
-	"action":{},
+	"action":null,
 	"events":[],
 	"connections":{
 		"proMonSprite":null,
 		"antMonSprite":null
+	},
+	"getPro":function() {
+		return this.protagonist.c("trainer").synthmon[BattleController.proCur];
+	},
+	"getAnt":function() {
+		return this.antagonist.c("trainer").synthmon[BattleController.proCur];;
 	}
 }
 
@@ -601,48 +574,78 @@ function configureBattle() {
 	BattleController.connections.antMonSprite = antMonsterSprite;
 
 
-	var battleMenu = new ECS.Entity();
-	battleMenu.addComponent(new ECS.Components.UIPosition(128 * 2, 0));
-	battleMenu.addComponent(new ECS.Components.UIList([
-		{
-			"name":"Attack",
-			"action":function() {
-
-			}
-		},
-		{
-			"name":"Items",
-			"action":function() {
-				
-			}
-		},
-		{
-			"name":"Synthmon",
-			"action":function() {
-				
-			}
-		},
-		{
-			"name":"Run",
-			"action":function() {
-				
-			}
-		}
-	], function() {
-
-	}));
+	var battleMenu = MenuController.combatMenu.make();
 	ECS.entities2.push(battleMenu);
-
 
 	gameState = 2;
 }
 
 
 ECS.Systems.BattleControl = function BattleControl(_e) {
-
+	var curIndex;
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var uiZI = entity.c("uizindex");
+		if(uiZI) {
+			if(!curIndex) {
+				curIndex = uiZI.zindex;
+			} else {
+				if(curIndex < uiZI.zindex) {
+					curIndex = uiZI.zindex;
+				}
+			}
+		}
+	}
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var uiZI = entity.c("uizindex");
+		if(!curIndex || (uiZI && uiZI.zindex == curIndex)) {
+			if(entity.c("uilist")) {
+				var uiL = entity.c("uilist");
+				if(keyboardKeys[87]) {
+					keyboardKeys[87] = false;
+					uiL.up();
+				} else if (keyboardKeys[83]) {
+					keyboardKeys[83] = false;
+					uiL.down();
+				} else if (keyboardKeys[32]) {
+				} else if (keyboardKeys[69]) {
+					keyboardKeys[69] = false;
+					uiL.options[uiL.curIndex].action();
+				}
+			}
+		}
+	}
 }
 ECS.Systems.BattleLogic = function BattleLogic(_e) {
+	if(BattleController.action != null) {
+		if(BattleController.action.type == "attack") {
+			//Create a battle event.
+			BattleController.events.push(new BattleEvent(0, 1000));
+			BattleController.action = null;
+		}
+	}
 
+
+	/*
+		Events
+	*/
+	if(BattleController.events.length >= 1) {
+		BattleController.events[0].curTime += dTime;
+		if(BattleController.events[0].endTime <= BattleController.events[0].curTime) {
+			BattleController.events.splice(0, 1);
+		}
+	}
+}
+
+
+function BattleEvent(_s, _e, _sA, _eA) {
+	this.startTime = _s;
+	this.endTime = _e;
+	this.curTime = -1;
+	this.startAction = _sA || function() {};
+	this.endAction = _eA || function() {};
+	this.queue;
 }
 
 ECS.Systems.BattleRender = function BattleRender(_e) {
@@ -651,8 +654,6 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = "black";
 	ctx.save();
-
-
 
 	for(var entityID in _e) {
 		var entity = _e[entityID];
@@ -664,10 +665,17 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 		}
 	}
 
+	var proSynth = BattleController.getPro();
+	var antSynth = BattleController.getAnt();
 
+	ctx.fillStyle = "red";
+	ctx.fillRect(0, 128, 128, 16);
+	ctx.fillRect(128, 0, 128, 16);
+	ctx.fillStyle = "green";
+	ctx.fillRect(0, 128, 128 * proSynth.curHP / proSynth.maxHP, 16);
+	ctx.fillRect(128, 0, 128 * antSynth.curHP / antSynth.maxHP, 16);
 
 	ctx.restore();
-
 }
 ECS.Systems.BattleUI = function BattleUI(_e) {
 

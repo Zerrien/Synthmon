@@ -132,7 +132,12 @@ function makeTooltip() {
 	var tooltip = document.createElement("div");
 	tooltip.onmousedown = function(_e) {
 		if(_e.layerY < 10) {
-			this.isclicked = true;
+			if(this.isclicked) {
+				this.isclicked = false;
+			} else {
+				this.isclicked = true;
+			}
+			
 			this.xOffset = _e.layerX;
 			this.yOffset = _e.layerY;
 		}
@@ -148,13 +153,10 @@ function makeTooltip() {
 			tooltip.style.top = _e.clientY - this.yOffset;
 		}
 	}
-	tooltip.onmouseup = function() {
-		this.isclicked = false;
-	}
 
 	tooltip.id = "tooltip";
 	tooltip.style.width = "400px"
-	tooltip.innerHTML = "Entity";
+	tooltip.innerHTML = 
 	tooltip.style.position = "absolute";
 	tooltip.style.backgroundColor = "#444444";
 	tooltip.style.color = "white";
@@ -182,16 +184,48 @@ function makeTooltip() {
 				variable.appendChild(variableName);
 
 				var variableValue = document.createElement("input");
+
+				var variableDec = document.createElement("button");
+				variableDec.style.float = "right";
+				variableDec.innerHTML = "-"
+				variableDec.var = _variable;
+				variableDec.comp = _component;
+				variableDec.val = variableValue;
+				variableDec.onclick = function() {
+					curSelect.c(this.comp)[this.var] = curSelect.c(this.comp)[this.var] - 1;
+					this.val.value = curSelect.c(this.comp)[this.var];
+				}
+
+				variable.appendChild(variableDec);
+
+				variableValue.style.width = "4em"
+
 				variableValue.var = _variable;
 				variableValue.comp = _component;
 				variableValue.style.textAlign = "right";
 				variableValue.onchange = function(_e) {
 					curSelect.c(this.comp)[this.var] = this.value;
+					/*
+						Update the world JSON here.
+					*/
 				}
 				variableValue.value = curSelect.components[_component][_variable];
 				variableValue.style.float = "right";
 
 				variable.appendChild(variableValue);
+
+				var variableInc = document.createElement("button");
+				variableInc.style.float = "right";
+				variableInc.innerHTML = "+"
+				variableInc.var = _variable;
+				variableInc.comp = _component;
+				variableInc.val = variableValue;
+				variableInc.onclick = function() {
+					curSelect.c(this.comp)[this.var] = curSelect.c(this.comp)[this.var] + 1;
+					this.val.value = curSelect.c(this.comp)[this.var];
+				}
+				variable.appendChild(variableInc)
+
 				component.appendChild(variable);
 			}
 		}
@@ -202,6 +236,12 @@ function makeTooltip() {
 	tooltip.appendChild(blankDiv);
 	var addComponent = document.createElement("input");
 	addComponent.style.clear = "both";
+
+
+
+
+
+
 	addComponent.onchange = function(_e) {
 		if(ECS.Components[this.value]) {
 			if(this.value == "WorldSprite") {
@@ -377,14 +417,8 @@ function duplicateEntity(curX, curY) {
 	entity.c("worldposition").x = curX;
 	entity.c("worldposition").y = curY;
 
-
-	console.log(entity);
 	var result = JSON.stringify(worldData.chunks["1,0"]["objects"][curSelect.id]);
-	console.log(worldData.chunks["1,0"]["objects"][curSelect.id]);
-	console.log(result);
 	worldData.chunks["1,0"]["objects"][entity.id] = JSON.parse(result);
-
-	console.log(worldData.chunks["1,0"]["objects"][entity.id]);
 	worldData.chunks["1,0"]["objects"][entity.id].WorldPosition.x = curX;
 	worldData.chunks["1,0"]["objects"][entity.id].WorldPosition.y = curY;
 
