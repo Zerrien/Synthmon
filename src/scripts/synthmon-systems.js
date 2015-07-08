@@ -582,36 +582,38 @@ function configureBattle() {
 
 
 ECS.Systems.BattleControl = function BattleControl(_e) {
-	var curIndex;
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var uiZI = entity.c("uizindex");
-		if(uiZI) {
-			if(!curIndex) {
-				curIndex = uiZI.zindex;
-			} else {
-				if(curIndex < uiZI.zindex) {
+	if(BattleController.events.length == 0) {
+		var curIndex;
+		for(var entityID in _e) {
+			var entity = _e[entityID];
+			var uiZI = entity.c("uizindex");
+			if(uiZI) {
+				if(!curIndex) {
 					curIndex = uiZI.zindex;
+				} else {
+					if(curIndex < uiZI.zindex) {
+						curIndex = uiZI.zindex;
+					}
 				}
 			}
 		}
-	}
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var uiZI = entity.c("uizindex");
-		if(!curIndex || (uiZI && uiZI.zindex == curIndex)) {
-			if(entity.c("uilist")) {
-				var uiL = entity.c("uilist");
-				if(keyboardKeys[87]) {
-					keyboardKeys[87] = false;
-					uiL.up();
-				} else if (keyboardKeys[83]) {
-					keyboardKeys[83] = false;
-					uiL.down();
-				} else if (keyboardKeys[32]) {
-				} else if (keyboardKeys[69]) {
-					keyboardKeys[69] = false;
-					uiL.options[uiL.curIndex].action();
+		for(var entityID in _e) {
+			var entity = _e[entityID];
+			var uiZI = entity.c("uizindex");
+			if(!curIndex || (uiZI && uiZI.zindex == curIndex)) {
+				if(entity.c("uilist")) {
+					var uiL = entity.c("uilist");
+					if(keyboardKeys[87]) {
+						keyboardKeys[87] = false;
+						uiL.up();
+					} else if (keyboardKeys[83]) {
+						keyboardKeys[83] = false;
+						uiL.down();
+					} else if (keyboardKeys[32]) {
+					} else if (keyboardKeys[69]) {
+						keyboardKeys[69] = false;
+						uiL.options[uiL.curIndex].action();
+					}
 				}
 			}
 		}
@@ -621,7 +623,15 @@ ECS.Systems.BattleLogic = function BattleLogic(_e) {
 	if(BattleController.action != null) {
 		if(BattleController.action.type == "attack") {
 			//Create a battle event.
-			BattleController.events.push(new BattleEvent(0, 1000));
+			var anEvent = new BattleEvent(0, 1000, function() {
+				console.log("Ole!");
+			}, function() {
+				console.log("Ole :(");
+			})
+			anEvent.var = BattleController.connections.proMonSprite.c("uiposition");
+			anEvent.varLoc = "x"
+			anEvent.setOrigin();
+			BattleController.events.push(anEvent);
 			BattleController.action = null;
 		}
 	}
@@ -631,8 +641,16 @@ ECS.Systems.BattleLogic = function BattleLogic(_e) {
 		Events
 	*/
 	if(BattleController.events.length >= 1) {
+		if(BattleController.events[0].curTime == -1) {
+			BattleController.events[0].startAction();
+		}
 		BattleController.events[0].curTime += dTime;
+		BattleController.events[0].var[BattleController.events[0].varLoc] += 1;
 		if(BattleController.events[0].endTime <= BattleController.events[0].curTime) {
+			BattleController.events[0].var[BattleController.events[0].varLoc] = BattleController.events[0].origin;
+
+
+			BattleController.events[0].endAction();
 			BattleController.events.splice(0, 1);
 		}
 	}
@@ -646,6 +664,13 @@ function BattleEvent(_s, _e, _sA, _eA) {
 	this.startAction = _sA || function() {};
 	this.endAction = _eA || function() {};
 	this.queue;
+
+	this.origin;
+	this.setOrigin = function() {
+		if(this.var && this.varLoc) {
+			this.origin = this.var[this.varLoc];
+		}
+	}
 }
 
 ECS.Systems.BattleRender = function BattleRender(_e) {
