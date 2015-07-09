@@ -144,3 +144,11 @@ ECS.Components.WorldFloor = function WorldFloor() {
 
 }
 ECS.Components.WorldFloor.prototype.name = "worldfloor";
+ECS.Components.WorldBattler = function WorldBattler() {
+
+}
+ECS.Components.WorldBattler.prototype.name = "worldbattler";
+ECS.Components.WorldGrass = function WorldGrass(_region) {
+	this.region = _region || "default";
+}
+ECS.Components.WorldGrass.prototype.name = "worldgrass";

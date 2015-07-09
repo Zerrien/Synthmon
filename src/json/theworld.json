@@ -17,19 +17,43 @@
         "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
         "player": ".\/src\/assets\/img\/characters\/player.png",
         "piggen_front": ".\/src\/assets\/img\/synthmon\/piggen.png",
-        "piggen_back": ".\/src\/assets\/img\/synthmon\/piggen2.png"
+        "piggen_back": ".\/src\/assets\/img\/synthmon\/piggen2.png",
+        "water_attack":"./src/assets/img/attacks/water.png",
+        "water_attack_back":"./src/assets/img/attacks/water_back.png"
     },
     "chunks": {
         "0,0": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png",
             "objects": {
+                "chatter2": {
+                    "WorldSprite": {
+                        "name": "chatter"
+                    },
+                    "WorldPosition": {
+                        "x": 3,
+                        "y": 3
+                    },
+                    "WorldCollider":{
+
+                    },
+                    "Trainer":{
+
+                    },
+                    "WorldBattler":{
+                        "saying":"Ole!"
+                    },
+                    "WorldFaces":{
+                        "facing":"north"
+                    }
+
+                },
                 "boulder": {
                     "WorldSprite": {
                         "name": "boulder"
                     },
                     "WorldPosition": {
                         "x": 0,
-                        "y": 5
+                        "y": 3
                     },
                     "WorldCollider": [
 
@@ -240,7 +264,9 @@
                     },
                     "WorldFloor": [
 
-                    ]
+                    ],
+                    "WorldGrass":{
+                    }
                 },
                 "theGrass3": {
                     "WorldSprite": {
@@ -252,7 +278,9 @@
                     },
                     "WorldFloor": [
 
-                    ]
+                    ],
+                    "WorldGrass":{
+                    }
                 },
                 "theGras4s": {
                     "WorldSprite": {
@@ -264,7 +292,9 @@
                     },
                     "WorldFloor": [
 
-                    ]
+                    ],
+                    "WorldGrass":{
+                    }
                 },
                 "theGra5ss": {
                     "WorldSprite": {
@@ -276,7 +306,9 @@
                     },
                     "WorldFloor": [
 
-                    ]
+                    ],
+                    "WorldGrass":{
+                    }
                 }
             }
         },

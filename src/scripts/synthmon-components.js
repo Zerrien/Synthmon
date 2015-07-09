@@ -43,6 +43,18 @@ ECS.Components.UIZIndex.prototype.name = "uizindex";
 
 ECS.Components.UIDialogueBox = function UIDialogueBox(_string) {
 	this.string = _string;
+	this.tick = 50;
+	this.curTime = 0;
+}
+ECS.Components.UIDialogueBox.prototype = {
+	progress : function() {
+		if(this.curTime < this.string.length * this.tick) {
+			this.curTime = this.string.length * this.tick;
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
 ECS.Components.UIDialogueBox.prototype.name = "uidialoguebox";
 
