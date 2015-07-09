@@ -158,9 +158,6 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 					gameState = 1;
 					var menu = MenuController.worldmainmenu.make();
 					ECS.entities.push(menu);
-				} else if (keyboardKeys[75]) {
-					keyboardKeys[75] = false;
-					configureBattle();
 				} else if (keyboardKeys[32]) {
 					keyboardKeys[32] = false;
 					var facingXY = wF.facingTile();
@@ -182,12 +179,18 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 							gameState = 1;
 							var box = new ECS.Entity();
 							box.addComponent(new ECS.Components.UIPosition(0, 0));
-							var challenge = new ECS.Components.UIDialogueBox("helllo!");
-							challenge.onclose = function() {
-								configureBattle();
+							if(result.c("trainer").synthmon[0].curHP > 0) {
+								var challenge = new ECS.Components.UIDialogueBox(result.c("worldbattler").saying);
+								challenge.onclose = function() {
+									BC.configure(player, result);
+								}
+								box.addComponent(challenge);
+								ECS.entities.push(box);
+							} else {
+								var challenge = new ECS.Components.UIDialogueBox(result.c("worldbattler").defeatedSaying);
+								box.addComponent(challenge);
+								ECS.entities.push(box);
 							}
-							box.addComponent(challenge);
-							ECS.entities.push(box);
 						}
 					}
 				}
@@ -273,8 +276,16 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 		} else if (entity.c("worldgrass")) {
 			var wP = entity.c("worldposition");
 			var result = checkCollision(_e, wP.x, wP.y, entity);
-			if(result) {
-				console.log("??");	
+			if(result && result == player &&  result.c("worldmoves").state == "standing" && entity.c("worldgrass").last != player) {
+				entity.c("worldgrass").last = player;
+				if(Math.random() < 0.125) {
+					var enemy = new ECS.Entity();
+					enemy.addComponent(new ECS.Components.Trainer());
+					enemy.c("trainer").synthmon.push(new Synthmon());
+					BC.configure(player, enemy, "wild");
+				}
+			} else if(result == null) {
+				entity.c("worldgrass").last = null;
 			}
 		}
 	}
@@ -367,6 +378,10 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = "black";
 	ctx.save();
+
+	/*
+		Replace with CameraController in the future.
+	*/
 	if(player) {
 		var pPos = player.c("worldposition");
 		var pShift = player.c("worldmoves");
@@ -551,6 +566,7 @@ var BattleController = {
 	"antagonist":null,
 	"proCur":null,
 	"antCur":null,
+	"type":null,
 
 	"state":null,
 
@@ -561,55 +577,63 @@ var BattleController = {
 		"proMonSprite":null,
 		"antMonSprite":null
 	},
-	"getPro":function() {
+	"getProtagonist":function() {
+		return this.protagonist.c("trainer");
+	},
+	"getAntagonist":function() {
+		return this.antagonist.c("trainer");
+	},
+	"getProCurrent":function() {
 		return this.protagonist.c("trainer").synthmon[this.proCur];
 	},
-	"getAnt":function() {
+	"getAntCurrent":function() {
 		return this.antagonist.c("trainer").synthmon[this.proCur];
+	},
+	"configure":function(_pro, _ant, _type) {
+		//Not sure if this belongs in the battle configure.
+		ECS.entities2 = [];
+
+		this.protagonist = _pro;
+		this.antagonist = _ant;
+
+		this.proCur = 0;
+		this.antCur = 0;
+
+		this.state = 0;
+		this.type = _type || null;
+
+		var proMonsterSprite = new ECS.Entity();
+		proMonsterSprite.addComponent(new ECS.Components.UIPosition(0, 0));
+		proMonsterSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_back));
+		ECS.entities2.push(proMonsterSprite)
+
+		var antMonsterSprite = new ECS.Entity();
+		antMonsterSprite.addComponent(new ECS.Components.UIPosition(128, 0));
+		antMonsterSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_front));
+		ECS.entities2.push(antMonsterSprite)
+
+		this.connections.proMonSprite = proMonsterSprite;
+		this.connections.antMonSprite = antMonsterSprite;
+
+		var battleMenu = MenuController.combatMenu.make();
+		ECS.entities2.push(battleMenu);
+
+		var endDialogue = new ECS.Entity();
+		endDialogue.addComponent(new ECS.Components.UIPosition(64, 0));
+		endDialogue.addComponent(new ECS.Components.UIDialogueBox("YA WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
+		var dialogueEvent = new BattleEvent(0, 1000, function() {
+			ECS.entities2.push(endDialogue)
+		}, function() {
+			ECS.entities2.splice(ECS.entities2.indexOf(endDialogue), 1);
+		});
+		dialogueEvent.queue = true;
+		this.events.push(dialogueEvent);
+
+		//Not sure if this belongs in the battle configure.
+		gameState = 2;
 	}
 }
-
-function configureBattle() {
-	ECS.entities2 = [];
-
-	BattleController.protagonist = player;
-
-	var enemy = new ECS.Entity();
-	enemy.addComponent(new ECS.Components.Trainer());
-	enemy.c('trainer').synthmon.push(new Synthmon());
-	enemy.c('trainer').synthmon.push(new Synthmon());
-	enemy.c('trainer').synthmon.push(new Synthmon());
-	enemy.c('trainer').synthmon.push(new Synthmon());
-
-	BattleController.antagonist = enemy;
-
-	BattleController.proCur = 0;
-	BattleController.antCur = 0;
-
-	BattleController.state = 0;
-
-	//Events.
-
-	var proMonsterSprite = new ECS.Entity();
-	proMonsterSprite.addComponent(new ECS.Components.UIPosition(0, 0));
-	proMonsterSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_back));
-	ECS.entities2.push(proMonsterSprite)
-
-	var antMonsterSprite = new ECS.Entity();
-	antMonsterSprite.addComponent(new ECS.Components.UIPosition(128, 0));
-	antMonsterSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_front));
-	ECS.entities2.push(antMonsterSprite)
-
-	BattleController.connections.proMonSprite = proMonsterSprite;
-	BattleController.connections.antMonSprite = antMonsterSprite;
-
-
-	var battleMenu = MenuController.combatMenu.make();
-	ECS.entities2.push(battleMenu);
-
-	gameState = 2;
-}
-
+var BC = BattleController;
 
 ECS.Systems.BattleControl = function BattleControl(_e) {
 	var curIndex;
@@ -661,11 +685,7 @@ ECS.Systems.BattleControl = function BattleControl(_e) {
 	}
 }
 
-
-
-
 function enemyAction() {
-
 	//Currently picking a random ability.
 	BattleController.enemyAction = {
 		"type":"attack",
@@ -678,9 +698,8 @@ function evaluateTurn() {
 	var pAct = BattleController.action;
 	var eAct = BattleController.enemyAction;
 	if(pAct.type == "attack" && eAct.type == "attack") {
-		makeAttackEvent("Player's Piggen used " + pAct.use.name, BattleController.getAnt(), BattleController.connections.antMonSprite, images.images.water_attack, 10);
-		if(BattleController.getAnt().curHP - 10 <= 0) {
-			console.log("???");
+		makeAttackEvent("Player's Piggen used " + pAct.use.name, BattleController.getAntCurrent(), BattleController.connections.antMonSprite, images.images.water_attack, 10);
+		if(BattleController.getAntCurrent().curHP - 10 <= 0) {
 			var endDialogue = new ECS.Entity();
 			endDialogue.addComponent(new ECS.Components.UIPosition(64, 0));
 			endDialogue.addComponent(new ECS.Components.UIDialogueBox("YA WON!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
@@ -692,7 +711,7 @@ function evaluateTurn() {
 			dialogueEvent.queue = true;
 			BattleController.events.push(dialogueEvent);
 		} else {
-			makeAttackEvent("Enemy's Piggen used " + eAct.use.name,BattleController.getPro(), BattleController.connections.proMonSprite, images.images.water_attack_back, 1);
+			makeAttackEvent("Enemy's Piggen used " + eAct.use.name,BattleController.getProCurrent(), BattleController.connections.proMonSprite, images.images.water_attack_back, 1);
 		}
 	}
 
@@ -712,7 +731,7 @@ function makeAttackEvent(_words, _target, _targetimg, _img, _dmg) {
 	});
 
 	var waterAttack = new ECS.Entity();
-	waterAttack.addComponent(new ECS.Components.UIPosition(64, 0));
+	waterAttack.addComponent(new ECS.Components.UIPosition(64 + 32,  32));
 	waterAttack.addComponent(new ECS.Components.BattleSprite(_img));
 	waterAttack.addComponent(new ECS.Components.BattleAnimated(3, 3, 500 / 9));
 	var animationEvent = new BattleEvent(0, 500, function() {
@@ -808,7 +827,7 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 						//World Position
 						uiP.x, uiP.y,
 						//World Size
-						128, 128);
+						64, 64);
 				} else {
 					if(entity.c("battleshake")) {
 						ctx.drawImage(entity.c("battlesprite").img, uiP.x + (Math.sin(tTime / 100)) * 32, uiP.y);
@@ -817,15 +836,12 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 					}
 				}
 				
-				/*
-				
-				*/
 			}
 		}
 	}
 
-	var proSynth = BattleController.getPro();
-	var antSynth = BattleController.getAnt();
+	var proSynth = BattleController.getProCurrent();
+	var antSynth = BattleController.getAntCurrent();
 
 	ctx.fillStyle = "red";
 	ctx.fillRect(0, 128, 128, 16);
@@ -834,536 +850,36 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 	ctx.fillRect(0, 128, 128 * proSynth.curHP / proSynth.maxHP, 16);
 	ctx.fillRect(128, 0, 128 * antSynth.curHP / antSynth.maxHP, 16);
 
+	var proList = BC.getProtagonist().synthmon;
+	var antList = BC.getAntagonist().synthmon;
+
+	for(var i = 0; i < 6; i++) {
+		if(proList[i]) {
+			if(proList[i].curHP <= 0) {
+				ctx.drawImage(images.images.dead_drive, 128 / 2 - 16 * 3 + i * 16, 0);
+			} else {
+				ctx.drawImage(images.images.alive_drive, 128 / 2 - 16 * 3 + i * 16, 0);
+			}
+			
+		} else {
+			ctx.drawImage(images.images.empty_drive, 128 / 2 - 16 * 3 + i * 16, 0);
+		}
+
+		if(!BC.type) {
+			if(antList[i]) {
+				if(antList[i].curHP <= 0) {
+					ctx.drawImage(images.images.dead_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
+				} else {
+					ctx.drawImage(images.images.alive_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
+				}
+			} else {
+				ctx.drawImage(images.images.empty_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
+			}
+		}
+	}
+
 	ctx.restore();
 }
 ECS.Systems.BattleUI = function BattleUI(_e) {
 
 }
-
-/*
-ECS.Systems.KeyboardControl = function KeyboardControl(_e) {
-	//87, 83, 65, 68;
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var wM = entity.c("worldmoves");
-		var wP = entity.c("worldposition");
-		if(entity.c("worldkeyboardcontrolled") && wP && wM && wM.state == "standing") {
-			var wF = entity.c("worldfaces");
-			var canMove = false;
-			if(keyboardKeys[87]) {
-				wF.facing = "up";
-				if(wP.y > 0 && !checkCollision(_e, wP.x, wP.y - 1)) {
-					wM.destY = -1;
-					canMove = true;
-				}
-			} else if(keyboardKeys[83]) {
-				wF.facing = "down";
-				if(wP.y < 19 && !checkCollision(_e, wP.x, wP.y + 1)) {
-					wM.destY = 1;
-					canMove = true;
-				}
-			} else if (keyboardKeys[65]) {
-				wF.facing = "left";
-				if(wP.x > 0 && !checkCollision(_e, wP.x - 1, wP.y)) {
-					wM.destX = -1;
-					canMove = true;
-				}
-			} else if (keyboardKeys[68]) { 
-				wF.facing = "right";
-				if(wP.x < 19 && !checkCollision(_e, wP.x + 1, wP.y)) {
-					wM.destX = 1;
-					canMove = true;
-				}
-			} else if (keyboardKeys[32]) {
-				keyboardKeys[32] = false;
-				var fEntity;
-				switch(wF.facing) {
-					case "left":
-						fEntity = checkCollision(_e, wP.x - 1, wP.y);
-						break;
-					case "right":
-						fEntity = checkCollision(_e, wP.x + 1, wP.y);
-						break;
-					case "up":
-						fEntity = checkCollision(_e, wP.x, wP.y - 1);
-						break;
-					case "down":
-						fEntity = checkCollision(_e, wP.x, wP.y + 1);
-						break;
-				}
-				if(fEntity) {
-					if(fEntity.c("worldchatty")) {
-						gameState = 1;
-						interact = fEntity;
-						var textBox = new ECS.Entity();
-						textBox.addComponent(new ECS.Components.UIPosition(canvas.width / 2, 300));
-						textBox.addComponent(new ECS.Components.UIText(fEntity.c("worldchatty").string, 100));
-						if(fEntity.c("action")) {
-							textBox.addComponent(fEntity.c("action"));
-						}
-						if(fEntity.c("worldfaces")) {
-							fEntity.c("worldfaces").facing = player.c("worldfaces").inverseFace();
-						}
-						ECS.entities.push(textBox);
-					}
-					//
-					//var wI = fEntity.c("worldinteractable");
-					//if(wI) {
-					//	wI.act();
-					//}
-					
-				}
-			} else if (keyboardKeys[69]) {
-				keyboardKeys[69] = false;
-				gameState = 1;
-
-				var entity = new ECS.Entity();
-				entity.addComponent(new ECS.Components.UIPosition(100, 100));
-				entity.addComponent(new ECS.Components.MenuOptions([
-					{
-						"name":"Inventory",
-						"action":function() {
-							var inventoryMenu = new ECS.Entity();
-							var items = new ECS.Components.MenuOptions([]);
-							for(var i = 0; i < player.c("inventory").items.length; i++) {
-								items.list.push({
-									"name":player.c("inventory").items[i].name,
-									"action":function() {
-
-									},
-									"index":i
-								})
-							}
-							items.list.push({
-								"name":"Back",
-								"action":function() {
-									ECS.entities.splice(ECS.entities.indexOf(inventoryMenu), 1);
-									inventoryMenu = null;
-								}
-							});
-							items.zDepth = 1;
-							inventoryMenu.addComponent(items);
-							inventoryMenu.addComponent(new ECS.Components.UIPosition(250, 125));
-							ECS.entities.push(inventoryMenu);
-
-
-						}
-					},
-					{
-						"name":"Synthmon",
-						"action":function() {
-							
-						}
-					},
-					{
-						"name":"Information",
-						"action":function() {
-							
-						}
-					},
-					{
-						"name":"Leave Menu",
-						"action":function() {
-							ECS.entities.splice(ECS.entities.indexOf(entity), 1);
-							entity = null;
-							clearUI();
-							gameState = 0;
-						}
-					}
-				]));
-				ECS.entities.push(entity);
-
-				
-				//keyboardKeys[69] = false;
-				//gameState = 1;
-//
-				//var entity = new ECS.Entity();
-				//entity.addComponent(new ECS.Components.UIPosition(100, 100));
-				//entity.addComponent(new ECS.Components.MenuOptions(["Inventory", "Synthmon", "Information", "Leave Menu"]));
-				//ECS.entities.push(entity);
-				
-
-			}
-			if(canMove) {
-				wM.curCycle = 0;
-				wM.state = "walking";
-			}
-		}
-	}
-}
-
-function checkCollision(_e, _x, _y) {
-	//Collision currently: BAD
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var wP = entity.c("worldposition");
-		var wM = entity.c("worldmoves");
-		if(entity.c("worldcollision") && wP) {
-			if(wM) {
-				if((wP.x == _x && wP.y == _y && wM.curCycle < wM.speed / 2) || (wP.x + wM.destX == _x && wP.y + wM.destY == _y)) {
-					return entity;
-				}
-			} else {
-				if(wP.x == _x && wP.y == _y) {
-					return entity;
-				}
-			}
-		} else if (entity.c("worldlargecollision")&& wP) {
-			var wLC = entity.c("worldlargecollision")
-			var colWidth = wLC.width;
-			var colHeight = wLC.height;
-			var xOff = wLC.xOffset;
-			var yOff = wLC.yOffset;
-			//Assume no wM
-			if(wP.x + xOff <= _x && wP.x + xOff + colWidth > _x && wP.y + yOff <= _y && wP.y + yOff +  colHeight > _y) {
-				return entity;
-			}
-		}
-	}
-	return false;
-}
-
-
-
-var moveai_array = ["left", "right", "down", "up"];
-ECS.Systems.AI = function SystemAI(_e) {
-	//AI System
-	var hasTarget = false;
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var wM = entity.c("worldmoves");
-		var wP = entity.c("worldposition");
-		if(wM && wP && entity.c("movementai")) {
-			if(wM.state == "standing" && Math.random() < 0.01) {
-				var rand = Math.floor(Math.random() * 4);
-				var canMove = false;
-				if(entity.c("worldfaces")) {
-					entity.c("worldfaces").facing = moveai_array[rand];
-				}
-				if(rand == 0) {
-					if(wP.x > 0 && !checkCollision(_e, wP.x - 1, wP.y)) {
-						wM.destX = -1;
-						canMove = true;
-					}
-				} else if (rand == 1) {
-					if(wP.x < 19 && !checkCollision(_e, wP.x + 1, wP.y)) {
-						wM.destX = 1;
-						canMove = true;
-					}
-				} else if (rand == 2) {
-					if(wP.y < 19 && !checkCollision(_e, wP.x, wP.y + 1)) {
-						wM.destY = 1;
-						canMove = true;
-					}
-				} else {
-					if(wP.y > 0 && !checkCollision(_e, wP.x, wP.y - 1)) {
-						wM.destY = -1;
-						canMove = true;
-					}
-				}
-				if(canMove) {
-					wM.curCycle = 0;
-					wM.state = "walking";
-				}
-			}
-		}
-		//Redo directional AI
-	}
-}
-
-ECS.Systems.Logic = function SystemLogic(_e) {
-	//Logic System
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var wM = entity.c("worldmoves");
-		if(wM && entity.c("worldposition")) {
-			if(wM.state == "walking") {
-				wM.curCycle += dTime;
-				if(wM.curCycle >= wM.speed) {
-					wM.curCycle = 0;
-					wM.state = "standing";
-					entity.c("worldposition").x += wM.destX;
-					entity.c("worldposition").y += wM.destY;
-					wM.destX = 0;
-					wM.destY = 0;
-				}
-			}
-			var wP = entity.c("worldposition")
-			var pID = entity.c("playerid");
-			var wF = entity.c("worldfaces");
-			if(pID && wF) {
-				
-				//webSocket.send(JSON.stringify({
-				//	"playerid":pID.id,
-				//	"x":wP.x,
-				//	"y":wP.y,
-				//	"state":wM.state,
-				//	"curCycle":wM.curCycle,
-				//	"destX":wM.destX,
-				//	"destY":wM.destY,
-				//	"facing":wF.facing
-				//}));
-				
-			}
-		}
-	}
-}
-
-
-
-ECS.Systems.Render = function SystemRender(_e) {
-	//Render system
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = "rgba(0, 0, 0, 0.125)";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = "black";
-	ctx.save();
-
-	var pPos = player.c("worldposition");
-	var pShift = player.c("worldmoves");
-	var pShiftX = pShift.curCycle / pShift.speed * 32 * pShift.destX;
-	var pShiftY = pShift.curCycle / pShift.speed * 32 * pShift.destY;
-
-	ctx.translate(canvas.width / 2 - pPos.x * 32 - pShiftX, canvas.height / 2 - pPos.y * 32 - pShiftY);
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		//Draw a world sprite
-		if(entity.c("worldsprite") && entity.c("worldposition")) {
-			var TILE_SIZE = 32;
-			var width = 1;
-			var height = 1;
-			if(entity.c("worldsize")) {
-				width = entity.c("worldsize").width;
-				height = entity.c("worldsize").height;
-			}
-			var sourceX, sourceY, destX, destY;
-			sourceY = sourceX = 0;
-			destX = entity.c("worldposition").x * 32;
-			destY = entity.c("worldposition").y * 32;
-
-			var wM = entity.c("worldmoves");
-			var shiftX, shiftY;
-			shiftX = shiftY = 0;
-			if(entity.c("worldfaces")) {
-				switch(entity.c("worldfaces").facing) {
-					case "left":
-						sourceX = 3 * 32;
-						break;
-					case "up":
-						sourceX = 1 * 32;
-						break;
-					case "right":
-						sourceX = 2 * 32;
-						break;
-					case "down":
-						sourceX = 0 * 32;
-						break;
-				}
-			} else if (entity.c("worldsheet")) {
-				sourceX = entity.c("worldsheet").num % 4;
-				sourceY = (entity.c("worldsheet").num - sourceX) / 4;
-				sourceX *= 32;
-				sourceY *= 32;
-			}
-			if(wM) {
-				shiftX = wM.curCycle / wM.speed * 32 * wM.destX;
-				shiftY = wM.curCycle / wM.speed * 32 * wM.destY;
-			}
-			ctx.drawImage(entity.c("worldsprite").img, sourceX, sourceY, 32 * width, 32 * height, destX + shiftX, destY + shiftY, 32 * width, 32 * height);
-		}
-	}
-	ctx.restore();
-	ctx.fillText(dTime, 10, 10);
-	
-	
-	//if(is_debug) {
-	//	var sum2 = 0;
-	//	for(var i = 0; i < frameArray.length; i++) {
-	//		sum2 += frameArray[i];
-	//	}
-	//	var avg2 = sum2 / frameArray.length;
-	//
-	//	ctx.fillText(avg2.toFixed(2), 10, 20);
-	//	ctx.fillText((1000 / avg2).toFixed(2) + " Avg. FPS", 10, 30)
-	//	
-	//	time = (new Date()).getTime() - time;
-	//	timeArrays[3].push(time);
-	//	var sum = 0;
-	//	for(var i = 0; i < timeArrays[3].length; i++) {
-	//		sum += timeArrays[3][i];
-	//	}
-	//	var avg = sum / timeArrays[3].length;
-	//	document.getElementById("system4").innerHTML = avg.toFixed(2) + " "  + time.toFixed(2);
-	//}
-	
-}
-
-ECS.Systems.UIControl = function UIControl(_e) {
-	//87, 83, 65, 68;
-	var highestDepth = -1;
-	var bC;
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var mO = entity.c("menuoptions");
-		if(mO && mO.zDepth > highestDepth) {
-			highestDepth = mO.zDepth;
-		}
-
-		var bCC = entity.c("battlecontroller");
-		if(bCC) {
-			bC = bCC;
-		}
-	}
-	for(var entityID in _e) {
-		//Debug option
-		var entity = _e[entityID];		
-		var mO = entity.c("menuoptions");
-		var canInput = true;
-		if(bC && bC.state != 0) {
-			canInput = false;
-		}
-		if(mO && highestDepth == mO.zDepth && canInput) {
-			if(keyboardKeys[83]) {
-				keyboardKeys[83] = false;
-				mO.advance();
-			} else if (keyboardKeys[87]) {
-				keyboardKeys[87] = false;
-				mO.reverse();
-			} else if (keyboardKeys[69] && mO.escapable) {
-				keyboardKeys[69] = false;
-				clearUI();
-				gameState = 0;
-			} else if (keyboardKeys[32] || keyboardKeys[68]) {
-				keyboardKeys[32] = keyboardKeys[68] = false;
-				if(mO.list[mO.curIndex].action) {
-					mO.list[mO.curIndex].action();
-				}
-			} else if (keyboardKeys[65] || keyboardKeys[27]) {
-				keyboardKeys[65] = keyboardKeys[27] = false;
-				if(mO.zDepth != 0) {
-					_e.splice(entityID, 1);
-					entity = null;
-				}
-			}
-		} else {
-			//No mO, so everything else takes precedence.
-			var uT = entity.c("uitext");
-			if(uT) {
-				if(keyboardKeys[32]) {
-					keyboardKeys[32] = false;
-					if(Math.floor(uT.curTime / uT.speed) < uT.text.length) {
-						uT.curTime = uT.text.length * uT.speed;
-					} else {
-						if(entity.c("action")) {
-							entity.c("action").act();
-						} else {
-							interact = null;
-							gameState = 0;
-							_e.splice(entityID, 1);
-						}
-						
-						
-						//clearUI();
-						//if(interact.c("trainer")) {
-						//	setUpBattle(player, interact);
-						//	gameState = 2;
-						//} else {
-						//	interact = null;
-						//	gameState = 0;
-						//}
-						
-					}
-				}
-			}
-		}
-		
-		////Old implementation, may return.
-		//if(entity.c("keyboardevent")) {
-		//	if(keyboardKeys[entity.c("keyboardevent").key]) {
-		//		keyboardKeys[entity.c("keyboardevent").key] = false;
-		//		entity.c("keyboardevent").act();
-		//	}
-		//}
-		//
-	}
-}
-
-function clearUI() {
-	for(var entityID in ECS.entities) {
-		var entity = ECS.entities[entityID];
-		if(entity.c("uiposition")) {
-			ECS.entities.splice(entityID, 1);
-		}
-	}
-}
-
-ECS.Systems.DrawUI = function DrawUI(_e) {
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var uP = entity.c("uiposition");
-		if(uP) {
-			if(entity.c("uitext")) {
-				entity.c("uitext").curTime += dTime;
-				var theString = entity.c("uitext").text.slice(0, Math.floor(entity.c("uitext").curTime / entity.c("uitext").speed));
-				ctx.fillStyle = "white";
-				ctx.fillRect(25, canvas.height - 125, canvas.width - 50, 100);
-				ctx.fillStyle = "black";
-				ctx.save();
-				ctx.textBaseline = "top";
-				ctx.font="30px Arial";
-				ctx.fillText(theString, 25, canvas.height - 125);
-				ctx.restore();
-			} else if (entity.c("menuoptions")) {
-				var mO = entity.c("menuoptions")
-				for(var i = 0; i < mO.list.length; i++) {
-					ctx.save();
-					if(mO.curIndex == i) {
-						ctx.font = "bold 20px Arial";
-						ctx.fillText(">", uP.x - 20, uP.y + 20 * i);
-					} else {
-						ctx.font = "20px Arial";
-					}
-					ctx.fillText(mO.list[i].name, uP.x, uP.y + 20 * i);
-					ctx.restore();
-				}
-			} else if (entity.c("healthbox")) {
-				ctx.fillStyle = "red";
-				ctx.fillRect(entity.c("uiposition").x, entity.c("uiposition").y, 96, 25)
-				
-				ctx.fillStyle = "green";
-				//haha that code hahAHA HAH H AHAHHHSHDASDHfls;agjkdfsdfag
-				ctx.fillRect(entity.c("uiposition").x, entity.c("uiposition").y, 96 * entity.c("healthbox").ref[entity.c("healthbox").index].curHP / entity.c("healthbox").ref[entity.c("healthbox").index].maxHP, 25)
-
-				ctx.fillStyle = "black";
-				ctx.strokeRect(entity.c("uiposition").x, entity.c("uiposition").y, 96, 25)
-				
-			} else if (entity.c("monstersprite")) {
-				var x = uP.x;
-				var y = uP.y;
-				if(entity.c("battlespriteshake")) {
-					x += Math.sin(entity.c("battlespriteshake").curTime / 100) * entity.c("battlespriteshake").maxX;
-
-
-					entity.c("battlespriteshake").curTime += dTime;
-				}
-				ctx.drawImage(deox, x, y);
-			}
-		}
-	} 
-}
-
-ECS.Components.BattleController = function BattleController(_pro, _ant) {
-	this.protagonist = _pro;
-	this.proCur = _pro.c("trainer").monsters[Math.floor(_pro.c("trainer").monsters.length * Math.random())];
-	this.antagonist = _ant;
-	this.antCur = _ant.c("trainer").monsters[Math.floor(_ant.c("trainer").monsters.length * Math.random())];
-	this.state = 0;
-	this.action = {};
-	this.events = [];
-	this.connections = {
-		"playerMonSprite":null,
-		"enemyMonSprite":null
-	};
-}
-ECS.Components.BattleController.prototype.name = "battlecontroller";
-*/
