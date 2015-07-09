@@ -125,9 +125,6 @@ var gameState = 0;
 
 ECS.entities2 = [];
 
-
-
-
 function loadZone(_name) {
 	if(_name == 0) {
 		var k = 0;
@@ -143,6 +140,11 @@ function loadZone(_name) {
 					var component = new ECS.Components[componentID];
 					if(componentID == "WorldSprite") {
 						component.img = images.images[details.name];
+					} else if(componentID == "Trainer") {
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
 					} else {
 						for(var value in details) {
 							component[value] = details[value];

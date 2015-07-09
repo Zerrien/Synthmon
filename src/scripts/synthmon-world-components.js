@@ -145,7 +145,8 @@ ECS.Components.WorldFloor = function WorldFloor() {
 }
 ECS.Components.WorldFloor.prototype.name = "worldfloor";
 ECS.Components.WorldBattler = function WorldBattler() {
-
+	this.saying = "DEFAULT_BATTLE_ME_TEXT, BEEP BOOP.";
+	this.defeatedSaying = "DEFAULT_DEFEATED_TEXT, BEEP BOOP."
 }
 ECS.Components.WorldBattler.prototype.name = "worldbattler";
 ECS.Components.WorldGrass = function WorldGrass(_region) {

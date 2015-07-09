@@ -14,12 +14,19 @@
         "chatter": ".\/src\/assets\/img\/object_tiles\/genericNPC.png",
         "cliffs": ".\/src\/assets\/img\/object_tiles\/cliffs.png",
         "iceyground": ".\/src\/assets\/img\/object_tiles\/iceyground.png",
+
         "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
         "player": ".\/src\/assets\/img\/characters\/player.png",
+
         "piggen_front": ".\/src\/assets\/img\/synthmon\/piggen.png",
         "piggen_back": ".\/src\/assets\/img\/synthmon\/piggen2.png",
+
         "water_attack":"./src/assets/img/attacks/water.png",
-        "water_attack_back":"./src/assets/img/attacks/water_back.png"
+        "water_attack_back":"./src/assets/img/attacks/water_back.png",
+
+        "alive_drive":"./src/assets/img/ui/alivedrive.png",
+        "dead_drive":"./src/assets/img/ui/deaddrive.png",
+        "empty_drive":"./src/assets/img/ui/emptydrive.png"
     },
     "chunks": {
         "0,0": {
@@ -40,7 +47,8 @@
 
                     },
                     "WorldBattler":{
-                        "saying":"Ole!"
+                        "saying":"Let's do battle!",
+                        "defeatedSaying":"Aw man!"
                     },
                     "WorldFaces":{
                         "facing":"north"

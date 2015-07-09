@@ -19,6 +19,10 @@ function ImageController() {
 	}
 }
 
+var CameraController = {
+
+}
+
 
 var MenuController = {
 	"worldmainmenu":{
@@ -140,19 +144,18 @@ var MenuController = {
 			menu.addComponent(new ECS.Components.UIList([], function() {
 				ECS.entities2.splice(ECS.entities2.indexOf(menu));
 			}));
-			for(var i = 0; i < BattleController.getPro().abilities.length; i++) {
-				var ability = BattleController.getPro().abilities[i];
-				menu.c("uilist").options.push(
-					{
-						"name":ability.name,
-						"action":function() {
-							BattleController.action = {
-								"type":"attack",
-								"use":ability
-							}
+			for(var i = 0; i < BattleController.getProCurrent().abilities.length; i++) {
+				var ability = BattleController.getProCurrent().abilities[i];
+				menu.c("uilist").options.push({
+					"name":ability.name,
+					"ref":i,
+					"action":function() {
+						BattleController.action = {
+							"type":"attack",
+							"use":BC.getProCurrent().abilities[this.ref]
 						}
 					}
-				);
+				});
 			}
 			menu.c("uilist").options.push(
 				{
