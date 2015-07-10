@@ -76,10 +76,10 @@ function init() {
 			player.c('inventory').items.push("Item1");
 			player.c('inventory').items.push("Item1");
 			player.addComponent(new ECS.Components.Trainer());
-			player.c('trainer').synthmon.push(new Synthmon());
-			player.c('trainer').synthmon.push(new Synthmon());
-			player.c('trainer').synthmon.push(new Synthmon());
-			player.c('trainer').synthmon.push(new Synthmon());
+			player.c('trainer').synthmon.push(new Synthmon(true));
+			player.c('trainer').synthmon.push(new Synthmon(true));
+			player.c('trainer').synthmon.push(new Synthmon(true));
+			player.c('trainer').synthmon.push(new Synthmon(true));
 
 			ECS.entities.push(player);
 

@@ -6,6 +6,17 @@ ECS.Components.Inventory.prototype.name = "inventory";
 ECS.Components.Trainer = function Trainer() {
 	this.synthmon = [];
 }
+ECS.Components.Trainer.prototype = {
+	hasHealthy : function(_exclude) {
+		var healthy = [];
+		for(var i = 0; i < this.synthmon.length; i++) {
+			if(this.synthmon[i].curHP > 0 && this.synthmon[i] != _exclude) {
+				healthy.push(this.synthmon[i])
+			}
+		}
+		return healthy.length > 0 ? healthy : null;
+	}
+}
 ECS.Components.Trainer.prototype.name = "trainer";
 
 

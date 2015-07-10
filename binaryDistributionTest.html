@@ -1,0 +1,107 @@
+<script>
+	Array.prototype.sum = function() {
+		var sum = 0;
+		for(var i = 0; i < this.length; i++) {
+			sum += this[i];
+		}
+		return sum;
+	}
+	function getMax(_obj) {
+		var max;
+		for(var i in _obj) {
+			if(max) {
+				if(max < _obj[i]) {
+					max = _obj[i];
+				}
+			} else {
+				max = _obj[i];
+			}
+		}
+		return max;
+	}
+	Array.prototype.partition = function() {
+		var partition = {};
+		for(var i = 0; i < this.length; i++) {
+			if(partition[this[i]]) {
+				partition[this[i]] += 1;
+			} else {
+				partition[this[i]] = 1;
+			}
+		}
+		return partition;
+	}
+
+	function countObject(_obj) {
+		var count = 0;
+		for(var key in _obj) {
+			count++;
+		}
+		return count;
+	}
+	var trials = 100000;
+
+	var resultArray = [];
+
+	console.log((Math.pow(2, 2) - 1) / (Math.pow(2, 2)));
+	var pow = [4, 2, 1, 2, 4];
+	for(var j = 0; j < trials; j++) {
+		/*
+		var a = 0b00000;
+		for(var i = 0; i < 5; i++) {
+			//console.log(Math.floor(Math.random() * Math.pow(2, i)), Math.pow(2, i) - 1)
+			/*
+			if(Math.floor(Math.random() * Math.pow(2, Math.abs(2 - i + 1))) == Math.pow(2, Math.abs(2 - i + 1)) - 1) {
+				k = 1;
+			} else {
+				k = 0;
+			}
+			
+			//console.log(Math.pow(2, pow[i]), Math.pow(2, pow[i]) - 1);
+			if(Math.floor(Math.random() * Math.pow(2, pow[i])) == Math.pow(2, pow[i]) - 1) {
+				k = 1;
+			} else {
+				k = 0;
+			}
+			//var k = Math.floor(Math.random() * 2);
+			k = k << i;
+			a |= k;
+		}
+		*/
+		var a = 0;
+		for(var i = 0; i < 32; i++) {
+			a += Math.floor(Math.floor(Math.random() * 2));
+		}
+		resultArray.push(a);
+
+	}
+	document.write(resultArray.sum() / trials);
+
+	var canvas = document.createElement("canvas");
+	canvas.width = 500;
+	canvas.height = 500;
+	var ctx = canvas.getContext("2d");
+
+	var result = resultArray.partition();
+	var max = getMax(result);
+	var min = Math.min(result);
+	var count = countObject(result);
+
+	var i = 0;
+	for(var index in result) {
+		console.log(result[index]);
+		ctx.fillRect(canvas.width / count * i, canvas.height- 20, 10, -1 * canvas.height * result[index] / max);
+		ctx.fillText(index, canvas.width / count * i, canvas.height)
+		i++;
+	}
+	/*
+	for(var i = 0; i < count; i++) {
+		console.log(result[i])
+		ctx.fillRect(canvas.width / count * i, canvas.height- 20, 10, -1 * canvas.height * result[i] / max);
+		ctx.fillText("Ole!", canvas.width / count * i, canvas.height)
+		//ctx.strokeRect(canvas.width / count * i, canvas.height, canvas.width / count * i * 2, -1 * result[i] / 30);
+	}
+	*/
+
+
+	document.body.appendChild(canvas);
+</script>

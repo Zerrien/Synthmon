@@ -1,0 +1,40 @@
+<script>
+	window.addEventListener("gamepadconnected", function(e) {
+  		console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+   		 e.gamepad.index, e.gamepad.id,
+    	e.gamepad.buttons.length, e.gamepad.axes.length);
+	});
+	var GP = navigator.getGamepads();
+	console.log(GP)
+	var canvas = document.createElement("canvas");
+	canvas.width = canvas.height = 1000;
+	var ctx = canvas.getContext("2d");
+	setInterval(function() {
+		ctx.clearRect(0, 0, 2000, 2000);
+		GP = navigator.getGamepads();
+		ctx.beginPath();
+		ctx.arc(200, 200, 100, 0, Math.PI * 2);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.arc(500, 200, 100, 0, Math.PI * 2);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.arc(200 + GP[0].axes[0] * 100, 200 + GP[0].axes[1] * 100, 5, 0, Math.PI * 2);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.arc(500 + GP[0].axes[2] * 100, 200 + GP[0].axes[3] * 100, 5, 0, Math.PI * 2);
+		ctx.stroke();
+		ctx.beginPath();
+		ctx.moveTo(200, 0);
+		ctx.lineTo(200, 400);
+		ctx.moveTo(0, 200);
+		ctx.lineTo(700, 200)
+
+		ctx.moveTo(500, 0);
+		ctx.lineTo(500, 400)
+		ctx.stroke();
+	}, 10);
+
+	document.write("Controller");
+	document.body.appendChild(canvas);
+</script>
