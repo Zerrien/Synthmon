@@ -150,6 +150,7 @@ var MenuController = {
 					"name":ability.name,
 					"ref":i,
 					"action":function() {
+						ECS.entities2.splice(ECS.entities2.indexOf(menu), 1);
 						BattleController.action = {
 							"type":"attack",
 							"use":BC.getProCurrent().abilities[this.ref]
@@ -161,7 +162,7 @@ var MenuController = {
 				{
 					"name":"Back",
 					"action":function() {
-							ECS.entities2.splice(ECS.entities2.indexOf(menu));
+							ECS.entities2.splice(ECS.entities2.indexOf(menu), 1);
 					}
 				}
 			);

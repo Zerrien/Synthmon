@@ -142,9 +142,9 @@ function loadZone(_name) {
 						component.img = images.images[details.name];
 					} else if(componentID == "Trainer") {
 						component.synthmon.push(new Synthmon());
-						component.synthmon.push(new Synthmon());
-						component.synthmon.push(new Synthmon());
-						component.synthmon.push(new Synthmon());
+						//component.synthmon.push(new Synthmon());
+						//component.synthmon.push(new Synthmon());
+						//component.synthmon.push(new Synthmon());
 					} else {
 						for(var value in details) {
 							component[value] = details[value];
