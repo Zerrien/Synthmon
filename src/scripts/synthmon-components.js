@@ -3,8 +3,9 @@ ECS.Components.Inventory = function Inventory() {
 }
 ECS.Components.Inventory.prototype.name = "inventory";
 
-ECS.Components.Trainer = function Trainer() {
+ECS.Components.Trainer = function Trainer(_name) {
 	this.synthmon = [];
+	this.tName = "DEV_NAME" || _name;
 }
 ECS.Components.Trainer.prototype = {
 	hasHealthy : function(_exclude) {

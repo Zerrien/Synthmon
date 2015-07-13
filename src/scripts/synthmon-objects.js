@@ -74,7 +74,7 @@ Synthmon.prototype = {
 	}
 }
 
-var abilityNames = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"]
+var abilityNames = ["Tackle", "Water Gun", "Bubble Blow", "Headbutt", "Slam", "Water Cannon", "Water Gush", "Slice"];
 
 function Ability() {
 	this.name = abilityNames[Math.floor(Math.random() * abilityNames.length)];
