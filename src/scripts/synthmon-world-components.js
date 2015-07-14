@@ -153,3 +153,8 @@ ECS.Components.WorldGrass = function WorldGrass(_region) {
 	this.region = _region || "default";
 }
 ECS.Components.WorldGrass.prototype.name = "worldgrass";
+
+ECS.Components.WorldSoil = function WorldSoil() {
+
+}
+ECS.Components.WorldSoil.prototype.name = "worldsoil";

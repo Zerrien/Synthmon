@@ -14,6 +14,7 @@
         "chatter": ".\/src\/assets\/img\/object_tiles\/genericNPC.png",
         "cliffs": ".\/src\/assets\/img\/object_tiles\/cliffs.png",
         "iceyground": ".\/src\/assets\/img\/object_tiles\/iceyground.png",
+        "soilground":"./src/assets/img/object_tiles/soil.png",
 
         "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
         "player": ".\/src\/assets\/img\/characters\/player.png",
@@ -54,6 +55,21 @@
                         "facing":"north"
                     }
 
+                },
+                "theSoil":{
+                    "WorldSprite": {
+                        "name": "soilground"
+                    },
+                    "WorldPosition": {
+                        "x": 2,
+                        "y": 6
+                    },
+                    "WorldFloor":{
+                    },
+                    "WorldCollider":{                        
+                    },
+                    "WorldSoil":{   
+                    }
                 },
                 "boulder": {
                     "WorldSprite": {

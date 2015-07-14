@@ -1,5 +1,84 @@
-function Item() {
+/*
+	What is an item?
 
+	Well, first, we must define, what is 'what'?
+
+	An item is an image, a description, and uses.
+	Is an item the amount of the item there is?
+*/
+
+var ItemSchema = {
+	"potion":{
+		"name":"Potion",
+		"description":"Delicious! Great at healing your Synthmon.",
+		"use":{
+
+		}
+	},
+	"fruitA":{
+		"name":"An Fruit",
+		"description":"An unusual fruit. Filling and healthy!",
+		"use":{
+
+		}
+	}
+}
+
+
+function Item(_item) {
+	if(_item) {
+		this.name = _item.name;
+		this.description = _item.description;
+	} else {
+		this.name = "DEV_ITEM_NAME";
+		this.description = "DEV_ITEM_DESCRIPTION";
+	}
+	this.use = {
+		"ref":this,
+		//Being held.
+		"held":function() {
+
+		},
+		//Used in the over world.
+		"world":function() {
+			var dialogue = new ECS.Entity();
+			dialogue.addComponent(new ECS.Components.UIPosition(64, 0));
+			dialogue.addComponent(new ECS.Components.UIDialogueBox(this.ref.description));
+			dialogue.addComponent(new ECS.Components.UIZIndex(5));
+			ECS.entities.push(dialogue);
+
+			var objectControl = new ECS.Entity();
+			objectControl.addComponent(new ECS.Components.UIPosition(64, 64));
+			objectControl.addComponent(new ECS.Components.UIList([
+				{
+					"name":"Use",
+					"action":function() {
+						ECS.entities.splice(ECS.entities.indexOf(objectControl));
+						ECS.entities.splice(ECS.entities.indexOf(dialogue));
+
+						var dialogue2 = new ECS.Entity();
+						dialogue2.addComponent(new ECS.Components.UIPosition(64, 0));
+						dialogue2.addComponent(new ECS.Components.UIDialogueBox("You can do that here!"));
+						dialogue2.addComponent(new ECS.Components.UIZIndex(5));
+						ECS.entities.push(dialogue2);
+					}
+				},
+				{
+					"name":"Back",
+					"action":function() {
+						ECS.entities.splice(ECS.entities.indexOf(objectControl));
+						ECS.entities.splice(ECS.entities.indexOf(dialogue));
+					}
+				}
+			]));
+			objectControl.addComponent(new ECS.Components.UIZIndex(6));
+			ECS.entities.push(objectControl);
+		},
+		//Used in battle.
+		"battle":function() {
+
+		}
+	};
 }
 /*
 	Using placeholder mechanics in the mean time.

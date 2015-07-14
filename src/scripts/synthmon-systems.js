@@ -66,16 +66,18 @@ ECS.Systems.UIKeyboard = function UIKeyboard(_e) {
 					uiL.options[uiL.curIndex].action();
 				}
 			} else if(entity.c("uidialoguebox")) {
-				if(keyboardKeys[32]) {
-					keyboardKeys[32] = false;
+				if(keyboardKeys[32] || keyboardKeys[69]) {
+					keyboardKeys[32] = keyboardKeys[69] = false;
 					var isDone = entity.c("uidialoguebox").progress();
-					if(isDone) {
+					if(isDone && !uiZI) {
 						ECS.entities.splice(ECS.entities.indexOf(entity), 1);
 						gameState = 0;
 						if(entity.c("uidialoguebox").onclose) {
 							entity.c("uidialoguebox").onclose();
 						}
-					}					
+					} else if (isDone) {
+						ECS.entities.splice(ECS.entities.indexOf(entity), 1);
+					}				
 				}
 			}
 		}
@@ -246,7 +248,9 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 			var result = checkCollision(_e, wP.x, wP.y, entity);
 			if(result) {
 				var rwM = result.c("worldmoves");
-				rwM.state = "sliding";
+				if(rwM.destX != 0 || rwM.destY != 0) {
+					rwM.state = "sliding";
+				}
 			}
 		} else if (entity.c("worldsuperpusher")) {
 			var wP = entity.c("worldposition");
@@ -300,9 +304,9 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 			if(wP.state != "standing") {
 				var result = checkCollision(_e, wP.x + wM.destX, wP.y + wM.destY, entity);
 				if(result) {
-					if(result.c("worldpushable") && result.c("worldmoves") && entity.c("worldcanpush")) {
+					if(entity.c("worldcanpush") && result.c("worldpushable") && result.c("worldmoves")) {
 						var rwM = result.c("worldmoves");
-						if(rwM.state == "standing") {
+						if(wM.state != "standing" && rwM.state == "standing") {
 							rwM.state = "walking";
 							rwM.curSpeed = 250;
 							rwM.destX = wM.destX;
@@ -345,7 +349,7 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 }
 
 ECS.Systems.WorldLogic = function WorldLogic(_e) {
-	world.trackPos(player);
+	world.trackPos(player)
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
@@ -363,9 +367,11 @@ ECS.Systems.WorldLogic = function WorldLogic(_e) {
 					}
 					if(wM.state != "superpushed") {
 						wM.state = "standing";
-					} else {
 					}
 				}
+			} else {
+				wM.destX = 0;
+				wM.destY = 0;
 			}
 		}
 	}

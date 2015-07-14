@@ -116,8 +116,10 @@ var MenuController = {
 			for(var i = 0; i < player.c("inventory").items.length; i++) {
 				menu.c("uilist").options.push(
 					{
-						"name":"Olee!!!!",
+						"name":player.c("inventory").items[i].name,
+						"ref":i,
 						"action":function() {
+							player.c("inventory").items[this.ref].use.world();
 						}
 					}
 				);
