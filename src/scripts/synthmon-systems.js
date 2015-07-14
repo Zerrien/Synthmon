@@ -345,6 +345,7 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 }
 
 ECS.Systems.WorldLogic = function WorldLogic(_e) {
+	world.trackPos(player);
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
@@ -590,9 +591,11 @@ var BattleController = {
 		return this.antagonist.c("trainer").synthmon[this.antCur];
 	},
 	"setCurrent":function(_who, _which) {
-		if(_who == "ant") {
+		console.log(_who)
+		if(_who == "antagonist") {
 			this.antCur = this.getAntagonist().synthmon.indexOf(_which);
-		} else if (_who == "pro") {
+			console.log(this.antCur);
+		} else if (_who == "protagonist") {
 			this.proCur = this.getProtagonist().synthmon.indexOf(_which);
 		} else {
 			console.log("???");
@@ -613,10 +616,17 @@ var BattleController = {
 
 		var battleMenu = MenuController.combatMenu.make();
 		ECS.entities2.push(battleMenu);
+
+		/*
+		makeBattleStartEvent(_type);
+		*/
 		makeBattleStartEvent(_type);
 
 		//Not sure if this belongs in the battle configure.
 		gameState = 2;
+	},
+	"firstEvent":function() {
+		return this.events[0];	
 	}
 }
 var BC = BattleController;
@@ -629,132 +639,65 @@ function makeUIDialogue(_string) {
 }
 
 
+function makeBattleStartEvent() {
+	var playerSprite = new ECS.Entity();
+	playerSprite.addComponent(new ECS.Components.UIPosition(0, 0));
+	playerSprite.addComponent(new ECS.Components.BattleSprite(images.images.player));
+
+	var enemySprite = new ECS.Entity();
+	enemySprite.addComponent(new ECS.Components.UIPosition(128, 0));
+	enemySprite.addComponent(new ECS.Components.BattleSprite(images.images.opponent));
+
+	var shortsBattle = makeUIDialogue("Enemy Trainer wants to battle!!!");
+	var firstEvent = new BattleEvent(1000);
+	firstEvent.short(shortsBattle);
+	firstEvent.toAdd.push(playerSprite);
+	firstEvent.toAdd.push(enemySprite);
+	firstEvent.queue = true;
+
+	var secondEvent = sendSynthmonEvent(BC.getAntagonist(), BC.getAntCurrent(), "antagonist");
+	secondEvent.toRemove.push(enemySprite);
+	secondEvent.setVariable(enemySprite.c("uiposition"), "x", 128, 1000, false);
 
 
+	var thirdEvent = sendSynthmonEvent(BC.getProtagonist(), BC.getProCurrent(), "protagonist");
+	thirdEvent.toRemove.push(playerSprite);
+	thirdEvent.setVariable(playerSprite.c("uiposition"), "x", -128, 1000, false);
 
-function sendSynthmonEvent(_who, _what) {
-	var sentSynth = makeUIDialogue(_who + " sent out " + _what + ".");
-	var synthSprite = new ECS.Entity();
-	if(_who == "Player") {
-		synthSprite.addComponent(new ECS.Components.UIPosition(0, 0));
-		synthSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_back));
-	} else {
-		synthSprite.addComponent(new ECS.Components.UIPosition(128, 0));
-		synthSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_front));
-	}
-	var sentEvent = new BattleEvent(0, 1000, function() {
-		ECS.entities2.push(sentSynth);
-		ECS.entities2.push(synthSprite);
-	}, function() {
-		ECS.entities2.splice(ECS.entities2.indexOf(sentSynth), 1);
-	}, false);
-	sentEvent.queue = true;
-
-	
-
-	return {"event":sentEvent, "connection":synthSprite};
-	/*
-		BC.connections.antMonSprite = synthSprite;
-	*/
+	BC.events.push(firstEvent);
+	BC.events.push(secondEvent);
+	BC.events.push(thirdEvent);
 }
 
-
-
-
-function makeBattleStartEvent(_type) {
-	if(_type == "wild") {
-		var playerSprite = new ECS.Entity();
-		playerSprite.addComponent(new ECS.Components.UIPosition(0, 0));
-		playerSprite.addComponent(new ECS.Components.BattleSprite(images.images.player));
-
-		var enemySprite = new ECS.Entity();
-		enemySprite.addComponent(new ECS.Components.UIPosition(128, 0));
-		enemySprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_front));
-
-		BC.connections.antMonSprite = enemySprite;
-
-		var wildAppeared = makeUIDialogue("A wild PIGGEN appeared!");
-		var firstDialogue = new BattleEvent(0, 1000, function() {
-			ECS.entities2.push(wildAppeared);
-			ECS.entities2.push(playerSprite);
-			ECS.entities2.push(enemySprite);
-		}, function() {
-			ECS.entities2.splice(ECS.entities2.indexOf(wildAppeared), 1);
-		});
-		firstDialogue.queue = true;
-
-		var result = sendSynthmonEvent("Player", "Piggen");
-
-		var secondDialogue = result.event;
-		secondDialogue.var = playerSprite.c("uiposition");
-		secondDialogue.varLoc = "x";
-		secondDialogue.varVal = -1;
-		secondDialogue.setOrigin();
-
-		BC.connections.proMonSprite = result.connection;
-
-		BC.events.push(firstDialogue);
-		BC.events.push(secondDialogue);
-
-	} else {
-		var wantsBattle = makeUIDialogue("Shorts kid wants to BATTLE.");
-		var playerSprite = new ECS.Entity();
-		playerSprite.addComponent(new ECS.Components.UIPosition(0, 0));
-		playerSprite.addComponent(new ECS.Components.BattleSprite(images.images.player));
-
-		var opponentSprite = new ECS.Entity();
-		opponentSprite.addComponent(new ECS.Components.UIPosition(128, 0));
-		opponentSprite.addComponent(new ECS.Components.BattleSprite(images.images.opponent));
-
-		var firstDialogue = new BattleEvent(0, 1000, function() {
-			ECS.entities2.push(wantsBattle)
-			ECS.entities2.push(opponentSprite);
-			ECS.entities2.push(playerSprite);
-
-		}, function() {
-			ECS.entities2.splice(ECS.entities2.indexOf(opponentSprite), 1);
-			ECS.entities2.splice(ECS.entities2.indexOf(wantsBattle), 1);
-		});
-		firstDialogue.queue = true;
-
-		firstDialogue.var = opponentSprite.c("uiposition");
-		firstDialogue.varLoc = "x";
-		firstDialogue.varVal = 1;
-		firstDialogue.setOrigin();
-
-
-		var result = sendSynthmonEvent("Shorts Kid", "Piggen");
-		var secondDialogue = result.event;
-
-		BC.connections.antMonSprite = result.connection;
-
-		secondDialogue.var = playerSprite.c("uiposition");
-		secondDialogue.varLoc = "x";
-		secondDialogue.varVal = -1;
-		secondDialogue.setOrigin();
-
-
-		result = sendSynthmonEvent("Player", "Piggen");
-		var thirdDialogue = result.event;
-
-		BC.connections.proMonSprite = result.connection;
-
-		BC.events.push(firstDialogue);
-		BC.events.push(secondDialogue);
-		BC.events.push(thirdDialogue);
+function sendSynthmonEvent(_who, _what, _side) {
+	var monSprite = new ECS.Entity();
+	if(_side == "antagonist") {
+		monSprite.addComponent(new ECS.Components.UIPosition(128, 0));
+		monSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_front));
+		BC.connections.antMonSprite = monSprite;
+	} else if (_side == "protagonist") {
+		monSprite.addComponent(new ECS.Components.UIPosition(0, 0));
+		monSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_back));
+		BC.connections.proMonSprite = monSprite;
 	}
 
-	//Hype stuff
-	//Wild Reveal
-		//A wild x appeared!
-	//Go Y!
+	var dialogue = "";
+	if(_side == "protagonist" && BC.protagonist == player) {
+		dialogue = "Go! " + _what.name + "!";
+	} else {
+		dialogue = _who.tName + " sends out " + _what.name + "!";
+	}
 
-
-	//X Wants to battle!
-	//X sends out Y!
-	//You send out Z!
-	//doo doo doo doo doo <-- music
+	var sendMon = makeUIDialogue(dialogue);
+	var sendEvent = new BattleEvent(1000, function() {
+		BC.setCurrent(_side, _what);
+	});
+	sendEvent.toAdd.push(monSprite);
+	sendEvent.short(sendMon);
+	sendEvent.queue = true;
+	return sendEvent;
 }
+
 
 ECS.Systems.BattleControl = function BattleControl(_e) {
 	var curIndex;
@@ -798,8 +741,11 @@ ECS.Systems.BattleControl = function BattleControl(_e) {
 					keyboardKeys[32] = false;
 					keyboardKeys[69] = false;
 					var isDone = uiDB.progress();
-					if(isDone) {
+					if(isDone && BattleController.events[0].queue) {
 						BattleController.events[0].queue = false;
+						BattleController.events[0].skip = true;
+					} else if (isDone && !BattleController.events[0].queue) {
+						
 					}
 				}
 			}
@@ -815,6 +761,7 @@ function enemyAction() {
 	}
 }
 
+/*
 function hasFaintedEvent(_koee) {
 	var battleEvent;
 	var fainted = makeUIDialogue(_koee.name + " has fainted!");
@@ -826,9 +773,10 @@ function hasFaintedEvent(_koee) {
 	battleEvent.queue = true;
 	return battleEvent;
 }
+*/
 
 function synthKOEvent(_koee, _new, _owner) {
-	
+	/*
 	var firstDialogue = hasFaintedEvent(_koee);
 	var secondDialogue = new BattleEvent(0, 1000, function() {
 	}, function() {
@@ -878,6 +826,109 @@ function synthKOEvent(_koee, _new, _owner) {
 	BC.events.push(firstDialogue);
 	BC.events.push(secondDialogue);
 	BC.events.push(thirdDialogue);
+	*/
+}
+
+	/*
+	var attackDialogue = new ECS.Entity();
+	attackDialogue.addComponent(new ECS.Components.UIPosition(64, 0));
+	attackDialogue.addComponent(new ECS.Components.UIDialogueBox(_words));
+	var dialogueEvent = new BattleEvent(0, 500, function() {
+		ECS.entities2.push(attackDialogue)
+	}, function() {
+		
+	});
+
+	var waterAttack = new ECS.Entity();
+	waterAttack.addComponent(new ECS.Components.UIPosition(64 + 32,  32));
+	waterAttack.addComponent(new ECS.Components.BattleSprite(_img));
+	waterAttack.addComponent(new ECS.Components.BattleAnimated(3, 3, 500 / 9));
+	var animationEvent = new BattleEvent(0, 500, function() {
+		ECS.entities2.push(waterAttack)
+	}, function() {
+		ECS.entities2.splice(ECS.entities2.indexOf(waterAttack), 1);
+	});
+
+
+	var damageEvent = new BattleEvent(0, 500, function() {
+		_targetimg.addComponent(new ECS.Components.BattleShake());
+	}, function() {
+		_targetimg.removeComponent("battleshake");
+		_target.curHP -= _dmg;
+		if(_target.curHP < 0) {
+			_target.curHP = 0;
+		}
+		ECS.entities2.splice(ECS.entities2.indexOf(attackDialogue), 1);
+	});
+
+	BattleController.events.push(dialogueEvent);
+	BattleController.events.push(animationEvent);
+	BattleController.events.push(damageEvent);
+	*/
+
+
+function makeAttackEvent(_who, _action, _dmg) {
+	var target, targetImg, abilityImg, dialogueLine;
+	if(_who == "protagonist") {
+		target = BC.getAntCurrent();
+		targetImg = BC.connections.antMonSprite;
+		abilityImg = images.images.water_attack;
+		dialogueLine = BC.getProCurrent().name + " used " + _action.name + "!";
+	} else {
+		target = BC.getProCurrent();
+		targetImg = BC.connections.proMonSprite;
+		abilityImg = images.images.water_attack_back;
+		dialogueLine = "Enemy " + BC.getAntCurrent().name + " used " + _action.name + "!";
+	}
+
+	var attackDialogue = makeUIDialogue(dialogueLine);
+	var dialogueEvent = new BattleEvent(1000);
+	dialogueEvent.toAdd.push(attackDialogue);
+
+	var waterAttack = new ECS.Entity();
+	waterAttack.addComponent(new ECS.Components.UIPosition(64 + 32,  32));
+	waterAttack.addComponent(new ECS.Components.BattleSprite(abilityImg));
+	waterAttack.addComponent(new ECS.Components.BattleAnimated(3, 3, 500 / 9));
+	var animationEvent = new BattleEvent(500);
+	animationEvent.short(waterAttack);
+
+	var damageEvent = new BattleEvent(500, function() {
+		targetImg.addComponent(new ECS.Components.BattleShake());
+	}, function() {
+		targetImg.removeComponent("battleshake");
+	});
+	damageEvent.setVariable(target, "curHP", -1 * _dmg, 500, false);
+	damageEvent.minimum = 0;
+	damageEvent.toRemove.push(dialogueEvent);
+
+	BC.events.push(dialogueEvent);
+	BC.events.push(animationEvent);
+	BC.events.push(damageEvent);
+}
+
+function makeFaintedEvent(_who) {
+	var target, targetImg, dir;
+	if(_who == "protagonist") {
+		target = BC.getProCurrent();
+		targetImg = BC.connections.proMonSprite;
+		BC.connections.proMonSprite = null;
+		dir = -128;
+	} else {
+		target = BC.getAntCurrent();
+		targetImg = BC.connections.antMonSprite;
+		BC.connections.antMonSprite = null;
+		dir = 128;
+	}
+
+	var hasFaintedDialogue = makeUIDialogue(target.name + " has fainted!");
+	var faintedEvent = new BattleEvent(1000, null, function() {
+		ECS.entities2.splice(ECS.entities2.indexOf(targetImg), 1);
+	});
+	faintedEvent.setVariable(targetImg.c("uiposition"), "x", dir, 1000, false);
+	faintedEvent.short(hasFaintedDialogue);
+	faintedEvent.queue = true;
+
+	BC.events.push(faintedEvent);
 }
 
 function evaluateTurn() {
@@ -895,7 +946,84 @@ function evaluateTurn() {
 				pSpd -= 1;
 			}
 		}
+		var secondTurn = true;
+		if(pSpd > aSpd) {
+			//Protagonist's turn.
+			var dmg = BC.getProCurrent().getEvalDmg(BC.getAntCurrent(), pAct.use);
+			makeAttackEvent("protagonist", pAct.use, dmg);
+			if(BC.getAntCurrent().curHP - dmg <= 0) {
+				//fainted.
+				//about to use
+				//will change?
+				//sent out!
+				makeFaintedEvent("antagonist");
+				var remaining = BC.getAntagonist().hasHealthy(BC.getAntCurrent());
+				if(remaining) {
+					var chosen = remaining[Math.floor(Math.random() * remaining.length)];
+					//BC.setCurrent("antagonist", chosen);
+					var sendEvent = sendSynthmonEvent(BC.getAntagonist(), chosen, "antagonist");
+					BC.events.push(sendEvent);
+				} else {
+					//Game over! Winner.
+				}
+				secondTurn = false;
+			}
+		} else {
+			//Antagonist's turn.
+			var dmg = BC.getAntCurrent().getEvalDmg(BC.getProCurrent(), eAct.use);
+			makeAttackEvent("antagonist", eAct.use, dmg);
+			if(BC.getProCurrent().curHP - dmg <= 0) {
+				makeFaintedEvent("protagonist");
+				var remaining = BC.getProtagonist().hasHealthy(BC.getProCurrent());
+				if(remaining) {
+					var chosen = remaining[Math.floor(Math.random() * remaining.length)];
+					//BC.setCurrent("pro", chosen);
+					var sendEvent = sendSynthmonEvent(BC.getProtagonist(), chosen, "protagonist");
+					BC.events.push(sendEvent);
+				} else {
+					//Game over! LOSER.
+				}
+			}
+		}
 
+		if(secondTurn) {
+			if(pSpd > aSpd) {
+				//Now it's the antagonist's turn.
+				var dmg = BC.getAntCurrent().getEvalDmg(BC.getProCurrent(), eAct.use);
+				makeAttackEvent("antagonist", eAct.use, dmg);
+				if(BC.getProCurrent().curHP - dmg <= 0) {
+					makeFaintedEvent("protagonist");
+					var remaining = BC.getProtagonist().hasHealthy(BC.getProCurrent());
+					if(remaining) {
+						var chosen = remaining[Math.floor(Math.random() * remaining.length)];
+						//BC.setCurrent("pro", chosen);
+						var sendEvent = sendSynthmonEvent(BC.getProtagonist(), chosen, "protagonist");
+						BC.events.push(sendEvent);
+					} else {
+						//Game over! LOSER.
+					}
+				}
+			} else {
+				//Now it's the protagonist's turn.
+				var dmg = BC.getProCurrent().getEvalDmg(BC.getAntCurrent(), pAct.use);
+				makeAttackEvent("protagonist", pAct.use, dmg);
+				if(BC.getAntCurrent().curHP - dmg <= 0) {
+					makeFaintedEvent("antagonist");
+					var remaining = BC.getAntagonist().hasHealthy(BC.getAntCurrent());
+					if(remaining) {
+						var chosen = remaining[Math.floor(Math.random() * remaining.length)];
+						//BC.setCurrent("ant", chosen);
+						var sendEvent = sendSynthmonEvent(BC.getAntagonist(), chosen, "antagonist");
+						BC.events.push(sendEvent);
+					} else {
+						//Game over! Winner.
+					}
+				}
+			}
+		}
+
+
+		/*
 		var secondTurn = true;
 		if(pSpd > aSpd) {
 			var dmg = BC.getProCurrent().getEvalDmg(BC.getAntCurrent(), pAct.use);
@@ -1065,48 +1193,12 @@ function evaluateTurn() {
 				}
 			}
 		}
+		*/
 	}
 
 
 	BattleController.action = null;
 	BattleController.enemyAction = null;
-}
-
-function makeAttackEvent(_words, _target, _targetimg, _img, _dmg) {
-	var attackDialogue = new ECS.Entity();
-	attackDialogue.addComponent(new ECS.Components.UIPosition(64, 0));
-	attackDialogue.addComponent(new ECS.Components.UIDialogueBox(_words));
-	var dialogueEvent = new BattleEvent(0, 500, function() {
-		ECS.entities2.push(attackDialogue)
-	}, function() {
-		
-	});
-
-	var waterAttack = new ECS.Entity();
-	waterAttack.addComponent(new ECS.Components.UIPosition(64 + 32,  32));
-	waterAttack.addComponent(new ECS.Components.BattleSprite(_img));
-	waterAttack.addComponent(new ECS.Components.BattleAnimated(3, 3, 500 / 9));
-	var animationEvent = new BattleEvent(0, 500, function() {
-		ECS.entities2.push(waterAttack)
-	}, function() {
-		ECS.entities2.splice(ECS.entities2.indexOf(waterAttack), 1);
-	});
-
-
-	var damageEvent = new BattleEvent(0, 500, function() {
-		_targetimg.addComponent(new ECS.Components.BattleShake());
-	}, function() {
-		_targetimg.removeComponent("battleshake");
-		_target.curHP -= _dmg;
-		if(_target.curHP < 0) {
-			_target.curHP = 0;
-		}
-		ECS.entities2.splice(ECS.entities2.indexOf(attackDialogue), 1);
-	});
-
-	BattleController.events.push(dialogueEvent);
-	BattleController.events.push(animationEvent);
-	BattleController.events.push(damageEvent);
 }
 
 
@@ -1124,6 +1216,48 @@ ECS.Systems.BattleLogic = function BattleLogic(_e) {
 	/*
 		Events
 	*/
+	var curEvent = BC.firstEvent();
+	if(curEvent) {
+		if(curEvent.curTime == -1) {
+			curEvent.add();
+			curEvent.startAction();
+		}
+		curEvent.curTime += dTime;
+		if(curEvent.v) {
+			if(curEvent.minimum != undefined && curEvent.maximum != undefined) {
+				curEvent.v[curEvent.vL] = Math.max(Math.min(curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur), maximum), curEvent.minimum);
+			} else if (curEvent.minimum != undefined) {
+				curEvent.v[curEvent.vL] = Math.max(curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur), curEvent.minimum);
+			} else if (curEvent.maximum != undefined) {
+				curEvent.v[curEvent.vL] = Math.min(curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur), curEvent.maximum);
+			} else {
+				curEvent.v[curEvent.vL] = curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur);
+			}	
+		}
+		if((curEvent.duration <= curEvent.curTime && !curEvent.queue) || curEvent.skip) {
+			if(curEvent.v) {
+				if(curEvent.reset) {
+					curEvent.v[curEvent.vL] = curEvent.origin;
+				} else {
+					if(curEvent.minimum != undefined && curEvent.maximum != undefined) {
+						curEvent.v[curEvent.vL] = Math.max(Math.min(curEvent.origin + curEvent.val, maximum), curEvent.minimum);
+					} else if (curEvent.minimum != undefined) {
+						curEvent.v[curEvent.vL] = Math.max(curEvent.origin + curEvent.val, curEvent.minimum);
+					} else if (curEvent.maximum != undefined) {
+						curEvent.v[curEvent.vL] = Math.min(curEvent.origin + curEvent.val, curEvent.maximum);
+					} else {
+						curEvent.v[curEvent.vL] = curEvent.origin + curEvent.val;
+					}	
+				}
+			}
+			curEvent.endAction();
+			curEvent.remove();
+			BC.events.splice(0, 1);
+		}
+
+	}
+
+	/*
 	if(BattleController.events.length >= 1) {
 		if(BattleController.events[0].curTime == -1) {
 			BattleController.events[0].startAction();
@@ -1132,7 +1266,7 @@ ECS.Systems.BattleLogic = function BattleLogic(_e) {
 		if(BC.events[0].var && BC.events[0].endTime > BC.events[0].curTime) {
 			BattleController.events[0].var[BattleController.events[0].varLoc] += BC.events[0].varVal;
 		}
-		if(BattleController.events[0].endTime <= BattleController.events[0].curTime && !BattleController.events[0].queue) {
+		if((BattleController.events[0].endTime <= BattleController.events[0].curTime && !BattleController.events[0].queue) || BattleController.events[0].skip) {
 			if(BC.events[0].var && BC.events[0].reset) {
 				BattleController.events[0].var[BattleController.events[0].varLoc] = BattleController.events[0].origin;
 			}
@@ -1140,8 +1274,48 @@ ECS.Systems.BattleLogic = function BattleLogic(_e) {
 			BattleController.events.splice(0, 1);
 		}
 	}
+	*/
 }
 
+
+
+function BattleEvent(_dur, _sA, _eA) {
+	this.curTime = -1;
+	this.duration = _dur;
+	this.startAction = _sA || function() {};
+	this.endAction = _eA || function() {};
+
+	this.toAdd = [];
+	this.toRemove = [];
+
+	this.queue = false;
+	this.isSkip = false;
+	this.add = function() {
+		for(var i = 0; i < this.toAdd.length; i++) {
+			ECS.entities2.push(this.toAdd[i]);
+		}
+	}
+	this.remove = function() {
+		for(var i = 0; i < this.toRemove.length; i++) {
+			ECS.entities2.splice(ECS.entities2.indexOf(this.toRemove[i]), 1);
+		}
+	}
+	this.short = function(_e) {
+		this.toAdd.push(_e);
+		this.toRemove.push(_e);
+	}
+	this.setVariable = function(_var, _varLoc, _value, _duration, _reset) {
+		this.v = _var;
+		this.vL = _varLoc;
+		this.val = _value;
+		this.dur = _duration;
+		this.reset = _reset;
+		this.origin = this.v[this.vL];
+	}
+}
+
+
+/*
 function BattleEvent(_s, _e, _sA, _eA, _reset) {
 	this.startTime = _s;
 	this.endTime = _e;
@@ -1160,6 +1334,7 @@ function BattleEvent(_s, _e, _sA, _eA, _reset) {
 		}
 	}
 }
+*/
 
 ECS.Systems.BattleRender = function BattleRender(_e) {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1242,12 +1417,12 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 		}
 	}
 	ctx.fillStyle = "black";
-	ctx.fillText(BC.getProCurrent().curHP + " / " + BC.getProCurrent().maxHP, 0, 128 + 24);
+	ctx.fillText(Math.floor(BC.getProCurrent().curHP) + " / " + BC.getProCurrent().maxHP, 0, 128 + 24);
 	ctx.fillText("Level: " + BC.getProCurrent().level, 0, 128 + 32);
 
 	if(BC.connections.antMonSprite) {
 		ctx.textAlign = "right";
-		ctx.fillText(BC.getAntCurrent().curHP + " / " + BC.getAntCurrent().maxHP, 128 * 2, 128 + 24);
+		ctx.fillText(Math.floor(BC.getAntCurrent().curHP) + " / " + BC.getAntCurrent().maxHP, 128 * 2, 128 + 24);
 		ctx.fillText("Level: " + BC.getAntCurrent().level, 128 * 2, 128 + 32);
 	}
 

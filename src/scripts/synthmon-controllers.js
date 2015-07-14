@@ -9,6 +9,41 @@ function WorldController() {
 		this.images.interiors[chunkID] = new Image();
 		this.images.interiors[chunkID].src = worldData.interior[chunkID].source;
 	}
+	this.lastChunk = null;
+}
+WorldController.prototype = {
+	"trackPos":function(_player) {
+		var pChunkX = _player.c("worldposition").x >> 5;
+		var pChunkY = _player.c("worldposition").y >> 5;
+		if(!this.lastChunk) {
+			this.lastChunk = {x:pChunkX, y:pChunkY};
+		}
+		if(this.lastChunk.x != pChunkX) {
+			var diffX = this.lastChunk.x - pChunkX;
+			var distanceX = pChunkX + diffX * 2;
+			var forwardX = pChunkX + (diffX * - 1);
+			for(var i = -1; i <= 1; i++) {
+				unloadChunk(distanceX + "," + (pChunkY + i));
+				loadChunk(forwardX + "," + (pChunkY + i));
+			}
+		} else if (this.lastChunk.y != pChunkY) {
+		}
+		this.lastChunk = {x:pChunkX, y:pChunkY};
+		//console.log(_player.c("worldposition").x);
+	},
+	"init":function() {
+		if(player) {
+			var pChunkX = player.c("worldposition").x >> 5;
+			var pChunkY = player.c("worldposition").y >> 5;
+			for(var i = -1; i <= 1; i++) {
+				for(var j = -1; j <= 1; j++) {
+					loadChunk(i + "," + j);
+				}
+			}
+		} else {
+			console.log("There ain't a player!");
+		}
+	}
 }
 
 function ImageController() {

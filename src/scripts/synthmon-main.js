@@ -83,7 +83,11 @@ function init() {
 
 			ECS.entities.push(player);
 
+			world.init();
+
+			/*
 			loadZone(0);
+			*/
 
 			/*
 				Technically, this is where things will be read.
@@ -127,12 +131,35 @@ ECS.entities2 = [];
 
 function loadZone(_name) {
 	if(_name == 0) {
-		var k = 0;
-		var pPos = player.c("worldposition");
-		var pChunkX = pPos.x >> 5;
-		var pChunkY = pPos.y >> 5;
-		for(var obj in worldData.chunks[pChunkX+","+pChunkY].objects) {
-			var object = worldData.chunks[pChunkX+","+pChunkY].objects[obj];
+		world.init();
+	} else {
+		var door = new ECS.Entity();
+		door.addComponent(new ECS.Components.WorldSprite(images.images.door));
+		door.addComponent(new ECS.Components.WorldPosition(6,12));
+		door.addComponent(new ECS.Components.WorldCollider());
+		door.addComponent(new ECS.Components.WorldPortal(0, {
+			"x":12,
+			"y":2,
+			"facing":"south"
+		}));
+		ECS.entities.push(door);
+	}
+}
+
+function tArrayFind(_array, _key) {
+	for(var i = 0; i < _array.length; i++) {
+		if(_array[i].sID == _key) {
+			return _array[i];
+		}
+	}
+	return null;
+}
+
+function loadChunk(_coords) {
+	if(worldData.chunks[_coords] && worldData.chunks[_coords].objects) {
+		var splitArray = _coords.split(",");
+		for(var obj in worldData.chunks[_coords].objects) {
+			var object = worldData.chunks[_coords].objects[obj];
 			var entity = new ECS.Entity();
 			for(var componentID in object) {
 				var details = object[componentID];
@@ -149,6 +176,9 @@ function loadZone(_name) {
 						//component.synthmon.push(new Synthmon());
 						//component.synthmon.push(new Synthmon());
 						//component.synthmon.push(new Synthmon());
+					} else if(componentID == "WorldPosition") {
+						component.x = details.x + splitArray[0] * 32;
+						component.y = details.y + splitArray[1] * 32;
 					} else {
 						for(var value in details) {
 							component[value] = details[value];
@@ -159,21 +189,23 @@ function loadZone(_name) {
 					console.warn("Unable to find component of type:" + componentID)
 				}
 			}
-
+			entity.sID = (_coords) + obj;
 			ECS.entities.push(entity);
 		}
-	} else {
+	}
+}
 
-		var door = new ECS.Entity();
-		door.addComponent(new ECS.Components.WorldSprite(images.images.door));
-		door.addComponent(new ECS.Components.WorldPosition(6,12));
-		door.addComponent(new ECS.Components.WorldCollider());
-		door.addComponent(new ECS.Components.WorldPortal(0, {
-			"x":12,
-			"y":2,
-			"facing":"south"
-		}));
-		ECS.entities.push(door);
+function unloadChunk(_coords) {
+	if(worldData.chunks[_coords] && worldData.chunks[_coords].objects) {
+		var splitArray = _coords.split(",");
+		var objectArray = worldData.chunks[_coords].objects;
+		for(var objKey in objectArray) {
+			var result = tArrayFind(ECS.entities, _coords + objKey);
+			if(result) {
+				ECS.entities.splice(ECS.entities.indexOf(result), 1);
+
+			}
+		}
 	}
 }
 

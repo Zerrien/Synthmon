@@ -1,8 +1,6 @@
 function Item() {
 
 }
-
-
 /*
 	Using placeholder mechanics in the mean time.
 
