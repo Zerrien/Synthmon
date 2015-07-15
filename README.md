@@ -30,7 +30,7 @@ Below are the various milestones the project
 - [ ] 15 Species
 - [ ] 35 Species
 - [ ] 75 Species
-- 
+
 ##Online
 - [ ] Account Registration
  - [ ] SSL Certificate

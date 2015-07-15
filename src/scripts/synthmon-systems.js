@@ -937,6 +937,39 @@ function makeFaintedEvent(_who) {
 	BC.events.push(faintedEvent);
 }
 
+function makeTurnEvent(_side, _action) {
+	var from, to, toOwner, enemy;
+	if(_side == "protagonist") {
+		from = BC.getProCurrent();
+		to = BC.getAntCurrent();
+		toOwner = BC.getAntagonist();
+		enemy = "antagonist";
+	} else if (_side == "antagonist") {
+		from = BC.getAntCurrent();
+		to = BC.getProCurrent();
+		toOwner = BC.getProtagonist();
+		enemy = "protagonist";
+	}
+
+	var dmg = from.getEvalDmg(to, _action);
+	makeAttackEvent(_side, _action, dmg);
+	if(to.curHP - dmg <= 0) {
+		makeFaintedEvent(enemy);
+		var remaining = toOwner.hasHealthy(to);
+		if(remaining) {
+			var chosen = remaining[Math.floor(Math.random() * remaining.length)];
+			var sendEvent = sendSynthmonEvent(toOwner, chosen, enemy);
+			BC.events.push(sendEvent);
+			return "FAINTED";
+		} else {
+			//game over for this user!
+			return "LOSS";
+		}
+	}
+	return "SECOND_TURN";
+
+}
+
 function evaluateTurn() {
 	var pAct = BattleController.action;
 	var eAct = BattleController.enemyAction;
@@ -954,76 +987,32 @@ function evaluateTurn() {
 		}
 		var secondTurn = true;
 		if(pSpd > aSpd) {
-			//Protagonist's turn.
-			var dmg = BC.getProCurrent().getEvalDmg(BC.getAntCurrent(), pAct.use);
-			makeAttackEvent("protagonist", pAct.use, dmg);
-			if(BC.getAntCurrent().curHP - dmg <= 0) {
-				//fainted.
-				//about to use
-				//will change?
-				//sent out!
-				makeFaintedEvent("antagonist");
-				var remaining = BC.getAntagonist().hasHealthy(BC.getAntCurrent());
-				if(remaining) {
-					var chosen = remaining[Math.floor(Math.random() * remaining.length)];
-					//BC.setCurrent("antagonist", chosen);
-					var sendEvent = sendSynthmonEvent(BC.getAntagonist(), chosen, "antagonist");
-					BC.events.push(sendEvent);
-				} else {
-					//Game over! Winner.
-				}
+			var outcome = makeTurnEvent("protagonist", pAct.use);
+			if(outcome == "LOSS") {
+				console.log("Player won!");
+			} else if (outcome != "SECOND_TURN") {
 				secondTurn = false;
 			}
 		} else {
 			//Antagonist's turn.
-			var dmg = BC.getAntCurrent().getEvalDmg(BC.getProCurrent(), eAct.use);
-			makeAttackEvent("antagonist", eAct.use, dmg);
-			if(BC.getProCurrent().curHP - dmg <= 0) {
-				makeFaintedEvent("protagonist");
-				var remaining = BC.getProtagonist().hasHealthy(BC.getProCurrent());
-				if(remaining) {
-					var chosen = remaining[Math.floor(Math.random() * remaining.length)];
-					//BC.setCurrent("pro", chosen);
-					var sendEvent = sendSynthmonEvent(BC.getProtagonist(), chosen, "protagonist");
-					BC.events.push(sendEvent);
-				} else {
-					//Game over! LOSER.
-				}
+			var outcome = makeTurnEvent("antagonist", eAct.use);
+			if(outcome == "LOSS") {
+				console.log("Enemy won!");
+			} else if (outcome != "SECOND_TURN") {
+				secondTurn = false;
 			}
 		}
 
 		if(secondTurn) {
 			if(pSpd > aSpd) {
-				//Now it's the antagonist's turn.
-				var dmg = BC.getAntCurrent().getEvalDmg(BC.getProCurrent(), eAct.use);
-				makeAttackEvent("antagonist", eAct.use, dmg);
-				if(BC.getProCurrent().curHP - dmg <= 0) {
-					makeFaintedEvent("protagonist");
-					var remaining = BC.getProtagonist().hasHealthy(BC.getProCurrent());
-					if(remaining) {
-						var chosen = remaining[Math.floor(Math.random() * remaining.length)];
-						//BC.setCurrent("pro", chosen);
-						var sendEvent = sendSynthmonEvent(BC.getProtagonist(), chosen, "protagonist");
-						BC.events.push(sendEvent);
-					} else {
-						//Game over! LOSER.
-					}
+				var outcome = makeTurnEvent("antagonist", eAct.use);
+				if(outcome == "LOSS") {
+					console.log("Enemy won!");
 				}
 			} else {
-				//Now it's the protagonist's turn.
-				var dmg = BC.getProCurrent().getEvalDmg(BC.getAntCurrent(), pAct.use);
-				makeAttackEvent("protagonist", pAct.use, dmg);
-				if(BC.getAntCurrent().curHP - dmg <= 0) {
-					makeFaintedEvent("antagonist");
-					var remaining = BC.getAntagonist().hasHealthy(BC.getAntCurrent());
-					if(remaining) {
-						var chosen = remaining[Math.floor(Math.random() * remaining.length)];
-						//BC.setCurrent("ant", chosen);
-						var sendEvent = sendSynthmonEvent(BC.getAntagonist(), chosen, "antagonist");
-						BC.events.push(sendEvent);
-					} else {
-						//Game over! Winner.
-					}
+				var outcome = makeTurnEvent("protagonist", pAct.use);
+				if(outcome == "LOSS") {
+					console.log("Player won!");
 				}
 			}
 		}
