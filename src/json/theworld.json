@@ -15,6 +15,7 @@
         "cliffs": ".\/src\/assets\/img\/object_tiles\/cliffs.png",
         "iceyground": ".\/src\/assets\/img\/object_tiles\/iceyground.png",
         "soilground":"./src/assets/img/object_tiles/soil.png",
+        "pressureplate":"./src/assets/img/object_tiles/pressure.png",
 
         "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
         "player": ".\/src\/assets\/img\/characters\/player.png",
@@ -33,6 +34,42 @@
         "0,0": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png",
             "objects": {
+                "pressurePlate":{
+                    "WorldSprite":{
+                        "name":"pressureplate"
+                    },
+                    "WorldPosition":{
+                        "x":9,
+                        "y":9
+                    },
+                    "WorldPressure":{
+                    }
+                },
+                "lockedDoor":{
+                    "WorldSprite":{
+                        "name":"boulder"
+                    },
+                    "WorldPosition":{
+                        "x":12,
+                        "y":9
+                    },
+                    "WorldWire":{
+                        "connection":{
+                            "name":"pressurePlate",
+                            "component":"worldpressure",
+                            "value":"isActivated"
+                        },
+                        "link":{
+                            "name":"worldposition",
+                            "value":"x",
+                            "on":14,
+                            "off":12
+                        }
+                    },
+                    "WorldCollider":{
+                        
+                    }
+                },
                 "chatter2": {
                     "WorldSprite": {
                         "name": "chatter"

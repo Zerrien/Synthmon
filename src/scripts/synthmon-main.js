@@ -80,9 +80,9 @@ function init() {
 
 			player.addComponent(new ECS.Components.Trainer());
 			player.c('trainer').synthmon.push(new Synthmon(true));
-			player.c('trainer').synthmon.push(new Synthmon(true));
-			player.c('trainer').synthmon.push(new Synthmon(true));
-			player.c('trainer').synthmon.push(new Synthmon(true));
+			//player.c('trainer').synthmon.push(new Synthmon(true));
+			//player.c('trainer').synthmon.push(new Synthmon(true));
+			//player.c('trainer').synthmon.push(new Synthmon(true));
 
 			ECS.entities.push(player);
 
@@ -182,6 +182,31 @@ function loadChunk(_coords) {
 					} else if(componentID == "WorldPosition") {
 						component.x = details.x + splitArray[0] * 32;
 						component.y = details.y + splitArray[1] * 32;
+					} else if(componentID == "WorldWire") {
+						/*
+						"connection":{
+                            "name":"pressurePlate",
+                            "component":"worldpressure",
+                            "value":"isActivated"
+                        }
+                        */
+                        var attempt = tArrayFind(ECS.entities, (_coords) + details.connection.name);
+                        if(attempt) {
+                        	component.connection = attempt;
+                        	component.component = details.connection.component;
+                        	component.value = details.connection.value;
+
+                        	component.on = details.link.on;
+                        	component.off = details.link.off;
+
+                        	component.link = details.link.name;
+                        	component.val = details.link.value;
+                        } else {
+                        	component.connection = null;
+                        	console.warn("Unable to find component of name: \"" + details.connection.name + "\" at coords: " + _coords);
+                        }
+						
+
 					} else {
 						for(var value in details) {
 							component[value] = details[value];

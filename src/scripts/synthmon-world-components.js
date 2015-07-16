@@ -158,3 +158,17 @@ ECS.Components.WorldSoil = function WorldSoil() {
 
 }
 ECS.Components.WorldSoil.prototype.name = "worldsoil";
+
+
+
+
+ECS.Components.WorldPressure = function WorldPressure() {
+	this.isActivated = false;
+}
+ECS.Components.WorldPressure.prototype.name = "worldpressure";
+
+
+ECS.Components.WorldWire = function WorldWire() {
+
+}
+ECS.Components.WorldWire.prototype.name = "worldwire";

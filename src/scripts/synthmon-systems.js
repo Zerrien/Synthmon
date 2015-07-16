@@ -291,6 +291,22 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 			} else if(result == null) {
 				entity.c("worldgrass").last = null;
 			}
+		} else if (entity.c("worldpressure")) {
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				entity.c("worldpressure").isActivated = true;
+			} else {
+				entity.c("worldpressure").isActivated = false;
+			}
+		} else if (entity.c("worldwire")) {
+			var wW = entity.c("worldwire");
+			var wC = wW.connection;
+			if(wC.c(wW.component)[wW.value]) {
+				entity.c(wW.link)[wW.val] = wW.on;
+			} else {
+				entity.c(wW.link)[wW.val] = wW.off;
+			}
 		}
 	}
 }
@@ -989,7 +1005,15 @@ function evaluateTurn() {
 		if(pSpd > aSpd) {
 			var outcome = makeTurnEvent("protagonist", pAct.use);
 			if(outcome == "LOSS") {
-				console.log("Player won!");
+				//console.log("Player won!");
+				var winningDialog = makeUIDialogue("You won!");
+				var winningEvent = new BattleEvent(1000, null, function() {
+					gameState = 0;
+				});
+				winningEvent.short(winningDialog);
+				winningEvent.queue = true;
+				BC.events.push(winningEvent);
+				secondTurn = false;
 			} else if (outcome != "SECOND_TURN") {
 				secondTurn = false;
 			}
@@ -997,7 +1021,16 @@ function evaluateTurn() {
 			//Antagonist's turn.
 			var outcome = makeTurnEvent("antagonist", eAct.use);
 			if(outcome == "LOSS") {
-				console.log("Enemy won!");
+				var losingDialog = makeUIDialogue("You lost....");
+				var losingEvent = new BattleEvent(1000, null, function() {
+					gameState = 0;
+					/*
+						Include return to home functionality.
+					*/
+				});
+				losingEvent.short(losingDialog);
+				losingEvent.queue = true;
+				BC.events.push(losingEvent);
 			} else if (outcome != "SECOND_TURN") {
 				secondTurn = false;
 			}
@@ -1007,12 +1040,27 @@ function evaluateTurn() {
 			if(pSpd > aSpd) {
 				var outcome = makeTurnEvent("antagonist", eAct.use);
 				if(outcome == "LOSS") {
-					console.log("Enemy won!");
+					var losingDialog = makeUIDialogue("You lost....");
+					var losingEvent = new BattleEvent(1000, null, function() {
+						gameState = 0;
+						/*
+							Include return to home functionality.
+						*/
+					});
+					losingEvent.short(losingDialog);
+					losingEvent.queue = true;
+					BC.events.push(losingEvent);
 				}
 			} else {
 				var outcome = makeTurnEvent("protagonist", pAct.use);
 				if(outcome == "LOSS") {
-					console.log("Player won!");
+					var winningDialog = makeUIDialogue("You won!");
+					var winningEvent = new BattleEvent(1000, null, function() {
+						gameState = 0;
+					});
+					winningEvent.short(winningDialog);
+					winningEvent.queue = true;
+					BC.events.push(winningEvent);
 				}
 			}
 		}
