@@ -6,6 +6,14 @@ ECS.Components = {};
 ECS.Assemblages = {};
 ECS.Systems = {};
 
+//Scenes are combinations of systems, even if they don't employ Entities or Components.
+//Title Scene
+//Main Menu Scene
+//Overworld Scene
+//Battle Scene
+//Other minigame scenes.
+ECS.Scenes = {};
+
 ECS.Entity = function Entity() {
 	this.id = this.id = (+new Date()).toString(16) + (Math.random() * 100000000 | 0).toString(16) + ECS.Entity.prototype._count;
 	ECS.Entity.prototype._count++;
