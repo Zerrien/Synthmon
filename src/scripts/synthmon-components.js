@@ -20,6 +20,12 @@ ECS.Components.Trainer.prototype = {
 }
 ECS.Components.Trainer.prototype.name = "trainer";
 
+ECS.Components.Revives = function Revives() {
+	this.zone = "playerUpstairs";
+	this.position = {x:0, y:0};
+}
+ECS.Components.Revives.prototype.name = "revives";
+
 
 ECS.Components.UIPosition = function UIPosition(_x, _y) {
 	this.x = _x;

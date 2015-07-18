@@ -85,6 +85,7 @@ ECS.Systems.UIKeyboard = function UIKeyboard(_e) {
 }
 
 ECS.Systems.WorldUI = function WorldUI(_e) {
+
 	ctx.save();
 	for(var entityID in _e) {
 		var entity = _e[entityID];
@@ -345,9 +346,13 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 
 							wP.x = rwPo.params.x;
 							wP.y = rwPo.params.y;
-							wP.zone = rwPo.destination;
 
-							loadZone(rwPo.destination);
+
+							//console.log(rwPo.destination);
+
+							wP.zone = rwPo.dest;
+
+							loadZone(rwPo.dest);
 						}
 					} else if (result.c("worldfacingcollider")) {
 						if(result.c("worldfaces").facing == entity.c("worldfaces").facing) {
@@ -590,220 +595,6 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 
 
 
-
-/*
-ECS.Systems.BattleControl = function BattleControl(_e) {
-	var curIndex;
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var uiZI = entity.c("uizindex");
-		if(uiZI) {
-			if(!curIndex) {
-				curIndex = uiZI.zindex;
-			} else {
-				if(curIndex < uiZI.zindex) {
-					curIndex = uiZI.zindex;
-				}
-			}
-		}
-	}
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		if(BattleController.events.length == 0) {
-			var uiZI = entity.c("uizindex");
-			if(!curIndex || (uiZI && uiZI.zindex == curIndex)) {
-				if(entity.c("uilist")) {
-					var uiL = entity.c("uilist");
-					if(keyboardKeys[87]) {
-						keyboardKeys[87] = false;
-						uiL.up();
-					} else if (keyboardKeys[83]) {
-						keyboardKeys[83] = false;
-						uiL.down();
-					} else if (keyboardKeys[32] || keyboardKeys[69]) {
-						keyboardKeys[32] = false;
-						keyboardKeys[69] = false;
-						uiL.options[uiL.curIndex].action();
-					}
-				}
-			}
-		} else {
-			var uiDB = entity.c("uidialoguebox");
-			if(uiDB) {
-				if(keyboardKeys[32] || keyboardKeys[69]) {
-					keyboardKeys[32] = false;
-					keyboardKeys[69] = false;
-					var isDone = uiDB.progress();
-					if(isDone && BattleController.events[0].queue) {
-						BattleController.events[0].queue = false;
-						BattleController.events[0].skip = true;
-					} else if (isDone && !BattleController.events[0].queue) {
-						
-					}
-				}
-			}
-		}
-	}
-}
-*/
-
-
-
-
-
-
-
-/*
-ECS.Systems.BattleLogic = function BattleLogic(_e) {
-	//Actions
-	if(BattleController.action != null) {
-		enemyAction();
-		evaluateTurn();
-	}
-
-
-	//Events
-	var curEvent = BC.firstEvent();
-	if(curEvent) {
-		if(curEvent.curTime == -1) {
-			curEvent.add();
-			curEvent.startAction();
-		}
-		curEvent.curTime += dTime;
-		if(curEvent.v) {
-			if(curEvent.minimum != undefined && curEvent.maximum != undefined) {
-				curEvent.v[curEvent.vL] = Math.max(Math.min(curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur), maximum), curEvent.minimum);
-			} else if (curEvent.minimum != undefined) {
-				curEvent.v[curEvent.vL] = Math.max(curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur), curEvent.minimum);
-			} else if (curEvent.maximum != undefined) {
-				curEvent.v[curEvent.vL] = Math.min(curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur), curEvent.maximum);
-			} else {
-				curEvent.v[curEvent.vL] = curEvent.origin + curEvent.val * (Math.min(curEvent.curTime, curEvent.dur) / curEvent.dur);
-			}	
-		}
-		if((curEvent.duration <= curEvent.curTime && !curEvent.queue) || curEvent.skip) {
-			if(curEvent.v) {
-				if(curEvent.reset) {
-					curEvent.v[curEvent.vL] = curEvent.origin;
-				} else {
-					if(curEvent.minimum != undefined && curEvent.maximum != undefined) {
-						curEvent.v[curEvent.vL] = Math.max(Math.min(curEvent.origin + curEvent.val, maximum), curEvent.minimum);
-					} else if (curEvent.minimum != undefined) {
-						curEvent.v[curEvent.vL] = Math.max(curEvent.origin + curEvent.val, curEvent.minimum);
-					} else if (curEvent.maximum != undefined) {
-						curEvent.v[curEvent.vL] = Math.min(curEvent.origin + curEvent.val, curEvent.maximum);
-					} else {
-						curEvent.v[curEvent.vL] = curEvent.origin + curEvent.val;
-					}	
-				}
-			}
-			curEvent.endAction();
-			curEvent.remove();
-			BC.events.splice(0, 1);
-		}
-
-	}
-}
-*/
-
-
-
-
-
-/*
-ECS.Systems.BattleRen2der = function Battle2Render(_e) {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = "rgba(0, 0, 0, 0.125)";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = "black";
-	ctx.save();
-
-	for(var entityID in _e) {
-		var entity = _e[entityID];
-		var uiP = entity.c("uiposition");
-		if(uiP) {
-			if(entity.c("battlesprite")) {
-				var bS = entity.c("battlesprite");
-				var bSh = entity.c("battleshake");
-				var bA = entity.c("battleanimated");
-				if(bA) {
-					bA.curTime += dTime;
-					var curIndex = Math.floor(bA.curTime / bA.time);
-					ctx.drawImage(bS.img,
-						//Source Corner
-						64 * (curIndex % 3), 64 *  ((curIndex - (curIndex % 3)) / 3),
-						//Source Size
-						64, 64,
-						//World Position
-						uiP.x, uiP.y,
-						//World Size
-						64, 64);
-				} else {
-					if(entity.c("battleshake")) {
-						ctx.drawImage(entity.c("battlesprite").img, uiP.x + (Math.sin(tTime / 100)) * 32, uiP.y);
-					} else {
-						ctx.drawImage(entity.c("battlesprite").img, uiP.x, uiP.y);
-					}
-				}
-				
-			}
-		}
-	}
-
-	var proSynth = BattleController.getProCurrent();
-	var antSynth = BattleController.getAntCurrent();
-
-	ctx.fillStyle = "red";
-	ctx.fillRect(0, 128, 128, 16);
-	if(BC.connections.antMonSprite) {
-		ctx.fillRect(128, 0, 128, 16);
-	}
-	ctx.fillStyle = "green";
-	ctx.fillRect(0, 128, 128 * proSynth.curHP / proSynth.maxHP, 16);
-	if(BC.connections.antMonSprite) {
-		ctx.fillRect(128, 0, 128 * antSynth.curHP / antSynth.maxHP, 16);
-	}
-
-	var proList = BC.getProtagonist().synthmon;
-	var antList = BC.getAntagonist().synthmon;
-
-	for(var i = 0; i < 6; i++) {
-		if(proList[i]) {
-			if(proList[i].curHP <= 0) {
-				ctx.drawImage(images.images.dead_drive, 128 / 2 - 16 * 3 + i * 16, 0);
-			} else {
-				ctx.drawImage(images.images.alive_drive, 128 / 2 - 16 * 3 + i * 16, 0);
-			}
-			
-		} else {
-			ctx.drawImage(images.images.empty_drive, 128 / 2 - 16 * 3 + i * 16, 0);
-		}
-
-		if(!BC.type) {
-			if(antList[i]) {
-				if(antList[i].curHP <= 0) {
-					ctx.drawImage(images.images.dead_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
-				} else {
-					ctx.drawImage(images.images.alive_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
-				}
-			} else {
-				ctx.drawImage(images.images.empty_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
-			}
-		}
-	}
-	ctx.fillStyle = "black";
-	ctx.fillText(Math.floor(BC.getProCurrent().curHP) + " / " + BC.getProCurrent().maxHP, 0, 128 + 24);
-	ctx.fillText("Level: " + BC.getProCurrent().level, 0, 128 + 32);
-
-	if(BC.connections.antMonSprite) {
-		ctx.textAlign = "right";
-		ctx.fillText(Math.floor(BC.getAntCurrent().curHP) + " / " + BC.getAntCurrent().maxHP, 128 * 2, 128 + 24);
-		ctx.fillText("Level: " + BC.getAntCurrent().level, 128 * 2, 128 + 32);
-	}
-
-	ctx.restore();
-}
-*/
 ECS.Systems.BattleUI = function BattleUI(_e) {
 
 }

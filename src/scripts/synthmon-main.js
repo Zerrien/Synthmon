@@ -51,7 +51,9 @@ function init() {
 
 			//World-components
 			player.addComponent(new ECS.Components.WorldSprite(images.images.explorer));
-			player.addComponent(new ECS.Components.WorldPosition(0, 0));
+			var playerPos = new ECS.Components.WorldPosition(0, 0);
+			playerPos.zone = "playerUpstairs";
+			player.addComponent(playerPos);
 			player.addComponent(new ECS.Components.WorldFaces("north"));
 			player.addComponent(new ECS.Components.WorldMoves());
 			player.addComponent(new ECS.Components.WorldAnimation({
@@ -63,6 +65,7 @@ function init() {
 				"floating":[2, 3],
 				"superpushed":[0,1]
 			}));
+			player.addComponent(new ECS.Components.Revives());
 			player.addComponent(new ECS.Components.WorldCollider());
 			player.addComponent(new ECS.Components.WorldCanPush(1));
 
@@ -86,7 +89,7 @@ function init() {
 
 			ECS.entities.push(player);
 
-			world.init();
+			//world.init();
 
 			for(var sceneName in ECS.Scenes) {
 				ECS.Scenes[sceneName].init();
@@ -95,6 +98,7 @@ function init() {
 			/*
 			loadZone(0);
 			*/
+			loadZone(playerPos.zone);
 
 			/*
 				Technically, this is where things will be read.
@@ -125,21 +129,80 @@ ECS.States.WorldUI = [
 	ECS.Systems.WorldUI
 ]
 
-ECS.States.Battle = [
-	ECS.Systems.BattleControl,
-	ECS.Systems.BattleLogic,
-	ECS.Systems.BattleRender,
-	ECS.Systems.WorldUI
-]
 
 var gameState = 0;
 
 ECS.entities2 = [];
 
 function loadZone(_name) {
+	ECS.entities = [];
+	ECS.entities.push(player);
 	if(_name == 0) {
 		world.init();
 	} else {
+		for(var obj in worldData.interior[_name].objects) {
+			var object = worldData.interior[_name].objects[obj];
+			var entity = new ECS.Entity();
+			for(var componentID in object) {
+				var details = object[componentID];
+				if(ECS.Components[componentID]) {
+					var component = new ECS.Components[componentID];
+					if(componentID == "WorldSprite") {
+						component.img = images.images[details.name];
+					} else if(componentID == "Trainer") {
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.tName = details["tName"]
+						//component.synthmon.push(new Synthmon());
+						//component.synthmon.push(new Synthmon());
+						//component.synthmon.push(new Synthmon());
+					} else if(componentID == "WorldPosition") {
+						component.x = details.x;
+						component.y = details.y;
+					} else if(componentID == "WorldWire") {
+						/*
+						"connection":{
+                            "name":"pressurePlate",
+                            "component":"worldpressure",
+                            "value":"isActivated"
+                        }
+                        */
+                        var attempt = tArrayFind(ECS.entities, details.connection.name);
+                        if(attempt) {
+                        	component.connection = attempt;
+                        	component.component = details.connection.component;
+                        	component.value = details.connection.value;
+
+                        	component.on = details.link.on;
+                        	component.off = details.link.off;
+
+                        	component.link = details.link.name;
+                        	component.val = details.link.value;
+                        } else {
+                        	component.connection = null;
+                        	console.warn("Unable to find component of name: \"" + details.connection.name + "\" at coords: " + "Interior");
+                        }
+						
+
+					} else {
+						for(var value in details) {
+							component[value] = details[value];
+						}
+					}
+					entity.addComponent(component);
+				} else {
+					console.warn("Unable to find component of type:" + componentID)
+				}
+			}
+			entity.sID = obj;
+			ECS.entities.push(entity);
+		}
+
+		//console.log(_name);
+		//console.log(worldData.interior[_name]);
+		/*
 		var door = new ECS.Entity();
 		door.addComponent(new ECS.Components.WorldSprite(images.images.door));
 		door.addComponent(new ECS.Components.WorldPosition(6,12));
@@ -150,6 +213,7 @@ function loadZone(_name) {
 			"facing":"south"
 		}));
 		ECS.entities.push(door);
+		*/
 	}
 }
 

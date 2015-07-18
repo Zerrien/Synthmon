@@ -147,7 +147,7 @@ var MenuController = {
 					"action":function() {
 						var abilityMenu = MenuController.abilityMenu.make();
 						abilityMenu.addComponent(new ECS.Components.UIZIndex(1));
-						ECS.entities2.push(abilityMenu);
+						battleEntities.push(abilityMenu);
 					}
 				},
 				{
@@ -179,7 +179,7 @@ var MenuController = {
 			var menu = new ECS.Entity();
 			menu.addComponent(new ECS.Components.UIPosition(128 * 4, 0));
 			menu.addComponent(new ECS.Components.UIList([], function() {
-				ECS.entities2.splice(ECS.entities2.indexOf(menu));
+				battleEntities.splice(battleEntities.indexOf(menu));
 			}));
 			for(var i = 0; i < BattleController.getProCurrent().abilities.length; i++) {
 				var ability = BattleController.getProCurrent().abilities[i];
@@ -187,7 +187,7 @@ var MenuController = {
 					"name":ability.name,
 					"ref":i,
 					"action":function() {
-						ECS.entities2.splice(ECS.entities2.indexOf(menu), 1);
+						battleEntities.splice(battleEntities.indexOf(menu), 1);
 						BattleController.action = {
 							"type":"attack",
 							"use":BC.getProCurrent().abilities[this.ref]
@@ -199,7 +199,7 @@ var MenuController = {
 				{
 					"name":"Back",
 					"action":function() {
-							ECS.entities2.splice(ECS.entities2.indexOf(menu), 1);
+							battleEntities.splice(battleEntities.indexOf(menu), 1);
 					}
 				}
 			);
