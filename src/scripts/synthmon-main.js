@@ -88,6 +88,10 @@ function init() {
 
 			world.init();
 
+			for(var sceneName in ECS.Scenes) {
+				ECS.Scenes[sceneName].init();
+			}
+
 			/*
 			loadZone(0);
 			*/
@@ -258,9 +262,12 @@ function gameLoop() {
 			}
 			break;
 		case 2:
+			/*
 			for(var i = 0; i < ECS.States.Battle.length; i++) {
 				ECS.States.Battle[i](ECS.entities2);
 			}
+			*/
+			ECS.Scenes.Battle.logic();
 			break;
 	}
 
