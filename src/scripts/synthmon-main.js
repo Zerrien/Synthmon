@@ -199,21 +199,6 @@ function loadZone(_name) {
 			entity.sID = obj;
 			ECS.entities.push(entity);
 		}
-
-		//console.log(_name);
-		//console.log(worldData.interior[_name]);
-		/*
-		var door = new ECS.Entity();
-		door.addComponent(new ECS.Components.WorldSprite(images.images.door));
-		door.addComponent(new ECS.Components.WorldPosition(6,12));
-		door.addComponent(new ECS.Components.WorldCollider());
-		door.addComponent(new ECS.Components.WorldPortal(0, {
-			"x":12,
-			"y":2,
-			"facing":"south"
-		}));
-		ECS.entities.push(door);
-		*/
 	}
 }
 

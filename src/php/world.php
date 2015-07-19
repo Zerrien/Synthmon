@@ -11,8 +11,10 @@
 			$chunk = array($depth[$i] => $chunk);
 		}
 		//print_r($chunk);
-		$world = array_replace_recursive($world, $chunk);
-		//print_r(json_encode($result));
+		//$world = array_replace_recursive($world, $chunk);
+		//$world['chunks']['1,0']
+		$world['chunks'][$depth[1]] = $chunk['chunks'][$depth[1]];
+		//print_r(json_encode($chunk['chunks'][$depth[1]]));
 	} else {
 		print_r($world);
 	}

@@ -10,82 +10,79 @@
         "boxtiles": ".\/src\/assets\/img\/object_tiles\/cardboardBoxTiles.png",
         "bigtree": ".\/src\/assets\/img\/object_tiles\/3x2tree.png",
         "shoppe": ".\/src\/assets\/img\/object_tiles\/shoppe.png",
-        "house1":".\/src\/assets\/img\/object_tiles\/house1.png",
+        "house1": ".\/src\/assets\/img\/object_tiles\/house1.png",
         "tallgrass": ".\/src\/assets\/img\/object_tiles\/bush.png",
         "chatter": ".\/src\/assets\/img\/object_tiles\/genericNPC.png",
         "cliffs": ".\/src\/assets\/img\/object_tiles\/cliffs.png",
         "iceyground": ".\/src\/assets\/img\/object_tiles\/iceyground.png",
-        "soilground":"./src/assets/img/object_tiles/soil.png",
-        "pressureplate":"./src/assets/img/object_tiles/pressure.png",
-        "signpost":"./src/assets/img/object_tiles/sign.png",
-
+        "soilground": ".\/src\/assets\/img\/object_tiles\/soil.png",
+        "pressureplate": ".\/src\/assets\/img\/object_tiles\/pressure.png",
+        "signpost": ".\/src\/assets\/img\/object_tiles\/sign.png",
         "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
         "player": ".\/src\/assets\/img\/characters\/player.png",
-
         "piggen_front": ".\/src\/assets\/img\/synthmon\/piggen.png",
         "piggen_back": ".\/src\/assets\/img\/synthmon\/piggen2.png",
-
-        "water_attack":"./src/assets/img/attacks/water.png",
-        "water_attack_back":"./src/assets/img/attacks/water_back.png",
-
-        "alive_drive":"./src/assets/img/ui/alivedrive.png",
-        "dead_drive":"./src/assets/img/ui/deaddrive.png",
-        "empty_drive":"./src/assets/img/ui/emptydrive.png"
+        "water_attack": ".\/src\/assets\/img\/attacks\/water.png",
+        "water_attack_back": ".\/src\/assets\/img\/attacks\/water_back.png",
+        "alive_drive": ".\/src\/assets\/img\/ui\/alivedrive.png",
+        "dead_drive": ".\/src\/assets\/img\/ui\/deaddrive.png",
+        "empty_drive": ".\/src\/assets\/img\/ui\/emptydrive.png"
     },
     "chunks": {
         "0,0": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png",
             "objects": {
-                "homeSign":{
-                    "WorldSprite":{
-                        "name":"signpost"
+                "homeSign": {
+                    "WorldSprite": {
+                        "name": "signpost"
                     },
-                    "WorldPosition":{
-                        "x":2,
-                        "y":3
+                    "WorldPosition": {
+                        "x": 2,
+                        "y": 3
                     },
-                    "WorldChatty":{
+                    "WorldChatty": {
                         "saying": "You live here."
                     },
-                    "WorldCollider":{
+                    "WorldCollider": [
 
-                    }
+                    ]
                 },
-                "pressurePlate":{
-                    "WorldSprite":{
-                        "name":"pressureplate"
+                "pressurePlate": {
+                    "WorldSprite": {
+                        "name": "pressureplate"
                     },
-                    "WorldPosition":{
-                        "x":9,
-                        "y":9
+                    "WorldPosition": {
+                        "x": 9,
+                        "y": 9
                     },
-                    "WorldPressure":{
-                    }
+                    "WorldPressure": [
+
+                    ]
                 },
-                "lockedDoor":{
-                    "WorldSprite":{
-                        "name":"boulder"
+                "lockedDoor": {
+                    "WorldSprite": {
+                        "name": "boulder"
                     },
-                    "WorldPosition":{
-                        "x":12,
-                        "y":9
+                    "WorldPosition": {
+                        "x": 12,
+                        "y": 9
                     },
-                    "WorldWire":{
-                        "connection":{
-                            "name":"pressurePlate",
-                            "component":"worldpressure",
-                            "value":"isActivated"
+                    "WorldWire": {
+                        "connection": {
+                            "name": "pressurePlate",
+                            "component": "worldpressure",
+                            "value": "isActivated"
                         },
-                        "link":{
-                            "name":"worldposition",
-                            "value":"x",
-                            "on":14,
-                            "off":12
+                        "link": {
+                            "name": "worldposition",
+                            "value": "x",
+                            "on": 14,
+                            "off": 12
                         }
                     },
-                    "WorldCollider":{
-                        
-                    }
+                    "WorldCollider": [
+
+                    ]
                 },
                 "chatter2": {
                     "WorldSprite": {
@@ -95,22 +92,21 @@
                         "x": 3,
                         "y": 3
                     },
-                    "WorldCollider":{
+                    "WorldCollider": [
 
+                    ],
+                    "Trainer": {
+                        "tName": "Billy Bob"
                     },
-                    "Trainer":{
-                        "tName":"Billy Bob"
+                    "WorldBattler": {
+                        "saying": "Let's do battle!",
+                        "defeatedSaying": "Aw man!"
                     },
-                    "WorldBattler":{
-                        "saying":"Let's do battle!",
-                        "defeatedSaying":"Aw man!"
-                    },
-                    "WorldFaces":{
-                        "facing":"north"
+                    "WorldFaces": {
+                        "facing": "north"
                     }
-
                 },
-                "theSoil":{
+                "theSoil": {
                     "WorldSprite": {
                         "name": "soilground"
                     },
@@ -118,12 +114,15 @@
                         "x": 2,
                         "y": 6
                     },
-                    "WorldFloor":{
-                    },
-                    "WorldCollider":{                        
-                    },
-                    "WorldSoil":{   
-                    }
+                    "WorldFloor": [
+
+                    ],
+                    "WorldCollider": [
+
+                    ],
+                    "WorldSoil": [
+
+                    ]
                 },
                 "boulder": {
                     "WorldSprite": {
@@ -376,8 +375,9 @@
                     "WorldFloor": [
 
                     ],
-                    "WorldGrass":{
-                    }
+                    "WorldGrass": [
+
+                    ]
                 },
                 "theGrass3": {
                     "WorldSprite": {
@@ -390,8 +390,9 @@
                     "WorldFloor": [
 
                     ],
-                    "WorldGrass":{
-                    }
+                    "WorldGrass": [
+
+                    ]
                 },
                 "theGras4s": {
                     "WorldSprite": {
@@ -404,8 +405,9 @@
                     "WorldFloor": [
 
                     ],
-                    "WorldGrass":{
-                    }
+                    "WorldGrass": [
+
+                    ]
                 },
                 "theGra5ss": {
                     "WorldSprite": {
@@ -418,21 +420,22 @@
                     "WorldFloor": [
 
                     ],
-                    "WorldGrass":{
-                    }
+                    "WorldGrass": [
+
+                    ]
                 }
             }
         },
         "1,0": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map3.png",
             "objects": {
-                "theGra5ss": {
-                    "WorldSprite": {
-                        "name": "tallgrass"
-                    },
+                "14ea3c2f0045158fda0": {
                     "WorldPosition": {
-                        "x": 2,
-                        "y": 1
+                        "x": 6,
+                        "y": 6
+                    },
+                    "WorldSprite": {
+                        "name": "iceyground"
                     }
                 }
             }
@@ -463,99 +466,97 @@
         "houseA": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map5.png",
             "objects": {
-                "exitDoor":{
-                    "WorldSprite":{
-                        "name":"door"
+                "exitDoor": {
+                    "WorldSprite": {
+                        "name": "door"
                     },
-                    "WorldPosition":{
-                        "x":6,
-                        "y":12
+                    "WorldPosition": {
+                        "x": 6,
+                        "y": 12
                     },
                     "WorldPortal": {
                         "dest": 0,
                         "params": {
-                            "x":12,
-                            "y":2,
+                            "x": 12,
+                            "y": 2,
                             "facing": "north"
                         }
                     },
-                    "WorldCollider":{
+                    "WorldCollider": [
 
-                    }
+                    ]
                 }
             }
         },
-        "playerUpstairs":{
+        "playerUpstairs": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map5.png",
-            "objects":{
-                "downstairsDoor":{
-                    "WorldSprite":{
-                        "name":"door"
+            "objects": {
+                "downstairsDoor": {
+                    "WorldSprite": {
+                        "name": "door"
                     },
-                    "WorldPosition":{
-                        "x":9,
-                        "y":0
+                    "WorldPosition": {
+                        "x": 9,
+                        "y": 0
                     },
                     "WorldPortal": {
                         "dest": "playerHouse",
                         "params": {
-                            "x":7,
-                            "y":0,
+                            "x": 7,
+                            "y": 0,
                             "facing": "north"
                         }
                     },
-                    "WorldCollider":{
+                    "WorldCollider": [
 
-                    }
+                    ]
                 }
             }
-            
         },
-        "playerHouse":{
+        "playerHouse": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map5.png",
             "objects": {
-                "exitDoor":{
-                    "WorldSprite":{
-                        "name":"door"
+                "exitDoor": {
+                    "WorldSprite": {
+                        "name": "door"
                     },
-                    "WorldPosition":{
-                        "x":6,
-                        "y":12
+                    "WorldPosition": {
+                        "x": 6,
+                        "y": 12
                     },
                     "WorldPortal": {
                         "dest": 0,
                         "params": {
-                            "x":17,
-                            "y":2,
+                            "x": 17,
+                            "y": 2,
                             "facing": "north"
                         }
                     },
-                    "WorldCollider":{
+                    "WorldCollider": [
 
-                    }
+                    ]
                 },
-                "upstairsDoor":{
-                    "WorldSprite":{
-                        "name":"door"
+                "upstairsDoor": {
+                    "WorldSprite": {
+                        "name": "door"
                     },
-                    "WorldPosition":{
-                        "x":8,
-                        "y":0
+                    "WorldPosition": {
+                        "x": 8,
+                        "y": 0
                     },
                     "WorldPortal": {
                         "dest": "playerUpstairs",
                         "params": {
-                            "x":10,
-                            "y":0,
+                            "x": 10,
+                            "y": 0,
                             "facing": "north"
                         }
                     },
-                    "WorldCollider":{
+                    "WorldCollider": [
 
-                    }
+                    ]
                 }
             }
-
         }
     }
 }

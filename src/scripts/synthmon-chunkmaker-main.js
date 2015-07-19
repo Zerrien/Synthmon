@@ -15,6 +15,10 @@ var isMouseDown = false;
 
 var keyboardKeys = [];
 
+
+var curChunk = "1,0";
+
+
 function init() {
 	canvas = document.getElementById("game");
 	canvas.width = 1024;
@@ -39,12 +43,6 @@ function init() {
 		keyboardKeys[_e.keyCode] = false;
 	}
 
-	/*
-	var entity = new ECS.Entity();
-	entity.addComponent(new ECS.Components.WorldPosition(0, 0));
-	entity.addComponent(new ECS.Components.WorldSprite(explorer));
-	ECS.entities.push(entity);
-	*/
 
 
 	var xobj = new XMLHttpRequest();
@@ -53,6 +51,11 @@ function init() {
 	xobj.onreadystatechange = function() {
 		if(xobj.readyState == 4 && xobj.status == "200") {
 			worldData = JSON.parse(xobj.responseText);
+			if(worldData.chunks[curChunk].objects.length === undefined) {
+				console.log("Object!");
+			} else {
+				worldData.chunks[curChunk].objects = {};
+			}
 			images = new ImageController();
 			loadZone();
 			setInterval(logic, 10);
@@ -194,6 +197,8 @@ function makeTooltip() {
 				variableDec.onclick = function() {
 					curSelect.c(this.comp)[this.var] = curSelect.c(this.comp)[this.var] - 1;
 					this.val.value = curSelect.c(this.comp)[this.var];
+					worldData.chunks['1,0'].objects[curSelect.id][findComponent(this.comp)][this.var] = curSelect.c(this.comp)[this.var];
+					updateWorld();
 				}
 
 				variable.appendChild(variableDec);
@@ -205,9 +210,9 @@ function makeTooltip() {
 				variableValue.style.textAlign = "right";
 				variableValue.onchange = function(_e) {
 					curSelect.c(this.comp)[this.var] = this.value;
-					/*
-						Update the world JSON here.
-					*/
+					worldData.chunks['1,0'].objects[curSelect.id][findComponent(this.comp)][this.var] = curSelect.c(this.comp)[this.var];
+					updateWorld();
+
 				}
 				variableValue.value = curSelect.components[_component][_variable];
 				variableValue.style.float = "right";
@@ -223,6 +228,8 @@ function makeTooltip() {
 				variableInc.onclick = function() {
 					curSelect.c(this.comp)[this.var] = curSelect.c(this.comp)[this.var] + 1;
 					this.val.value = curSelect.c(this.comp)[this.var];
+					worldData.chunks['1,0'].objects[curSelect.id][findComponent(this.comp)][this.var] = curSelect.c(this.comp)[this.var];
+					updateWorld();
 				}
 				variable.appendChild(variableInc)
 
@@ -251,11 +258,14 @@ function makeTooltip() {
 
 				var obj = {};
 				obj[this.value] = {};
-				worldData.chunks["1,0"]["objects"][curSelect.id][this.value] = obj;
-	
+				worldData.chunks[curChunk]["objects"][curSelect.id][this.value] = obj;
+				
+
+				updateWorld();
+
 				/*
 				var xObj = new XMLHttpRequest();
-				xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
+				xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks[curChunk]), true);
 				xObj.onreadystatechange = function() {
 					if(xObj.readyState == 4 && xObj.status == "200") {
 					}
@@ -305,6 +315,7 @@ function makeImageSelect() {
 	for(var _images in images.images) {
 		var img = images.images[_images];
 		img.ref = images.images[_images];
+		img.properName = _images;
 		img.width = 32;
 		img.height = 32;
 		newDiv.appendChild(img);
@@ -313,15 +324,19 @@ function makeImageSelect() {
 			/****
 	!!!!!!!!!!!!!!!!!!!!
 			*/
-			worldData.chunks["1,0"]["objects"][curSelect.id].WorldSprite = {
-				"name":"boulder"
+
+
+			
+			worldData.chunks[curChunk]["objects"][curSelect.id].WorldSprite = {
+				"name":this.properName
 			};
+			updateWorld();
 			
 
 			/*
 			var xObj = new XMLHttpRequest();
-			xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
-			//console.log("?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]));
+			xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks[curChunk]), true);
+			//console.log("?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks[curChunk]));
 			xObj.onreadystatechange = function() {
 				if(xObj.readyState == 4 && xObj.status == "200") {
 				}
@@ -344,11 +359,17 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 		isMouseDown = false;
 		var result = checkXY(_e, curX, curY);
 		if (keyboardKeys[17] && result) {
+			delete worldData.chunks[curChunk].objects[result.id];
+			//console.log(worldData.chunks[curChunk].objects);
 			ECS.entities.splice(ECS.entities.indexOf(result), 1);
+
+			updateWorld();
 
 			/*
 				Add delete code.
 			*/
+
+
 
 
 		} else if(!curSelect) {
@@ -356,19 +377,7 @@ ECS.Systems.ChunkMakerMouse = function ChunkMakerMouse(_e) {
 				curSelect = result;
 				makeTooltip();
 			} else {
-				var entity = new ECS.Entity();
-				entity.addComponent(new ECS.Components.WorldPosition(curX, curY));
-
-				worldData.chunks["1,0"]["objects"][entity.id] = {
-					"WorldPosition":{
-						"x":curX,
-						"y":curY
-					}
-				};
-
-				
-
-				ECS.entities.push(entity);
+				createEntity();
 			}
 		} else {
 			if(keyboardKeys[16] && !result) {
@@ -396,10 +405,14 @@ function deleteEntity() {
 }
 
 function createEntity() {
+	var curX, curY;
+	curX = (mousePos.x - mousePos.x % 32) / 32;
+	curY = (mousePos.y - mousePos.y % 32) / 32;
+
 	var entity = new ECS.Entity();
 	entity.addComponent(new ECS.Components.WorldPosition(curX, curY));
 
-	worldData.chunks["1,0"]["objects"][entity.id] = {
+	worldData.chunks[curChunk]["objects"][entity.id] = {
 		"WorldPosition":{
 			"x":curX,
 			"y":curY
@@ -417,10 +430,10 @@ function duplicateEntity(curX, curY) {
 	entity.c("worldposition").x = curX;
 	entity.c("worldposition").y = curY;
 
-	var result = JSON.stringify(worldData.chunks["1,0"]["objects"][curSelect.id]);
-	worldData.chunks["1,0"]["objects"][entity.id] = JSON.parse(result);
-	worldData.chunks["1,0"]["objects"][entity.id].WorldPosition.x = curX;
-	worldData.chunks["1,0"]["objects"][entity.id].WorldPosition.y = curY;
+	var result = JSON.stringify(worldData.chunks[curChunk]["objects"][curSelect.id]);
+	worldData.chunks[curChunk]["objects"][entity.id] = JSON.parse(result);
+	worldData.chunks[curChunk]["objects"][entity.id].WorldPosition.x = curX;
+	worldData.chunks[curChunk]["objects"][entity.id].WorldPosition.y = curY;
 
 	updateWorld();
 
@@ -428,14 +441,15 @@ function duplicateEntity(curX, curY) {
 }
 
 function editComponent() {
-	
+	updateWorld();
 }
 
 function updateWorld() {
 	var xObj = new XMLHttpRequest();
-	xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks["1,0"]), true);
+	xObj.open('get', "./src/php/world.php?set="+"chunks:1,0"+"&data="+JSON.stringify(worldData.chunks[curChunk]), true);
 	xObj.onreadystatechange = function() {
 		if(xObj.readyState == 4 && xObj.status == "200") {
+			console.log(xObj.responseText);
 		}
 	}
 	xObj.send();
