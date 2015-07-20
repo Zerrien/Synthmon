@@ -22,9 +22,16 @@ WorldController.prototype = {
 			var diffX = this.lastChunk.x - pChunkX;
 			var distanceX = pChunkX + diffX * 2;
 			var forwardX = pChunkX + (diffX * - 1);
-			for(var i = -1; i <= 1; i++) {
-				unloadChunk(distanceX + "," + (pChunkY + i));
-				loadChunk(forwardX + "," + (pChunkY + i));
+			if(IS_DEBUG) {
+				for(var i = -2; i <= 2; i++) {
+					unloadChunk(distanceX + "," + (pChunkY + i));
+					loadChunk(forwardX + "," + (pChunkY + i));
+				}
+			} else {
+				for(var i = -1; i <= 1; i++) {
+					unloadChunk(distanceX + "," + (pChunkY + i));
+					loadChunk(forwardX + "," + (pChunkY + i));
+				}
 			}
 		} else if (this.lastChunk.y != pChunkY) {
 		}
@@ -35,9 +42,17 @@ WorldController.prototype = {
 		if(player) {
 			var pChunkX = player.c("worldposition").x >> 5;
 			var pChunkY = player.c("worldposition").y >> 5;
-			for(var i = -1; i <= 1; i++) {
-				for(var j = -1; j <= 1; j++) {
-					loadChunk(i + "," + j);
+			if(IS_DEBUG) {
+				for(var i = -2; i <= 2; i++) {
+					for(var j = -2; j <= 2; j++) {
+						loadChunk(i + "," + j);
+					}
+				}
+			} else {
+				for(var i = -1; i <= 1; i++) {
+					for(var j = -1; j <= 1; j++) {
+						loadChunk(i + "," + j);
+					}
 				}
 			}
 		} else {

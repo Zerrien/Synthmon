@@ -107,7 +107,7 @@ ECS.Components.WorldCanPush = function WorldCanPush(_val) {
 ECS.Components.WorldCanPush.prototype.name = "worldcanpush";
 
 ECS.Components.WorldPortal = function WorldPortal(_dest, _params, _xOff, _yOff) {
-	this.destination = _dest;
+	this.dest = _dest;
 	this.params = _params;
 	this.xOff = _xOff;
 	this.yOff = _yOff;

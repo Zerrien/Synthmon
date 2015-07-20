@@ -410,6 +410,11 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 	/*
 		Replace with CameraController in the future.
 	*/
+
+	if(IS_DEBUG) {
+		ctx.scale(0.5, 0.5);
+		ctx.translate(canvas.width / 2, canvas.height / 2);
+	}
 	if(player) {
 		var pPos = player.c("worldposition");
 		var pShift = player.c("worldmoves");
@@ -420,8 +425,14 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 		if(pPos.zone == 0) {
 			var pChunkX = pPos.x >> 5;
 			var pChunkY = pPos.y >> 5;
-			for(var i = -1; i <= 1; i++) {
-				for(var j = -1; j <= 1; j++) {
+
+			var amount = 3;
+			if(IS_DEBUG) {
+				amount = 5;
+			}
+			amount = (amount - 1) / 2;
+			for(var i = -amount; i <= amount; i++) {
+				for(var j = -amount; j <= amount; j++) {
 					if(world.images[(pChunkX+i)+","+(pChunkY+j)]) {
 						ctx.drawImage(world.images[(pChunkX+i)+","+(pChunkY+j)], (i + pChunkX) * 1024, (j + pChunkY) * 1024);
 					}

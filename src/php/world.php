@@ -5,20 +5,23 @@
 	$world = json_decode($world, true);
 
 	if(isset($_GET['set']) && isset($_GET['data'])) {
-		$depth = explode(":", $_GET['set']);
-		$chunk = json_decode($_GET['data'], true);
-		for($i = count($depth) - 1; $i >= 0; $i--) {
-			$chunk = array($depth[$i] => $chunk);
+		$chunk = $_GET['set'];
+		$data = json_decode($_GET['data'], true);
+		if(isset($world['chunks'][$chunk]['objects'][key($data)])) {
+			if($data[key($data)] == null) {
+				unset($world['chunks'][$chunk]['objects'][key($data)]);
+				echo("Removed object with ID: ".key($data));
+			} else {
+				$world['chunks'][$chunk]['objects'][key($data)] = $data[key($data)];
+				echo("Updated object with ID: ".key($data));
+			}
+		} else {
+			$world['chunks'][$chunk]['objects'][key($data)] = $data[key($data)];
+			echo("Added object with ID: ".key($data));
 		}
-		//print_r($chunk);
-		//$world = array_replace_recursive($world, $chunk);
-		//$world['chunks']['1,0']
-		$world['chunks'][$depth[1]] = $chunk['chunks'][$depth[1]];
-		//print_r(json_encode($chunk['chunks'][$depth[1]]));
 	} else {
-		print_r($world);
+		echo("No Set/Data included.");
 	}
-
 	
 	$fHandle = fopen("../json/theworld.json", 'w') or die("Can't open file.");
 	fwrite($fHandle, json_encode($world, JSON_PRETTY_PRINT));

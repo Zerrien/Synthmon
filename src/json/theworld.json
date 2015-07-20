@@ -111,7 +111,7 @@
                         "name": "soilground"
                     },
                     "WorldPosition": {
-                        "x": 2,
+                        "x": 3,
                         "y": 6
                     },
                     "WorldFloor": [
@@ -423,19 +423,340 @@
                     "WorldGrass": [
 
                     ]
+                },
+                "14ea4639adef02ae527": {
+                    "WorldPosition": {
+                        "x": 0,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea4639d8c45d71c28": {
+                    "WorldPosition": {
+                        "x": 2,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea4639ffbb127cc29": {
+                    "WorldPosition": {
+                        "x": 4,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea463a24690c11830": {
+                    "WorldPosition": {
+                        "x": 6,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea463c9df28cee2f31": {
+                    "WorldPosition": {
+                        "x": 8,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea463ccaf9d66e632": {
+                    "WorldPosition": {
+                        "x": 10,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea463cfe555fd6ae33": {
+                    "WorldPosition": {
+                        "x": 12,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea463d310566654734": {
+                    "WorldPosition": {
+                        "x": 14,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea463d574438dce435": {
+                    "WorldPosition": {
+                        "x": 16,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
+                },
+                "14ea463d7d7411a56536": {
+                    "WorldPosition": {
+                        "x": 18,
+                        "y": 31
+                    },
+                    "WorldSprite": {
+                        "name": "bigtree"
+                    },
+                    "WorldSize": {
+                        "WorldSize": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    },
+                    "WorldOffset": {
+                        "WorldOffset": [
+
+                        ],
+                        "xOffset": 0,
+                        "yOffset": -2
+                    },
+                    "WorldLargeCollision": {
+                        "WorldLargeCollision": [
+
+                        ],
+                        "width": 2,
+                        "height": 3
+                    }
                 }
             }
         },
         "1,0": {
-            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map3.png",
+            "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png",
             "objects": {
-                "14ea3c2f0045158fda0": {
+                "14ea45ea4c4138a46021": {
                     "WorldPosition": {
-                        "x": 6,
-                        "y": 6
-                    },
-                    "WorldSprite": {
-                        "name": "iceyground"
+                        "x": 2,
+                        "y": 23
+                    }
+                },
+                "14ea45eabaf19a47f022": {
+                    "WorldPosition": {
+                        "x": 5,
+                        "y": 19
+                    }
+                },
+                "14ea45eac8d418c723": {
+                    "WorldPosition": {
+                        "x": 7,
+                        "y": 23
+                    }
+                },
+                "14ea45ecf194d71df725": {
+                    "WorldPosition": {
+                        "x": 5,
+                        "y": 30
+                    }
+                },
+                "14ea45f7aa54182bc25": {
+                    "WorldPosition": {
+                        "x": 2,
+                        "y": 22
                     }
                 }
             }
