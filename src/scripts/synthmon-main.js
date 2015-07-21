@@ -113,6 +113,7 @@ function init() {
 ECS.States = {};
 
 ECS.States.WorldControl = [
+	ECS.Systems.WorldEvents,
 	ECS.Systems.WorldAI,
 	ECS.Systems.WorldKeyboard,
 	ECS.Systems.WorldCollision,
@@ -121,6 +122,7 @@ ECS.States.WorldControl = [
 ]
 
 ECS.States.WorldUI = [
+	ECS.Systems.WorldEvents,
 	ECS.Systems.WorldAI,
 	ECS.Systems.UIKeyboard,
 	ECS.Systems.WorldCollision,

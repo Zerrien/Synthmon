@@ -308,7 +308,89 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 			} else {
 				entity.c(wW.link)[wW.val] = wW.off;
 			}
+		} else if (entity.c("worldlinearmonitor")) {
+			var wP = entity.c("worldposition");
+			var wL = entity.c("worldlinearmonitor");
+			var wF = entity.c("worldfaces");
+			var wM = entity.c("worldmoves");
+			if(wL.enabled == true) {
+				for(var i = 1; i <= wL.distance; i++) {
+					var result = checkCollision(_e, wP.x + wF.facingTile().x * i, wP.y + wF.facingTile().y * i);
+					if(result) {
+						if(result == player) {
+							wL.enabled = false;
+							gameState = 1;
+							wM.destX = wF.facingTile().x * (i-1);
+							wM.destY = wF.facingTile().y * (i-1);
+							wM.state = "walking";
+							wM.curSpeed = 2000;
+							wEvents.push(new WorldEvent(wM, "state", "standing", function() {
+								//console.log("OLE!!!!");
+							}))
+						}
+						i = wL.distance + 1;
+					}
+				}
+			}
 		}
+	}
+}
+
+function WorldEvent(_monitor, _loc, _for, _action) {
+	this.monitor = _monitor;
+	this.loc = _loc;
+	this.for = _for;
+	this.action = _action;
+	this.check = function() {
+		if(this.monitor[this.loc] == this.for) {
+			this.action();
+		}
+	}
+}
+
+var wEvents = [];
+
+/*
+function BattleEvent(_dur, _sA, _eA) {
+	this.curTime = -1;
+	this.duration = _dur;
+	this.startAction = _sA || function() {};
+	this.endAction = _eA || function() {};
+
+	this.toAdd = [];
+	this.toRemove = [];
+
+	this.queue = false;
+	this.isSkip = false;
+	this.add = function() {
+		for(var i = 0; i < this.toAdd.length; i++) {
+			
+			battleEntities.push(this.toAdd[i]);
+		}
+	}
+	this.remove = function() {
+		for(var i = 0; i < this.toRemove.length; i++) {
+			battleEntities.splice(battleEntities.indexOf(this.toRemove[i]), 1);
+		}
+	}
+	this.short = function(_e) {
+		this.toAdd.push(_e);
+		this.toRemove.push(_e);
+	}
+	this.setVariable = function(_var, _varLoc, _value, _duration, _reset) {
+		this.v = _var;
+		this.vL = _varLoc;
+		this.val = _value;
+		this.dur = _duration;
+		this.reset = _reset;
+		this.origin = this.v[this.vL];
+	}
+}
+*/
+
+ECS.Systems.WorldEvents = function WorldEvents(_e) {
+	for(var i = 0; i < wEvents.length; i++) {
+		wEvents[i].check();
 	}
 }
 
