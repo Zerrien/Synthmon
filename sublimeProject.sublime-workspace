@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"make",
+				"makeTranslation"
+			],
+			[
+				"set",
+				"setUniform"
+			],
+			[
 				"abov",
 				"aboveIndex"
 			],
@@ -106,10 +114,6 @@
 			[
 				"getPro",
 				"getProtagonist"
-			],
-			[
-				"make",
-				"makeFaintedEvent"
 			],
 			[
 				"enti",
@@ -510,28 +514,64 @@
 			[
 				"camera",
 				"cameraArray"
-			],
-			[
-				"_e",
-				"_e"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/C/wamp2/www/goaggro/projects/mineventures/index.html",
+			"file": "src/scripts/synthmon-main-3d.js",
 			"settings":
 			{
-				"buffer_size": 21780,
+				"buffer_size": 15649,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/scripts/synthmon-worldeditor-main.js",
+			"file": "src/json/theworld.json",
 			"settings":
 			{
-				"buffer_size": 10507,
+				"buffer_size": 27388,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "utility.js",
+			"settings":
+			{
+				"buffer_size": 9049,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "3dTest.html",
+			"settings":
+			{
+				"buffer_size": 1584,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/wamp2/www/goaggro/projects/ez_start_webgl/ezstart.html",
+			"settings":
+			{
+				"buffer_size": 3395,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/wamp2/www/goaggro/projects/ez_start_webgl/webgl-ezstart.js",
+			"settings":
+			{
+				"buffer_size": 15421,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/scripts/synthmon-systems.js",
+			"settings":
+			{
+				"buffer_size": 18698,
 				"line_ending": "Windows"
 			}
 		}
@@ -580,6 +620,11 @@
 	},
 	"file_history":
 	[
+		"/C/wamp2/www/goaggro/projects/synthmon/box.obj",
+		"/C/wamp2/www/ripper.php",
+		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-worldeditor-main.js",
+		"/C/wamp2/www/goaggro/projects/mineventures/index.html",
+		"/C/Program Files (x86)/Steam/html5app/package.json",
 		"/C/Users/JS/Desktop/ettercap-0.8.2/README",
 		"/C/Users/JS/Desktop/ettercap-0.8.2/README.LUA",
 		"/C/wamp2/www/goaggro/projects/synthmon/worldeditor.html",
@@ -594,14 +639,12 @@
 		"/C/wamp2/www/goaggro/projects/synthmon/sublimeProject.sublime-project",
 		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-world-system.js",
 		"/C/wamp2/www/goaggro/projects/synthmon/src/php/world.php",
-		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-worldeditor-main.js",
 		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-chunkmaker-main.js",
 		"/C/wamp2/www/goaggro/projects/plane_skirmish/mission.html",
 		"/C/wamp2/www/goaggro/projects/synthmon/chunkmaker.html",
 		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-components.js",
 		"/C/wamp2/www/goaggro/projects/synthmon/index.html",
 		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-fruit_processing-system.js",
-		"/C/wamp2/www/goaggro/projects/mineventures/index.html",
 		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-battle-systems.js",
 		"/C/wamp2/www/goaggro/projects/synthmon/src/scripts/synthmon-battle-components.js",
 		"/C/wamp2/www/goaggro/projects/synthmon/README.md",
@@ -704,10 +747,7 @@
 		"/C/wamp2/www/goaggro/stuffToDo.php",
 		"/C/wamp2/www/ECSMain.js",
 		"/C/wamp2/www/UIItems.js",
-		"/C/wamp2/www/ECSComponents.js",
-		"/C/wamp2/www/platform.html",
-		"/C/wamp2/www/CoreComponents.html",
-		"/C/wamp2/www/vikingTest.html"
+		"/C/wamp2/www/ECSComponents.js"
 	],
 	"find":
 	{
@@ -728,6 +768,25 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"loadZone",
+			"shaders.lambert",
+			"getCurrentShader",
+			"getCurrentShader()",
+			"drawApp",
+			"setUniform",
+			"getIdentiy",
+			"pushShader",
+			"drawApp",
+			"app = ",
+			"App =",
+			"App",
+			"app",
+			"initModels",
+			"initShaders",
+			"\"webgl\"",
+			"webgl",
+			"initWebGL",
+			"init()",
 			"getTile",
 			"isMouseUp",
 			"yVel",
@@ -836,26 +895,7 @@
 			"sendSynth",
 			"sendSynthmon",
 			"faintedEvent",
-			".minimum",
-			".setVariable",
-			".curHP",
-			"setVariable",
-			"makeAttackEvent",
-			"BattleEvent",
-			"function Battle",
-			"BattleEvent",
-			"sends out",
-			"Trainer",
-			"worldname",
-			"firstEvent",
-			"BC.configure",
-			"configure",
-			".queue = false",
-			".queue",
-			"[32]",
-			"24",
-			"16",
-			"248"
+			".minimum"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -863,6 +903,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"shaders.lambert.program",
 			"WorldStaticCollider",
 			"curChunk",
 			"battleEntities",
@@ -909,50 +950,23 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/C/wamp2/www/goaggro/projects/mineventures/index.html",
+					"file": "src/scripts/synthmon-main-3d.js",
 					"settings":
 					{
-						"buffer_size": 21780,
+						"buffer_size": 15649,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6327,
-								6327
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 2820.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "src/scripts/synthmon-worldeditor-main.js",
-					"settings":
-					{
-						"buffer_size": 10507,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								870,
-								598
+								6399,
+								6399
 							]
 						],
 						"settings":
@@ -961,7 +975,171 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 214.0,
+						"translation.y": 2591.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/json/theworld.json",
+					"settings":
+					{
+						"buffer_size": 27388,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2474,
+								2474
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 273.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "utility.js",
+					"settings":
+					{
+						"buffer_size": 9049,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10,
+								10
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "3dTest.html",
+					"settings":
+					{
+						"buffer_size": 1584,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1241,
+								1241
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/wamp2/www/goaggro/projects/ez_start_webgl/ezstart.html",
+					"settings":
+					{
+						"buffer_size": 3395,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2061,
+								2084
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 601.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/C/wamp2/www/goaggro/projects/ez_start_webgl/webgl-ezstart.js",
+					"settings":
+					{
+						"buffer_size": 15421,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2593,
+								2593
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1599.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/scripts/synthmon-systems.js",
+					"settings":
+					{
+						"buffer_size": 18698,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14207,
+								14029
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 6177.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

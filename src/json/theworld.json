@@ -32,28 +32,6 @@
         "0,0": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png",
             "objects": {
-                "houseMonitor" : {
-                    "WorldSprite": {
-                        "name": "chatter"
-                    },
-                    "WorldPosition":{
-                        "x": 20,
-                        "y": 2
-                    },
-                    "WorldFaces": {
-                        "facing":"west"
-                    },
-                    "WorldMoves":{
-
-                    },
-                    "WorldLinearMonitor":{
-                        "distance":3,
-                        "action":"chatty"
-                    },
-                    "WorldChatty":{
-                        "saying":"Greets!"
-                    }
-                },
                 "homeSign": {
                     "WorldSprite": {
                         "name": "signpost"
