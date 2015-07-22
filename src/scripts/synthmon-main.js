@@ -9,12 +9,16 @@ var keyboardKeys = [];
 
 var IS_DEBUG = false;
 
-function init() {
-	canvas = document.getElementById("game");
-	canvas.width = 800;
-	canvas.height = 600;
-	ctx = canvas.getContext("2d");
 
+var data = {};
+var assets = new AssetController();
+var settings = new SettingsController();
+
+var mousePos = {x:0, y:0};
+var mousePress = false;
+var mouseClick = false;
+
+function initControls() {
 	window.onkeydown = function(_e) {
 		if(!keyPress[_e.keyCode]) {
 			keyboardKeys[_e.keyCode] = true;
@@ -37,6 +41,47 @@ function init() {
 		}
 	}
 
+	canvas.onmousemove = function(_e) {
+		mousePos = {x:_e.offsetX, y:_e.offsetY};
+	}
+	canvas.onmousedown = function(_e) {
+		if(!mousePress) {
+			mouseClick = true;
+		}
+		mousePress = true;
+	}
+	canvas.onmouseup = function(_e) {
+		mouseClick = false;
+		mousePress = false;
+	}
+
+}
+
+function init() {
+	canvas = document.getElementById("game");
+	canvas.width = 800;
+	canvas.height = 600;
+	ctx = canvas.getContext("2d");
+
+	
+
+	initControls();
+
+	
+
+	
+
+	
+
+	for(var sceneName in ECS.Scenes) {
+		ECS.Scenes[sceneName].init();
+	}
+
+	gameState = "Loading";
+
+	setInterval(gameLoop, 10);
+
+	/*
 	var xobj = new XMLHttpRequest();
 	xobj.overrideMimeType("application/json");
 	xobj.open('get', './src/json/theworld.json', true);
@@ -94,20 +139,13 @@ function init() {
 			for(var sceneName in ECS.Scenes) {
 				ECS.Scenes[sceneName].init();
 			}
-
-			/*
-			loadZone(0);
-			*/
 			loadZone(playerPos.zone);
-
-			/*
-				Technically, this is where things will be read.
-			*/
 
 			setInterval(gameLoop, 10);
 		}
 	}
 	xobj.send(null);
+	*/
 }
 
 ECS.States = {};
@@ -301,6 +339,10 @@ function gameLoop() {
 	dTime = curTime - prevTime;
 	tTime += dTime;
 
+	//console.log(ECS.Scenes);
+	ECS.Scenes[gameState].logic();
+
+	/*
 	switch(gameState) {
 		case 0:
 			for(var i = 0; i < ECS.States.WorldControl.length; i++) {
@@ -313,14 +355,15 @@ function gameLoop() {
 			}
 			break;
 		case 2:
-			/*
-			for(var i = 0; i < ECS.States.Battle.length; i++) {
-				ECS.States.Battle[i](ECS.entities2);
-			}
-			*/
+			
+			//for(var i = 0; i < ECS.States.Battle.length; i++) {
+			//	ECS.States.Battle[i](ECS.entities2);
+			//}
+			
 			ECS.Scenes.Battle.logic();
 			break;
 	}
+	*/
 
 	prevTime = curTime;
 }

@@ -196,6 +196,15 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 							}
 						}
 					}
+				} else if (keyboardKeys[81]) {
+					//keyboardKeys[81] = false;
+					var entity = new ECS.Entity();
+					entity.addComponent(new ECS.Components.WorldPosition(0, offsetk--));
+					entity.addComponent(new ECS.Components.WorldSprite(images.images.boulder));
+					entity.addComponent(new ECS.Components.WorldCollider());
+					ECS.entities.push(entity);
+					//console.log(Math.abs(offsetk));
+					//console.log("??");
 				}
 				if(isMove) {
 					wM.state = "walking";
@@ -205,7 +214,7 @@ ECS.Systems.WorldKeyboard = function WorldKeyboard(_e) {
 		}
 	}
 }
-
+var offsetk = 0;
 
 
 ECS.Systems.WorldAI = function WorldAI(_e) {
@@ -395,6 +404,7 @@ ECS.Systems.WorldEvents = function WorldEvents(_e) {
 }
 
 ECS.Systems.WorldCollision = function WorldCollision(_e) {
+	var curTime = new Date().getTime();
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
@@ -428,7 +438,6 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 
 							wP.x = rwPo.params.x;
 							wP.y = rwPo.params.y;
-
 
 							//console.log(rwPo.destination);
 

@@ -1,3 +1,9 @@
+function SettingsController() {
+	this.soundVolume = 1;
+	this.musicVolume = 1;
+}
+
+
 function WorldController() {
 	this.images = {};
 	this.images.interiors = {};
@@ -68,6 +74,9 @@ function ImageController() {
 		this.images[imageName].src = worldData.images[imageName];
 	}
 }
+
+
+
 
 var CameraController = {
 
@@ -222,4 +231,104 @@ var MenuController = {
 			return menu;
 		}
 	}
+}
+
+
+function AssetController() {
+	this.images = {};
+	this.sounds = {};
+	this.models = {};
+	this.textures = {};
+
+	this.loadImages = function(_completed) {
+		var sum = loaded = 0;
+		for(var imageName in data.assets.images) {
+
+			var imageAlias = this.images;
+			sum++;
+			this.images[imageName] = new Image();
+			this.images[imageName].src = data.assets.images[imageName];
+			this.images[imageName].onload = function() {
+				imageAlias._loaded.current = ++loaded;
+				if(sum == loaded) {
+					_completed();
+				}
+			}
+		}
+		this.images._loaded = {
+			"total":sum,
+			"current":loaded
+		};
+	};
+
+	this.loadSounds = function(_completed) {
+		var sum = loaded = 0;
+		for(var soundName in data.assets.sounds) {
+			var soundAlias = this.sounds;
+			sum++;
+			this.sounds[soundName] = new Audio(data.assets.sounds[soundName]);
+
+			this.sounds[soundName].addEventListener("canplaythrough", function() {
+				soundAlias._loaded.current = ++loaded;
+				if(sum == loaded) {
+					_completed();
+				}
+			});
+		}
+		this.sounds._loaded = {
+			"total":sum,
+			"current":loaded
+		};
+	};
+
+	this.loadModels = function(_completed) {
+		var sum = loaded = 0;
+		for(var modelName in data.assets.models) {
+			var modelAlias = this.models;
+			sum++;
+			this.models[modelName] = "";
+			/*
+			var xobj = new XMLHttpRequest();
+			xobj.open('get', data.assets.models[modelName], true);
+			xobj.type = modelName;
+			xobj.onreadystatechange = function() {
+				if(xobj.readyState == 4 && xobj.status == "200") {
+					modelAlias._loaded.current = ++loaded;
+					modelAlias[modelName] = xobj.responseText;
+					if(sum == loaded) {
+						_completed();
+					}
+				}
+			}
+			xobj.send(null);
+			*/
+		}
+		this.models._loaded = {
+			"total":sum,
+			"current":loaded
+		};
+		_completed();
+	};
+
+	this.loadTextures = function(_completed) {
+		var sum = loaded = 0;
+		for(var textureName in data.assets.textures) {
+			var textureAlias = this.textures;
+			sum++;
+
+			this.textures[textureName] = new Image();
+			this.textures[textureName].src = data.assets.textures[textureName];
+			this.textures[textureName].onload = function() {
+				textureAlias._loaded.current = ++loaded;
+				if(sum == loaded) {
+					_completed();
+				}
+			}
+
+		}
+		this.textures._loaded = {
+			"total":sum,
+			"current":loaded
+		};
+	};
 }

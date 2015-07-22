@@ -1,32 +1,54 @@
 {
-    "images": {
-        "explorer": ".\/src\/assets\/img\/object_tiles\/explorer32.png?a=d",
-        "door": ".\/src\/assets\/img\/object_tiles\/door.png",
-        "boulder": ".\/src\/assets\/img\/object_tiles\/boulder.png",
-        "pushtile": ".\/src\/assets\/img\/object_tiles\/pushtile.png?",
-        "superpush": ".\/src\/assets\/img\/object_tiles\/superPushTile.png",
-        "stoppad": ".\/src\/assets\/img\/object_tiles\/stopTile.png?",
-        "box": ".\/src\/assets\/img\/object_tiles\/cardboardBox.png",
-        "boxtiles": ".\/src\/assets\/img\/object_tiles\/cardboardBoxTiles.png",
-        "bigtree": ".\/src\/assets\/img\/object_tiles\/3x2tree.png",
-        "shoppe": ".\/src\/assets\/img\/object_tiles\/shoppe.png",
-        "house1": ".\/src\/assets\/img\/object_tiles\/house1.png",
-        "tallgrass": ".\/src\/assets\/img\/object_tiles\/bush.png",
-        "chatter": ".\/src\/assets\/img\/object_tiles\/genericNPC.png",
-        "cliffs": ".\/src\/assets\/img\/object_tiles\/cliffs.png",
-        "iceyground": ".\/src\/assets\/img\/object_tiles\/iceyground.png",
-        "soilground": ".\/src\/assets\/img\/object_tiles\/soil.png",
-        "pressureplate": ".\/src\/assets\/img\/object_tiles\/pressure.png",
-        "signpost": ".\/src\/assets\/img\/object_tiles\/sign.png",
-        "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
-        "player": ".\/src\/assets\/img\/characters\/player.png",
-        "piggen_front": ".\/src\/assets\/img\/synthmon\/piggen.png",
-        "piggen_back": ".\/src\/assets\/img\/synthmon\/piggen2.png",
-        "water_attack": ".\/src\/assets\/img\/attacks\/water.png",
-        "water_attack_back": ".\/src\/assets\/img\/attacks\/water_back.png",
-        "alive_drive": ".\/src\/assets\/img\/ui\/alivedrive.png",
-        "dead_drive": ".\/src\/assets\/img\/ui\/deaddrive.png",
-        "empty_drive": ".\/src\/assets\/img\/ui\/emptydrive.png"
+    "assets":{
+        "images": {
+            "explorer": ".\/src\/assets\/img\/object_tiles\/explorer32.png",
+            "door": ".\/src\/assets\/img\/object_tiles\/door.png",
+            "boulder": ".\/src\/assets\/img\/object_tiles\/boulder.png",
+            "pushtile": ".\/src\/assets\/img\/object_tiles\/pushtile.png?",
+            "superpush": ".\/src\/assets\/img\/object_tiles\/superPushTile.png",
+            "stoppad": ".\/src\/assets\/img\/object_tiles\/stopTile.png?",
+            "box": ".\/src\/assets\/img\/object_tiles\/cardboardBox.png",
+            "boxtiles": ".\/src\/assets\/img\/object_tiles\/cardboardBoxTiles.png",
+            "bigtree": ".\/src\/assets\/img\/object_tiles\/3x2tree.png",
+            "shoppe": ".\/src\/assets\/img\/object_tiles\/shoppe.png",
+            "house1": ".\/src\/assets\/img\/object_tiles\/house1.png",
+            "tallgrass": ".\/src\/assets\/img\/object_tiles\/bush.png",
+            "chatter": ".\/src\/assets\/img\/object_tiles\/genericNPC.png",
+            "cliffs": ".\/src\/assets\/img\/object_tiles\/cliffs.png",
+            "iceyground": ".\/src\/assets\/img\/object_tiles\/iceyground.png",
+            "soilground": ".\/src\/assets\/img\/object_tiles\/soil.png",
+            "pressureplate": ".\/src\/assets\/img\/object_tiles\/pressure.png",
+            "signpost": ".\/src\/assets\/img\/object_tiles\/sign.png",
+            "opponent": ".\/src\/assets\/img\/characters\/opponent.png",
+            "player": ".\/src\/assets\/img\/characters\/player.png",
+            "piggen_front": ".\/src\/assets\/img\/synthmon\/piggen.png",
+            "piggen_back": ".\/src\/assets\/img\/synthmon\/piggen2.png",
+            "water_attack": ".\/src\/assets\/img\/attacks\/water.png",
+            "water_attack_back": ".\/src\/assets\/img\/attacks\/water_back.png",
+            "alive_drive": ".\/src\/assets\/img\/ui\/alivedrive.png",
+            "dead_drive": ".\/src\/assets\/img\/ui\/deaddrive.png",
+            "empty_drive": ".\/src\/assets\/img\/ui\/emptydrive.png"
+        },
+        "sounds":{
+            "bounce":"./src/assets/sound/bounce.wav",
+            "jump1":"./src/assets/sound/jump.wav",
+            "jump2":"./src/assets/sound/jump2.wav",
+            "jump3":"./src/assets/sound/jump3.wav",
+            "obtain":"./src/assets/sound/obtain.wav",
+            "select":"./src/assets/sound/select.wav"
+        },
+        "models":{
+            "box":"./src/assets/mdl/box.obj",
+            "faceSoft":"./src/assets/mdl/faceSoft.obj",
+            "moneyStack":"./src/assets/mdl/moneyStack.obj",
+            "sphere":"./src/assets/mdl/sphere.obj"
+        },
+        "textures":{
+            "tex1":"./src/assets/texture/tex1.png",
+            "tex2":"./src/assets/texture/tex2.png",
+            "tex3":"./src/assets/texture/tex3.png",
+            "tex4":"./src/assets/texture/tex4.png"
+        }
     },
     "chunks": {
         "0,0": {
