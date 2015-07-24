@@ -1,3 +1,4 @@
+/*
 function checkCollision(_e, _x, _y, _ex) {
 	for(var entityID in _e) {
 		var entity = _e[entityID];
@@ -31,6 +32,7 @@ function checkCollision(_e, _x, _y, _ex) {
 	}
 	return null;
 }
+*/
 
 ECS.Systems.UIKeyboard = function UIKeyboard(_e) {
 	var curIndex;
@@ -441,6 +443,7 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 
 							//console.log(rwPo.destination);
 
+
 							wP.zone = rwPo.dest;
 
 							loadZone(rwPo.dest);
@@ -689,14 +692,4 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 	}
 
 	ctx.restore();
-}
-
-
-
-
-
-
-
-ECS.Systems.BattleUI = function BattleUI(_e) {
-
 }

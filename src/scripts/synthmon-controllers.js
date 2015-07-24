@@ -78,8 +78,8 @@ function ImageController() {
 
 
 
-var CameraController = {
-
+function CameraController(_who) {
+	this.target = _who;
 }
 
 

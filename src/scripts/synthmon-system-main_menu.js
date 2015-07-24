@@ -34,10 +34,13 @@ ECS.Systems.MainMenuControl = function MainMenuControl(_e) {
 		if(mainMenuState == 0) {
 			if(mousePos.x > canvas.width / 2 - 200 && mousePos.x < canvas.width / 2 - 200 + 400 && mousePos.y > canvas.height / 2 - 50 - 100 && mousePos.y < canvas.height / 2 - 50 - 100 + 100) {
 				//New game.
+				worldNewGame();
+				gameState = "World";
 			} else if (mousePos.x > canvas.width / 2 - 200 && mousePos.x < canvas.width / 2 - 200 + 400 && mousePos.y > canvas.height / 2 - 50 + 25 && mousePos.y < canvas.height / 2 - 50 + 25 + 100) {
 				//Contiue Game
 			} else if (mousePos.x > canvas.width / 2 - 200 && mousePos.x < canvas.width / 2 - 200 + 400 && mousePos.y > canvas.height / 2 - 50 + 150 && mousePos.y < canvas.height / 2 - 50 + 150 + 100) {
 				//Options
+
 				mainMenuState = 3;
 			}
 		} else if (mainMenuState == 3) {

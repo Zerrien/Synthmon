@@ -13,6 +13,7 @@ var IS_DEBUG = false;
 var data = {};
 var assets = new AssetController();
 var settings = new SettingsController();
+var camera;
 
 var mousePos = {x:0, y:0};
 var mousePress = false;
@@ -63,15 +64,7 @@ function init() {
 	canvas.height = 600;
 	ctx = canvas.getContext("2d");
 
-	
-
 	initControls();
-
-	
-
-	
-
-	
 
 	for(var sceneName in ECS.Scenes) {
 		ECS.Scenes[sceneName].init();
@@ -80,72 +73,6 @@ function init() {
 	gameState = "Loading";
 
 	setInterval(gameLoop, 10);
-
-	/*
-	var xobj = new XMLHttpRequest();
-	xobj.overrideMimeType("application/json");
-	xobj.open('get', './src/json/theworld.json', true);
-	xobj.onreadystatechange = function() {
-		if(xobj.readyState == 4 && xobj.status == "200") {
-			
-			worldData = JSON.parse(xobj.responseText);
-			world = new WorldController();
-			images = new ImageController();
-
-			player = new ECS.Entity();
-
-			//World-components
-			player.addComponent(new ECS.Components.WorldSprite(images.images.explorer));
-			var playerPos = new ECS.Components.WorldPosition(0, 0);
-			playerPos.zone = "playerUpstairs";
-			player.addComponent(playerPos);
-			player.addComponent(new ECS.Components.WorldFaces("north"));
-			player.addComponent(new ECS.Components.WorldMoves());
-			player.addComponent(new ECS.Components.WorldAnimation({
-				"standing":[0],
-				"spinning":[0, 1],
-				"jumping":[0, 1],
-				"sliding":[0, 1],
-				"walking":[0, 1],
-				"floating":[2, 3],
-				"superpushed":[0,1]
-			}));
-			player.addComponent(new ECS.Components.Revives());
-			player.addComponent(new ECS.Components.WorldCollider());
-			player.addComponent(new ECS.Components.WorldCanPush(1));
-
-			//Control-components
-			player.addComponent(new ECS.Components.WorldKeyboardControlled());
-
-			//Meta-components.
-			player.addComponent(new ECS.Components.Inventory());
-			
-			player.c('inventory').items.push(new Item(ItemSchema.potion));
-			player.c('inventory').items.push(new Item(ItemSchema.fruitA));
-			//player.c('inventory').items.push(new Item());
-			//player.c('inventory').items.push(new Item());
-			//player.c('inventory').items.push(new Item());
-
-			player.addComponent(new ECS.Components.Trainer());
-			player.c('trainer').synthmon.push(new Synthmon(true));
-			//player.c('trainer').synthmon.push(new Synthmon(true));
-			//player.c('trainer').synthmon.push(new Synthmon(true));
-			//player.c('trainer').synthmon.push(new Synthmon(true));
-
-			ECS.entities.push(player);
-
-			//world.init();
-
-			for(var sceneName in ECS.Scenes) {
-				ECS.Scenes[sceneName].init();
-			}
-			loadZone(playerPos.zone);
-
-			setInterval(gameLoop, 10);
-		}
-	}
-	xobj.send(null);
-	*/
 }
 
 ECS.States = {};
@@ -174,6 +101,7 @@ var gameState = 0;
 
 ECS.entities2 = [];
 
+/*
 function loadZone(_name) {
 	ECS.entities = [];
 	ECS.entities.push(player);
@@ -202,13 +130,13 @@ function loadZone(_name) {
 						component.x = details.x;
 						component.y = details.y;
 					} else if(componentID == "WorldWire") {
-						/*
+						
 						"connection":{
                             "name":"pressurePlate",
                             "component":"worldpressure",
                             "value":"isActivated"
                         }
-                        */
+                        
                         var attempt = tArrayFind(ECS.entities, details.connection.name);
                         if(attempt) {
                         	component.connection = attempt;
@@ -242,6 +170,7 @@ function loadZone(_name) {
 	}
 }
 
+*/
 function tArrayFind(_array, _key) {
 	for(var i = 0; i < _array.length; i++) {
 		if(_array[i].sID == _key) {

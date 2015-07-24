@@ -88,7 +88,8 @@ function init() {
 	    initShaders();
 
 	    OBJ.downloadMeshes({
-	    	"cube":"box.obj"
+	    	"cube":"box.obj",
+	    	"player":"./src/assets/mdl/person.obj"
 	    }, function(_meshes) {
 	    	app.meshes = _meshes;
 			for(model in app.meshes) {
@@ -219,10 +220,10 @@ ECS.Systems.World3DRender = function World3DRender(_e) {
 
 
 	
-	viewMatrix = matrixMultiply(viewMatrix, makeYRotation(Math.PI / 16));
-	viewMatrix = matrixMultiply(viewMatrix, makeXRotation(Math.PI / 4));
+	//viewMatrix = matrixMultiply(viewMatrix, makeYRotation(Math.PI / 16));
+	viewMatrix = matrixMultiply(viewMatrix, makeXRotation(Math.PI / 5));
 
-	viewMatrix = matrixMultiply(viewMatrix, makeTranslation(0, 0, -50));
+	viewMatrix = matrixMultiply(viewMatrix, makeTranslation(0, 0, -12.5));
 	
 	//
 	
@@ -250,13 +251,41 @@ ECS.Systems.World3DRender = function World3DRender(_e) {
 			}
 
 			var modelMatrix = getIdentity();
-			modelMatrix = matrixMultiply(modelMatrix, makeScale(1 / 10, 1 / 10, 1 / 10));
-			modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + eShiftX, 0, wP.y + eShiftY));
+			
+			
 
 			setUniform("u_wMatrix", matrixMultiply(viewMatrix, perspectiveMatrix));
-			setUniform("u_mMatrix", modelMatrix);
+			
 
-			drawApp(app.meshes.cube);
+			if(entity != player) {
+				modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + eShiftX, 0, wP.y + eShiftY));
+				setUniform("u_mMatrix", modelMatrix);
+
+				drawApp(app.meshes.cube);
+			} else {
+				var wF = entity.c("worldfaces");
+				
+				
+				switch(wF.facing) {
+					case "north":
+						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(Math.PI / 2));
+						break;
+					case "south":
+						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(-Math.PI / 2));
+						break;
+					case "east":
+
+						break;
+					case "west":
+						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(-Math.PI));
+						break;
+				}
+				modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + eShiftX, 0, wP.y + eShiftY));
+				setUniform("u_mMatrix", modelMatrix);
+
+
+				drawApp(app.meshes.player);
+			}
 		}
 	}
 	console.log(i);
