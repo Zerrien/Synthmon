@@ -37,7 +37,7 @@ ECS.Systems.LoadingLogic = function LoadingLogic(_e) {
 			case 0:
 				var xobj = new XMLHttpRequest();
 				xobj.overrideMimeType("application/json");
-				xobj.open('get', './src/json/theworld.json?', true);
+				xobj.open('get', './src/json/theworld.json?rand=' + new Date().getTime(), true);
 				xobj.onreadystatechange = function() {
 					if(xobj.readyState == 4 && xobj.status == "200") {
 						data = JSON.parse(xobj.responseText);

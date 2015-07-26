@@ -62,71 +62,222 @@ function worldNewGame() {
 	
 
 	camera = new CameraController(player);
+	world = new WorldController();
 
 	loadZone(playerPos.zone);
 }
 
-function loadZone(_zone) {
-	var zoneData;
+function tArrayFind(_array, _key) {
+	for(var i = 0; i < _array.length; i++) {
+		if(_array[i].sID == _key) {
+			console.log("???123123");
+			return _array[i];
+		}
+	}
+	return null;
+}
+
+function unloadChunk(_coords) {
+	if(data.chunks[_coords] && data.chunks[_coords].objects) {
+		var splitArray = _coords.split(",");
+		var objectArray = data.chunks[_coords].objects;
+		for(var objKey in objectArray) {
+			var result = tArrayFind(worldEntities, _coords + objKey);
+			if(result) {
+				worldEntities.splice(worldEntities.indexOf(result), 1);
+			}
+		}
+	}
+}
+
+function loadZone(_zone, _chunk) {
+	var zoneData, xChunk, yChunk;
 	if(_zone == 0) {
 		//Time to load some chunks.
-		var pP = player.c("worldposition");
-		zoneData = data.chunks[(pP.x >> 5) + "," + (pP.y >> 5)];
+		if(!_chunk) {
+			var pP = player.c("worldposition");
+			zoneData = data.chunks[(pP.x >> 5) + "," + (pP.y >> 5)];
+			_chunk = (pP.x >> 5) + "," + (pP.y >> 5);
+			xChunk = (pP.x >> 5);
+			yChunk = (pP.y >> 5);
+		} else {
+			zoneData = data.chunks[_chunk];
+			var strSplit = _chunk.split(",");
+			xChunk = strSplit[0];
+			yChunk = strSplit[1];
+		}
 	} else {
 		worldEntities = [];
 		worldEntities.push(player);
 
 		zoneData = data.interior[_zone];
+		_chunk = _zone;
 	}
+	if(zoneData) {
+		for(var objName in zoneData.objects) {
+			var object = zoneData.objects[objName];
+			var entity = new ECS.Entity();
+			for(var componentName in object) {
+				var componentDetail = object[componentName];
+				if(ECS.Components[componentName]) {
+					var component = new ECS.Components[componentName];
+					if(componentName == "WorldSprite") {
+						component.img = assets.images[componentDetail.name];
+					} else if (componentName == "WorldPosition") {
+						component.x = componentDetail.x + (xChunk ? xChunk * 32 : 0);
+						component.y = componentDetail.y + (yChunk ? yChunk * 32 : 0);
+					} else if (componentName == "Trainer") {
 
-	for(var objName in zoneData.objects) {
-		var object = zoneData.objects[objName];
-		var entity = new ECS.Entity();
-		for(var componentName in object) {
-			var componentDetail = object[componentName];
-			if(ECS.Components[componentName]) {
-				var component = new ECS.Components[componentName];
-				if(componentName == "WorldSprite") {
-					component.img = assets.images[componentDetail.name];
-				} else if (componentName == "Trainer") {
+					} else if (componentName == "WorldWire") {
 
-				} else if (componentName == "WorldWire") {
-
-				} else {
-					for(var variableName in componentDetail) {
-						var variable = componentDetail[variableName];
-						component[variableName] = variable;
+					} else {
+						for(var variableName in componentDetail) {
+							var variable = componentDetail[variableName];
+							component[variableName] = variable;
+						}
 					}
+					entity.addComponent(component);
+				} else {
+					console.warn("Unable to find component of type:" + componentID)
 				}
-				entity.addComponent(component);
-			} else {
-				console.warn("Unable to find component of type:" + componentID)
+				
 			}
-			
+			entity.sID = (_chunk) + objName;
+			worldEntities.push(entity);
+
 		}
-		worldEntities.push(entity)
+	} else {
+		console.warn("Warning: No ZoneData of " + _zone + " at chunk " + _chunk);
 	}
 }
 
 ECS.Systems.WorldAI = function WorldAI(_e) {
+	
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		if(entity.c("worldconveyor")) {
-
+			var wC = entity.c("worldconveyor");
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				var rwM = result.c("worldmoves");
+				var rF = result.c("worldfaces");
+				var rcP = result.c("worldcanpush");
+				if(rwM.state == "standing") {
+					if(wC.pushTime >= rwM.curSpeed && result.c("worldkeyboardcontrolled")) {
+					} else {
+						if(rF) {
+							rF.facing = entity.c("worldfaces").facing;
+						}
+						if(rcP) {
+							rcP.curStrength = rcP.strength;
+						}
+						rwM.state = wC.type;
+						var facingXY = entity.c("worldfaces").facingTile();
+						rwM.destX = facingXY.x;
+						rwM.destY = facingXY.y;
+						if(wC.lastPust != result) {
+							wC.lastPush = result;
+							wC.pushTime = 0;
+						} else {
+							wC.pusTime += dTime;
+						}
+					}
+				}
+			} else {
+				wC.lastPush = null;
+				wC.pushTime = 0;
+			}
 		} else if (entity.c("worldslippery")) {
-
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				var rwM = result.c("worldmoves");
+				if(rwM.destX != 0 || rwM.destY != 0) {
+					rwM.state = "sliding";
+				}
+			}
 		} else if (entity.c("worldsuperpusher")) {
-
+			var wP = entity.c("worldposition");
+			var wF = entity.c("worldfaces");
+			var facingXY = wF.facingTile();
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				var rwM = result.c("worldmoves");
+				if(rwM.state == "standing") {
+					rwM.state = "superpushed";
+					rwM.destX = facingXY.x;
+					rwM.destY = facingXY.y;
+				}
+			}
 		} else if (entity.c("worldstopper")) {
-			
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				var rwM = result.c("worldmoves");
+				if(rwM.state == "superpushed") {
+					rwM.state = "walking"
+				} else {
+
+				}
+				
+			}
 		} else if (entity.c("worldgrass")) {
-			
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result && result == player &&  result.c("worldmoves").state == "standing" && entity.c("worldgrass").last != player) {
+				entity.c("worldgrass").last = player;
+				if(Math.random() < 0.125) {
+					var enemy = new ECS.Entity();
+					enemy.addComponent(new ECS.Components.Trainer());
+					enemy.c("trainer").synthmon.push(new Synthmon());
+					BC.configure(player, enemy, "wild");
+				}
+			} else if(result == null) {
+				entity.c("worldgrass").last = null;
+			}
 		} else if (entity.c("worldpressure")) {
-			
+			var wP = entity.c("worldposition");
+			var result = checkCollision(_e, wP.x, wP.y, entity);
+			if(result) {
+				entity.c("worldpressure").isActivated = true;
+			} else {
+				entity.c("worldpressure").isActivated = false;
+			}
 		} else if (entity.c("worldwire")) {
-			
+			/*
+			var wW = entity.c("worldwire");
+			var wC = wW.connection;
+			if(wC.c(wW.component)[wW.value]) {
+				entity.c(wW.link)[wW.val] = wW.on;
+			} else {
+				entity.c(wW.link)[wW.val] = wW.off;
+			}
+			*/
 		} else if (entity.c("worldlinearmonitor")) {
-			
+			var wP = entity.c("worldposition");
+			var wL = entity.c("worldlinearmonitor");
+			var wF = entity.c("worldfaces");
+			var wM = entity.c("worldmoves");
+			if(wL.enabled == true) {
+				for(var i = 1; i <= wL.distance; i++) {
+					var result = checkCollision(_e, wP.x + wF.facingTile().x * i, wP.y + wF.facingTile().y * i);
+					if(result) {
+						if(result == player) {
+							wL.enabled = false;
+							gameState = 1;
+							wM.destX = wF.facingTile().x * (i-1);
+							wM.destY = wF.facingTile().y * (i-1);
+							wM.state = "walking";
+							wM.curSpeed = 2000;
+							wEvents.push(new WorldEvent(wM, "state", "standing", function() {
+								//console.log("OLE!!!!");
+							}))
+						}
+						i = wL.distance + 1;
+					}
+				}
+			}
 		}
 	}
 }
@@ -197,7 +348,11 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 							}
 							
 							wP.zone = rwPo.dest;
-							loadZone(rwPo.dest);
+							if(wP.zone == 0) {
+								world.init();
+							} else {
+								loadZone(rwPo.dest);
+							}
 						}
 					} else if (result.c("worldfacingcollider")) {
 						if(result.c("worldfaces").facing == entity.c("worldfaces").facing) {
@@ -214,7 +369,7 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 	}
 }
 ECS.Systems.WorldLogic = function WorldLogic(_e) {
-	//Consider this: disregard this.
+	world.trackPos(player);
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
@@ -262,7 +417,23 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			//Eventual for a specific camera movement component.
 		}
 		ctx.translate(canvas.width / 2 - TILE_SIZE / 2 - cP.x * TILE_SIZE - cShiftX, canvas.height / 2 - TILE_SIZE / 2 - cP.y * TILE_SIZE - cShiftY);
+
+		if(cP.zone == 0) {
+			for(var i = -1; i <= 1; i++) {
+				for(var j = -1; j <= 1; j++) {
+					var chunkInfo = ((cP.x >> 5) + i) + "," + ((cP.y >> 5) + j);
+					if(world.images[chunkInfo]) {
+						ctx.drawImage(world.images[chunkInfo], TILE_SIZE * 32 * (i + (cP.x >> 5)), TILE_SIZE * 32 * (j + (cP.y >> 5)));
+					}
+				}
+			}
+		} else {
+			ctx.drawImage(world.images.interiors[cP.zone], 0, 0);
+		}
 	}
+
+	
+
 
 	_e.sort(function(_a, _b) {
 		var aF = _a.c("worldfloor");
@@ -272,7 +443,7 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 		} else if (aF) {
 			return -1;
 		} else if (bF) {
-			1;
+			return 1;
 		} else {
 			var aP = _a.c("worldposition");
 			var bP = _b.c("worldposition");
@@ -301,7 +472,6 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 			}
 		}
 	});
-
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 
@@ -419,8 +589,8 @@ function checkCollision(_e, _x, _y, _ex) {
 					width = wLC.width;
 					height = wLC.height;
 				}
-
-				if(xPos <= _x && xPos + width > _x && yPos <= _y && yPos + height > _y) {
+				if((xPos <= _x && xPos + width > _x && yPos <= _y && yPos + height > _y) ||
+					(wM && (xPos + wM.destX <= _x && xPos + width + wM.destX > _x && yPos + wM.destY <= _y && yPos + height + wM.destY > _y))) {
 					return entity;
 				}
 			}

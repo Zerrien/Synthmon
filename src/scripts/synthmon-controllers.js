@@ -7,42 +7,54 @@ function SettingsController() {
 function WorldController() {
 	this.images = {};
 	this.images.interiors = {};
-	for(var chunkID in worldData.chunks) {
+	for(var chunkID in data.chunks) {
 		this.images[chunkID] = new Image();
-		this.images[chunkID].src = worldData.chunks[chunkID].source;
+		this.images[chunkID].src = data.chunks[chunkID].source;
 	}
-	for(var chunkID in worldData.interior) {
+	for(var chunkID in data.interior) {
 		this.images.interiors[chunkID] = new Image();
-		this.images.interiors[chunkID].src = worldData.interior[chunkID].source;
+		this.images.interiors[chunkID].src = data.interior[chunkID].source;
 	}
 	this.lastChunk = null;
 }
 WorldController.prototype = {
 	"trackPos":function(_player) {
-		var pChunkX = _player.c("worldposition").x >> 5;
-		var pChunkY = _player.c("worldposition").y >> 5;
-		if(!this.lastChunk) {
-			this.lastChunk = {x:pChunkX, y:pChunkY};
-		}
-		if(this.lastChunk.x != pChunkX) {
-			var diffX = this.lastChunk.x - pChunkX;
-			var distanceX = pChunkX + diffX * 2;
-			var forwardX = pChunkX + (diffX * - 1);
-			if(IS_DEBUG) {
-				for(var i = -2; i <= 2; i++) {
-					unloadChunk(distanceX + "," + (pChunkY + i));
-					loadChunk(forwardX + "," + (pChunkY + i));
-				}
-			} else {
+		if(_player.c("worldposition").zone == 0) {
+			var pChunkX = _player.c("worldposition").x >> 5;
+			var pChunkY = _player.c("worldposition").y >> 5;
+			if(!this.lastChunk) {
+				this.lastChunk = {x:pChunkX, y:pChunkY};
+			}
+			if(this.lastChunk.x != pChunkX) {
+				var diffX = this.lastChunk.x - pChunkX;
+				var distanceX = pChunkX + diffX * 2;
+				var forwardX = pChunkX + (diffX * - 1);
 				for(var i = -1; i <= 1; i++) {
 					unloadChunk(distanceX + "," + (pChunkY + i));
-					loadChunk(forwardX + "," + (pChunkY + i));
+					loadZone(0, forwardX + "," + (pChunkY + i));
 				}
+			} else if (this.lastChunk.y != pChunkY) {
+				/*
+				var diffY = this.lastChunk.y - pChunkY;
+				var distanceY = pChunkY + diffY * 2;
+				var forwardY = pChunkY + (diffY * - 1);
+				if(IS_DEBUG) {
+					for(var i = -2; i <= 2; i++) {
+						unloadChunk(distanceX + "," + (pChunkY + i));
+						loadZone(0, (pChunkX + i) + "," + forwardY);
+					}
+				} else {
+					console.log("???");
+					for(var i = -1; i <= 1; i++) {
+						unloadChunk(distanceX + "," + (pChunkY + i));
+						loadZone(0, (pChunkX + i) + "," + forwardY);
+					}
+				}
+				*/
 			}
-		} else if (this.lastChunk.y != pChunkY) {
+			this.lastChunk = {x:pChunkX, y:pChunkY};
+			//console.log(_player.c("worldposition").x);
 		}
-		this.lastChunk = {x:pChunkX, y:pChunkY};
-		//console.log(_player.c("worldposition").x);
 	},
 	"init":function() {
 		if(player) {
@@ -51,13 +63,13 @@ WorldController.prototype = {
 			if(IS_DEBUG) {
 				for(var i = -2; i <= 2; i++) {
 					for(var j = -2; j <= 2; j++) {
-						loadChunk(i + "," + j);
+						loadZone(0, i + "," + j);
 					}
 				}
 			} else {
 				for(var i = -1; i <= 1; i++) {
 					for(var j = -1; j <= 1; j++) {
-						loadChunk(i + "," + j);
+						loadZone(0, i + "," + j);
 					}
 				}
 			}

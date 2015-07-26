@@ -756,30 +756,45 @@
                     "WorldPosition": {
                         "x": 2,
                         "y": 23
+                    },
+                    "WorldSprite": {
+                        "name":"tallgrass"
                     }
                 },
                 "14ea45eabaf19a47f022": {
                     "WorldPosition": {
                         "x": 5,
                         "y": 19
+                    },
+                    "WorldSprite": {
+                        "name":"tallgrass"
                     }
                 },
                 "14ea45eac8d418c723": {
                     "WorldPosition": {
                         "x": 7,
                         "y": 23
+                    },
+                    "WorldSprite": {
+                        "name":"tallgrass"
                     }
                 },
                 "14ea45ecf194d71df725": {
                     "WorldPosition": {
                         "x": 5,
                         "y": 30
+                    },
+                    "WorldSprite": {
+                        "name":"tallgrass"
                     }
                 },
                 "14ea45f7aa54182bc25": {
                     "WorldPosition": {
                         "x": 2,
                         "y": 22
+                    },
+                    "WorldSprite": {
+                        "name":"tallgrass"
                     }
                 }
             }

@@ -171,14 +171,7 @@ function loadZone(_name) {
 }
 
 */
-function tArrayFind(_array, _key) {
-	for(var i = 0; i < _array.length; i++) {
-		if(_array[i].sID == _key) {
-			return _array[i];
-		}
-	}
-	return null;
-}
+
 
 function loadChunk(_coords) {
 	if(worldData.chunks[_coords] && worldData.chunks[_coords].objects) {
@@ -245,6 +238,7 @@ function loadChunk(_coords) {
 	}
 }
 
+/*
 function unloadChunk(_coords) {
 	if(worldData.chunks[_coords] && worldData.chunks[_coords].objects) {
 		var splitArray = _coords.split(",");
@@ -258,6 +252,7 @@ function unloadChunk(_coords) {
 		}
 	}
 }
+*/
 
 function gameLoop() {
 	curTime = (new Date()).getTime();
