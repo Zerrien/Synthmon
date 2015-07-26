@@ -323,24 +323,49 @@ function AssetController() {
 	};
 
 	this.loadTextures = function(_completed) {
-		var sum = loaded = 0;
-		for(var textureName in data.assets.textures) {
-			var textureAlias = this.textures;
-			sum++;
-
-			this.textures[textureName] = new Image();
-			this.textures[textureName].src = data.assets.textures[textureName];
-			this.textures[textureName].onload = function() {
-				textureAlias._loaded.current = ++loaded;
-				if(sum == loaded) {
-					_completed();
+		if(IS_3D) {
+			var sum = loaded = 0;
+			for(var textureName in data.assets.textures) {
+				var textureAlias = this.textures;
+				sum++;
+				this.textures[textureName] = {}
+				this.textures[textureName];
+				this.textures[textureName].texture = gl.createTexture();
+				this.textures[textureName].image = new Image();
+				this.textures[textureName].image.name = textureName;
+				this.textures[textureName].image.onload = function() {
+					handleTextureLoaded(this, assets.textures[this.name].texture);
+					textureAlias._loaded.current = ++loaded;
+					if(sum == loaded) {
+						_completed();
+					}
 				}
+				this.textures[textureName].image.src = data.assets.textures[textureName];
 			}
+			this.textures._loaded = {
+				"total":sum,
+				"current":loaded
+			};
+		} else {
+			var sum = loaded = 0;
+			for(var textureName in data.assets.textures) {
+				var textureAlias = this.textures;
+				sum++;
 
+				this.textures[textureName] = new Image();
+				this.textures[textureName].src = data.assets.textures[textureName];
+				this.textures[textureName].onload = function() {
+					textureAlias._loaded.current = ++loaded;
+					if(sum == loaded) {
+						_completed();
+					}
+				}
+
+			}
+			this.textures._loaded = {
+				"total":sum,
+				"current":loaded
+			};
 		}
-		this.textures._loaded = {
-			"total":sum,
-			"current":loaded
-		};
 	};
 }

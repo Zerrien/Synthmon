@@ -47,7 +47,8 @@
             "tex1":"./src/assets/texture/tex1.png",
             "tex2":"./src/assets/texture/tex2.png",
             "tex3":"./src/assets/texture/tex3.png",
-            "tex4":"./src/assets/texture/tex4.png"
+            "tex4":"./src/assets/texture/tex4.png",
+            "tex5":"./src/assets/texture/tex5.png"
         }
     },
     "chunks": {

@@ -63,11 +63,22 @@ ECS.Systems.LoadingLogic = function LoadingLogic(_e) {
 				loadingHas = true;
 				break;
 			case 3:
-				assets.loadModels(function() {
+				OBJ.downloadMeshes({
+					"groundPlane" : "./src/assets/mdl/plane.obj",
+					"player" : "./src/assets/mdl/person.obj",
+					"box" : "./src/assets/mdl/box.obj?",
+					"worldPlane" : "./src/assets/mdl/32plane.obj",
+					"floorPlane" : "./src/assets/mdl/floorPlane.obj",
+					"house" : "./src/assets/mdl/house.obj"
+	    		}, function(_meshes) {
+	    			app.meshes = _meshes;
+					for(model in app.meshes) {
+						OBJ.initMeshBuffers(gl, app.meshes[model]);
+					}
 					loadingState = 4;
 					loadingHas = false;
-				})
-				//loadingHas = true; //Uncomment when implement a working model loader.
+				});
+				loadingHas = true;
 				break;
 			case 4:
 				assets.loadTextures(function() {
@@ -109,8 +120,8 @@ ECS.Systems.LoadingRender = function LoadingRender(_e) {
 					extraPercentage = assets.sounds._loaded.current / assets.sounds._loaded.total;
 					break;
 				case 3:
-					ctx.fillText(assets.models._loaded.current + " / " + assets.models._loaded.total, canvas.width / 2, canvas.height / 2 + 20);
-					extraPercentage = assets.models._loaded.current / assets.models._loaded.total;
+					//ctx.fillText(assets.models._loaded.current + " / " + assets.models._loaded.total, canvas.width / 2, canvas.height / 2 + 20);
+					//extraPercentage = assets.models._loaded.current / assets.models._loaded.total;
 					break;
 				case 4:
 					ctx.fillText(assets.textures._loaded.current + " / " + assets.textures._loaded.total, canvas.width / 2, canvas.height / 2 + 20);
@@ -124,4 +135,7 @@ ECS.Systems.LoadingRender = function LoadingRender(_e) {
 		ctx.fillText("I'm loaded", canvas.width / 2, canvas.height / 2)
 	}
 	ctx.restore();
+	if(IS_3D) {
+		ctx.drawImage(canvas3D, 0, 0);
+	}
 }

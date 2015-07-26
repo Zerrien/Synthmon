@@ -1,6 +1,9 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<script src="./webgl-obj-loader.js"></script>
+		<script src="utility.js"></script>
+
 		<script src="./src/scripts/synthmon-core.js"></script>
 		<script src="./src/scripts/synthmon-components.js"></script>
 		<script src="./src/scripts/synthmon-components-world.js"></script>
@@ -13,7 +16,57 @@
 		<script src="./src/scripts/synthmon-controllers.js"></script>
 		<script src="./src/scripts/synthmon-objects.js"></script>
 
+		<script src="./src/scripts/synthmon-webgl.js"></script>
+
 		<script src="./src/scripts/synthmon-main.js"></script>
+
+		<script name="lambertFragShader" id="lambert-fs" type="x-shader/x-fragment">
+			precision highp float;
+			uniform sampler2D u_sampler;
+
+			varying vec2 v_uvCoord;
+			varying vec4 v_vertNorm;
+
+			void main(void) {
+
+				vec3 ambientLight = vec3(0.25, 0.25, 0.25);
+    			vec3 directionalLightColor = vec3(0.75, 0.75, 0.75);
+    			vec3 directionalVector = vec3(0.85, 0.8, 0.75);
+
+    			float directional = max(dot(v_vertNorm.xyz, directionalVector), 0.0);
+
+    			vec4 phong_thing = vec4(ambientLight + (directionalLightColor * directional), 1.0);
+				vec4 a = texture2D(u_sampler, vec2(v_uvCoord.x,v_uvCoord.y * -1.0));
+				gl_FragColor = vec4(a.x * phong_thing.x, a.y * phong_thing.y, a.z * phong_thing.z, 1.0);
+			}
+		</script>
+		<script name="lambertVertShader" id="lambert-vs" type="x-shader/x-vertex">
+			precision highp float;
+
+			attribute vec3 a_vertPos;
+			attribute vec2 a_uvCoord;
+			attribute vec3 a_vertNorm;
+
+			uniform mat4 u_mMatrix;
+			uniform mat4 u_pMatrix;
+			uniform mat4 u_vMatrix;
+			uniform mat4 u_nMatrix;
+
+			varying vec2 v_uvCoord;
+			varying vec4 v_vertNorm;
+
+			void main(void) {
+				gl_Position = u_pMatrix * u_vMatrix * u_mMatrix * vec4(a_vertPos, 1.0);
+
+				v_uvCoord = a_uvCoord;
+
+				
+
+    			vec4 transformedNormal = u_nMatrix * vec4(a_vertNorm, 1.0);
+    			
+				v_vertNorm = transformedNormal;
+			}
+		</script>
 	</head>
 	<body onload="init()">
 		<canvas id="game"></canvas>

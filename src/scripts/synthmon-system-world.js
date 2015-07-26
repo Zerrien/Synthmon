@@ -4,7 +4,8 @@ ECS.Scenes.World = {
 		"WorldControl",
 		"WorldCollision",
 		"WorldLogic",
-		"WorldRender"
+		"WorldRender",
+		"WorldRender3D"
 	],
 	"entities":[],
 	"logic":function() {
@@ -123,6 +124,7 @@ function loadZone(_zone, _chunk) {
 					var component = new ECS.Components[componentName];
 					if(componentName == "WorldSprite") {
 						component.img = assets.images[componentDetail.name];
+						component.imgName = componentDetail.name;
 					} else if (componentName == "WorldPosition") {
 						component.x = componentDetail.x + (xChunk ? xChunk * 32 : 0);
 						component.y = componentDetail.y + (yChunk ? yChunk * 32 : 0);
@@ -559,10 +561,141 @@ ECS.Systems.WorldRender = function WorldRender(_e) {
 	}
 
 	ctx.restore();
+
+	tctx.clearRect(0, 0, 800, 600);
+	tctx.drawImage(canvas, 0, 0);
+
+	ctx.clearRect(0, 0, 800, 600);
+	if(IS_3D) {
+		ctx.drawImage(canvas3D, 0, 0);
+	}
 }
+
+var tCanvas = document.createElement("canvas");
+tCanvas.width = 800;
+tCanvas.height = 600;
+var tctx = tCanvas.getContext('2d');
 ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 	//An omen.
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	gl.disable(gl.CULL_FACE);
+	gl.enable(gl.DEPTH_TEST);
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+	gl.useProgram(shaders.lambert.program);
+	var viewMatrix = getIdentity();
+	var perspectiveMatrix = makePerspective(Math.PI/4, canvas.width/canvas.height, 1, 1000.0);
+	setUniform("u_pMatrix", perspectiveMatrix);
+	if(camera) {
+		var cP = camera.target.c("worldposition");
+		var cM = camera.target.c("worldmoves");
+		var cShiftX = 0;
+		var cShiftY = 0;
+		if(cM) {
+			cShiftX = cM.curCycle / cM.curSpeed * cM.destX;
+			cShiftY = cM.curCycle / cM.curSpeed * cM.destY;
+		} else {
+			//Eventual for a specific camera movement component.
+		}
+		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(-1 * (cP.x + cShiftX), -0.5, -1 * (cP.y + cShiftY)));
+		viewMatrix = matrixMultiply(viewMatrix, makeXRotation(Math.PI / 4));
+		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(0, 0, -25));
+		setUniform("u_vMatrix", viewMatrix);
+		
+		if(cP.zone == 0) {
+			for(var i = -1; i <= 1; i++) {
+				for(var j = -1; j <= 1; j++) {
+					var modelMatrix = getIdentity();
+					modelMatrix = matrixMultiply(modelMatrix, makeTranslation(i * 32 - 0.5, 0, j * 32 - 0.5))
+					setUniform("u_sampler", assets.textures["tex5"].texture, 0);
+					setUniform("u_mMatrix", modelMatrix);
+					setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
+					drawApp(app.meshes.worldPlane);
+				}
+			}
+		} else {
+				//draw interior
+		}
+		
+	}
+
+	
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var wP = entity.c("worldposition");
+		var wS = entity.c("worldsprite");
+		if(wP && wS) {
+			var wM = entity.c("worldmoves");
+			var shiftX, shiftY;
+			shiftX = shiftY = 0;
+			if(wM) {
+				shiftX = wM.curCycle / wM.curSpeed * wM.destX;
+				shiftY = wM.curCycle / wM.curSpeed * wM.destY;
+				if(wM.state == "jumping") {
+					shiftY -= Math.sin(wM.curCycle / wM.curSpeed * Math.PI) * 16;
+				}
+			}
+			var modelMatrix = getIdentity();
+			modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + shiftX, 0, wP.y + shiftY));
+			setUniform("u_k", 0.0);
+			setUniform("u_mMatrix", modelMatrix);
+					setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
+			if(entity == player) {
+				var wF = entity.c("worldfaces");
+				modelMatrix = getIdentity();
+				switch(wF.facing) {
+					case "north":
+						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(Math.PI / 2));
+						break;
+					case "south":
+						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(-Math.PI / 2));
+						break;
+					case "east":
+
+						break;
+					case "west":
+						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(-Math.PI));
+						break;
+				}
+				
+				modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + shiftX, 0, wP.y + shiftY));
+				setUniform("u_mMatrix", modelMatrix);
+					setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
+				setUniform("u_sampler", assets.textures["tex4"].texture, 0);
+				drawApp(app.meshes.player);
+			} else {
+				if(entity.c("worldfloor")) {
+					setUniform("u_sampler", assets.textures["tex2"].texture, 0);
+					drawApp(app.meshes.floorPlane);
+				} else {
+					if(wS.imgName == "shoppe" || wS.imgName == "house1") {
+						modelMatrix = matrixMultiply(modelMatrix, makeTranslation(2, 0, -1));
+
+						setUniform("u_mMatrix", modelMatrix);
+						setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
+						setUniform("u_sampler", assets.textures["tex2"].texture, 0);
+						drawApp(app.meshes.house);
+					} else {
+						setUniform("u_sampler", assets.textures["tex3"].texture, 0);
+						drawApp(app.meshes.box);
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	for(var i = 0; i < 100; i++) {
+		var modelMatrix = getIdentity();
+		modelMatrix = matrixMultiply(modelMatrix, makeTranslation(player.c("worldposition").x, -1, player.c("worldposition").y));
+		setUniform("u_mMatrix", modelMatrix);
+		drawApp(app.meshes.player);
+	}
+	*/
+	ctx.drawImage(tCanvas, 0, 0, 800 / 3, 600 / 3);
 }
+
 
 
 function checkCollision(_e, _x, _y, _ex) {

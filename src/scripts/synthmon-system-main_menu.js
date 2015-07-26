@@ -91,4 +91,7 @@ ECS.Systems.MainMenuRender = function MainMenuRender(_e) {
 	}
 
 	ctx.restore();
+	if(IS_3D) {
+		ctx.drawImage(canvas3D, 0, 0);
+	}
 }
