@@ -11,7 +11,9 @@ function initShaders() {
 		//gl.useProgram(shaders[shaderName].program);
 		gl.attachShader(shaders[shaderName].program, fragShader);
 		gl.attachShader(shaders[shaderName].program, vertShader);
+
 		gl.linkProgram(shaders[shaderName].program);
+		gl.useProgram(shaders[shaderName].program);
 
 		if(!gl.getProgramParameter(shaders[shaderName].program, gl.LINK_STATUS)) {
 			alert("WebGL-EzStart Error: Unable to init shader program");
@@ -24,7 +26,10 @@ function initShaders() {
 
 		shaders[shaderName].uniforms = shaderList[i].uniforms;
 	}
+	shaderStack.push(shaders.lambert);
 }
+
+var shaderStack = [];
 
 function getShader(_id) {
 	/*
@@ -63,13 +68,13 @@ function getShader(_id) {
 function drawApp(_app) {
 	//console.log(_app);
 	gl.bindBuffer(gl.ARRAY_BUFFER, _app.vertexBuffer);
-	gl.vertexAttribPointer(shaders.lambert.vertPos, _app.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(getCurrentShader().vertPos, _app.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, _app.textureBuffer);
-	gl.vertexAttribPointer(shaders.lambert.uvCoord, _app.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(getCurrentShader().uvCoord, _app.textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, _app.normalBuffer);
-	gl.vertexAttribPointer(shaders.lambert.vertNorm, _app.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(getCurrentShader().vertNorm, _app.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, _app.indexBuffer);
 
@@ -78,15 +83,15 @@ function drawApp(_app) {
 
 function setUniform(_n, _v, _n1) {
 	if(_v.length == 16) {
-		gl.uniformMatrix4fv(gl.getUniformLocation(shaders.lambert.program, _n), false, _v);
+		gl.uniformMatrix4fv(gl.getUniformLocation(getCurrentShader().program, _n), false, _v);
 	}  else if (typeof _v === 'number') {
-		gl.uniform1f(gl.getUniformLocation(shaders.lambert.program, _n), _v);
+		gl.uniform1f(gl.getUniformLocation(getCurrentShader().program, _n), _v);
 	} else if (_v.length == 3) {
-		gl.uniform3fv(gl.getUniformLocation(shaders.lambert.program, _n), _v);
+		gl.uniform3fv(gl.getUniformLocation(getCurrentShader().program, _n), _v);
 	} else {
 		gl.activeTexture(33984 + _n1);
   		gl.bindTexture(gl.TEXTURE_2D, _v);
-  		gl.uniform1i(gl.getUniformLocation(shaders.lambert.program, _n), _n1);
+  		gl.uniform1i(gl.getUniformLocation(getCurrentShader().program, _n), _n1);
 		//alert("Attempting to pass unknown-type uniform");
 	}
 }
@@ -106,4 +111,46 @@ function handleTextureLoaded(_img, _texture) {
 	gl.generateMipmap(gl.TEXTURE_2D);
 	
 	gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
+var rttFramebuffer;
+var rttTexture;
+
+function initTextureFramebuffer() {
+	rttFramebuffer = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, rttFramebuffer);
+
+	rttFramebuffer.width = 512;
+	rttFramebuffer.height = 512;
+
+	rttTexture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, rttTexture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, rttFramebuffer.width, rttFramebuffer.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.generateMipmap(gl.TEXTURE_2D);
+   
+
+    var renderbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, rttFramebuffer.width, rttFramebuffer.height)
+
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, rttTexture, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
+
+function getCurrentShader() {
+	return shaderStack[shaderStack.length - 1];
+}
+function pushShader(_shader) {
+	shaderStack.push(_shader);
+	gl.useProgram(_shader.program);
+}
+function popShader(_shader) {
+	shaderStack.pop();
+	gl.useProgram(shaderStack[shaderStack.length - 1].program);
 }

@@ -69,7 +69,9 @@ ECS.Systems.LoadingLogic = function LoadingLogic(_e) {
 					"box" : "./src/assets/mdl/box.obj?",
 					"worldPlane" : "./src/assets/mdl/32plane.obj",
 					"floorPlane" : "./src/assets/mdl/floorPlane.obj",
-					"house" : "./src/assets/mdl/house.obj"
+					"house" : "./src/assets/mdl/house.obj",
+					"boulder" : "./src/assets/mdl/boulder.obj",
+					"conveyor":"./src/assets/mdl/conveyor.obj?"
 	    		}, function(_meshes) {
 	    			app.meshes = _meshes;
 					for(model in app.meshes) {

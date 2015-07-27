@@ -44,6 +44,9 @@ function worldNewGame() {
 	player.addComponent(new ECS.Components.Revives());
 	player.addComponent(new ECS.Components.WorldCollider());
 	player.addComponent(new ECS.Components.WorldCanPush(1));
+	player.addComponent(new ECS.Components.WorldModel());
+	player.c('worldmodel').model = app.meshes.player;
+	player.c('worldmodel').texture = assets.textures['tex2'].texture;
 
 	//Control-components
 	player.addComponent(new ECS.Components.WorldKeyboardControlled());
@@ -128,6 +131,9 @@ function loadZone(_zone, _chunk) {
 					} else if (componentName == "WorldPosition") {
 						component.x = componentDetail.x + (xChunk ? xChunk * 32 : 0);
 						component.y = componentDetail.y + (yChunk ? yChunk * 32 : 0);
+					} else if (componentName == "WorldModel") {
+						component.model = app.meshes[componentDetail.modelName];
+						component.texture = assets.textures[componentDetail.modelTexture].texture;
 					} else if (componentName == "Trainer") {
 
 					} else if (componentName == "WorldWire") {
@@ -576,17 +582,15 @@ tCanvas.width = 800;
 tCanvas.height = 600;
 var tctx = tCanvas.getContext('2d');
 ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
-	//An omen.
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	gl.disable(gl.CULL_FACE);
-	gl.enable(gl.DEPTH_TEST);
-	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-	gl.useProgram(shaders.lambert.program);
+	
+	var perspectiveMatrix = makePerspective(Math.PI / 4, 800 / 600, 1, 64);
+	var modelMatrix = getIdentity();
 	var viewMatrix = getIdentity();
-	var perspectiveMatrix = makePerspective(Math.PI/4, canvas.width/canvas.height, 1, 1000.0);
+
 	setUniform("u_pMatrix", perspectiveMatrix);
+	setUniform("u_mMatrix", modelMatrix);
+	
 	if(camera) {
 		var cP = camera.target.c("worldposition");
 		var cM = camera.target.c("worldmoves");
@@ -598,102 +602,66 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 		} else {
 			//Eventual for a specific camera movement component.
 		}
-		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(-1 * (cP.x + cShiftX), -0.5, -1 * (cP.y + cShiftY)));
+		//ctx.translate(canvas.width / 2 - TILE_SIZE / 2 - cP.x * TILE_SIZE - cShiftX, canvas.height / 2 - TILE_SIZE / 2 - cP.y * TILE_SIZE - cShiftY);
+		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(-1 * (cP.x + cShiftX), 0, -1 * (cP.y + cShiftY)));
 		viewMatrix = matrixMultiply(viewMatrix, makeXRotation(Math.PI / 4));
-		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(0, 0, -25));
-		setUniform("u_vMatrix", viewMatrix);
-		
+		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(0, 0, -15));
 		if(cP.zone == 0) {
+
+			/*
 			for(var i = -1; i <= 1; i++) {
 				for(var j = -1; j <= 1; j++) {
-					var modelMatrix = getIdentity();
-					modelMatrix = matrixMultiply(modelMatrix, makeTranslation(i * 32 - 0.5, 0, j * 32 - 0.5))
-					setUniform("u_sampler", assets.textures["tex5"].texture, 0);
-					setUniform("u_mMatrix", modelMatrix);
-					setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
-					drawApp(app.meshes.worldPlane);
+					var chunkInfo = ((cP.x >> 5) + i) + "," + ((cP.y >> 5) + j);
+					if(world.images[chunkInfo]) {
+						ctx.drawImage(world.images[chunkInfo], TILE_SIZE * 32 * (i + (cP.x >> 5)), TILE_SIZE * 32 * (j + (cP.y >> 5)));
+					}
 				}
 			}
+			*/
 		} else {
-				//draw interior
+			//ctx.drawImage(world.images.interiors[cP.zone], 0, 0);
 		}
-		
 	}
+	setUniform("u_vMatrix", viewMatrix);
 
-	
+
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
 		var wS = entity.c("worldsprite");
+		var wMdl = entity.c("worldmodel");
 		if(wP && wS) {
 			var wM = entity.c("worldmoves");
-			var shiftX, shiftY;
-			shiftX = shiftY = 0;
+			var wF = entity.c("worldfaces");
+			var wShiftX = wShiftY = 0;
 			if(wM) {
-				shiftX = wM.curCycle / wM.curSpeed * wM.destX;
-				shiftY = wM.curCycle / wM.curSpeed * wM.destY;
-				if(wM.state == "jumping") {
-					shiftY -= Math.sin(wM.curCycle / wM.curSpeed * Math.PI) * 16;
-				}
+				wShiftX = wM.curCycle / wM.curSpeed * wM.destX;
+				wShiftY = wM.curCycle / wM.curSpeed * wM.destY;
 			}
-			var modelMatrix = getIdentity();
-			modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + shiftX, 0, wP.y + shiftY));
-			setUniform("u_k", 0.0);
+			modelMatrix = getIdentity();
+			
+			if(wF) {
+				modelMatrix = matrixMultiply(modelMatrix, makeYRotation(wF.facingRot()));
+			}
+
+			modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + wShiftX, 0, wP.y + wShiftY));
 			setUniform("u_mMatrix", modelMatrix);
-					setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
-			if(entity == player) {
-				var wF = entity.c("worldfaces");
-				modelMatrix = getIdentity();
-				switch(wF.facing) {
-					case "north":
-						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(Math.PI / 2));
-						break;
-					case "south":
-						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(-Math.PI / 2));
-						break;
-					case "east":
-
-						break;
-					case "west":
-						modelMatrix = matrixMultiply(modelMatrix, makeYRotation(-Math.PI));
-						break;
-				}
-				
-				modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + shiftX, 0, wP.y + shiftY));
-				setUniform("u_mMatrix", modelMatrix);
-					setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
-				setUniform("u_sampler", assets.textures["tex4"].texture, 0);
-				drawApp(app.meshes.player);
+			if(wMdl) {
+				setUniform("u_sampler", wMdl.texture, 0);
+				drawApp(wMdl.model);
 			} else {
-				if(entity.c("worldfloor")) {
-					setUniform("u_sampler", assets.textures["tex2"].texture, 0);
-					drawApp(app.meshes.floorPlane);
-				} else {
-					if(wS.imgName == "shoppe" || wS.imgName == "house1") {
-						modelMatrix = matrixMultiply(modelMatrix, makeTranslation(2, 0, -1));
-
-						setUniform("u_mMatrix", modelMatrix);
-						setUniform("u_nMatrix", makeTranspose(makeInverse(modelMatrix)));
-						setUniform("u_sampler", assets.textures["tex2"].texture, 0);
-						drawApp(app.meshes.house);
-					} else {
-						setUniform("u_sampler", assets.textures["tex3"].texture, 0);
-						drawApp(app.meshes.box);
-					}
-				}
+				setUniform("u_sampler", assets.textures['tex1'].texture, 0);
+				drawApp(app.meshes.box);
 			}
 		}
 	}
 	
-	/*
-	for(var i = 0; i < 100; i++) {
-		var modelMatrix = getIdentity();
-		modelMatrix = matrixMultiply(modelMatrix, makeTranslation(player.c("worldposition").x, -1, player.c("worldposition").y));
-		setUniform("u_mMatrix", modelMatrix);
-		drawApp(app.meshes.player);
-	}
-	*/
-	ctx.drawImage(tCanvas, 0, 0, 800 / 3, 600 / 3);
+
+
+
+
+
+
 }
 
 

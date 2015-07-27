@@ -72,12 +72,23 @@ function init() {
 		canvas3D.height = 600;
 		gl = canvas3D.getContext("webgl");
 		if(gl) {
+
+
 			gl.clearColor(0.0, 0.0, 0.0, 0.25);
 			gl.enable(gl.DEPTH_TEST);
 	    	gl.depthFunc(gl.LEQUAL);
+
+	    	gl.disable(gl.CULL_FACE);
+			gl.enable(gl.DEPTH_TEST);
+			gl.enable(gl.BLEND);
+			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);	
+			
 	    	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 
 
+
+
 	    	initShaders();
+	    	initTextureFramebuffer();
 		}
 	}
 	

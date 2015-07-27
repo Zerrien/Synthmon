@@ -204,6 +204,15 @@ function makePerspective(_fovRadians, aspect, near, far) {
 		0, 0, near * far * rangeInv * 2, 0
 	];
 }
+function makeOrthographic(_w, _h, near, far) {
+  return [
+    1/_w, 0, 0, 0,
+    0, 1/_h, 0, 0,
+    0, 0, (-2 / (far - near)), -1 * ((far + near)/(far - near)),
+    0, 0, 0, 1
+
+  ];
+}
 function makeTranslation(tx, ty, tz) {
 	return [
 		1, 0, 0, 0,

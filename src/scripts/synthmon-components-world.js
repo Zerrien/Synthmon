@@ -25,6 +25,12 @@ var faces_xy = {
 	"east":{x:1, y:0},
 	"west":{x:-1, y:0},
 }
+var faces_rot = {
+	"north":1 * Math.PI / 2,
+	"east":4 * Math.PI / 2,
+	"south":3 * Math.PI / 2,
+	"west":2 * Math.PI / 2
+}
 ECS.Components.WorldFaces.prototype = {
 	inverseFace : function(_facing) {
 		_facing = _facing || this.facing;
@@ -32,6 +38,9 @@ ECS.Components.WorldFaces.prototype = {
 	},
 	facingTile : function() {
 		return faces_xy[this.facing];
+	},
+	facingRot : function() {
+		return faces_rot[this.facing];
 	}
 }
 ECS.Components.WorldFaces.prototype.name = "worldfaces";
@@ -177,3 +186,9 @@ ECS.Components.WorldLinearMonitor = function WorldLinearMonitor(_dist) {
 }
 
 ECS.Components.WorldLinearMonitor.prototype.name = "worldlinearmonitor";
+
+ECS.Components.WorldModel = function WorldModel() {
+	this.model = null;
+	this.texture = null;
+}
+ECS.Components.WorldModel.prototype.name = "worldmodel";

@@ -41,14 +41,18 @@
             "box":"./src/assets/mdl/box.obj",
             "faceSoft":"./src/assets/mdl/faceSoft.obj",
             "moneyStack":"./src/assets/mdl/moneyStack.obj",
-            "sphere":"./src/assets/mdl/sphere.obj"
+            "sphere":"./src/assets/mdl/sphere.obj",
+            "boulder":"./src/assets/mdl/boulder.obj",
+            "conveyor":"./src/assets/mdl/conveyor.obj"
         },
         "textures":{
             "tex1":"./src/assets/texture/tex1.png",
             "tex2":"./src/assets/texture/tex2.png",
             "tex3":"./src/assets/texture/tex3.png",
             "tex4":"./src/assets/texture/tex4.png",
-            "tex5":"./src/assets/texture/tex5.png"
+            "tex5":"./src/assets/texture/tex5.png",
+            "boulderTexture":"./src/assets/texture/boulderTexture.png",
+            "conveyorTexture":"./src/assets/texture/conveyorTexture.png"
         }
     },
     "chunks": {
@@ -164,7 +168,11 @@
                     ],
                     "WorldMoves": [
 
-                    ]
+                    ],
+                    "WorldModel":{
+                        "modelName":"boulder",
+                        "modelTexture":"boulderTexture"
+                    }
                 },
                 "superPush": {
                     "WorldSprite": {
@@ -245,7 +253,11 @@
                     ],
                     "WorldFloor": [
 
-                    ]
+                    ],
+                    "WorldModel":{
+                        "modelName":"conveyor",
+                        "modelTexture":"conveyorTexture"
+                    }
                 },
                 "conveyor2": {
                     "WorldSprite": {
@@ -263,7 +275,11 @@
                     ],
                     "WorldFloor": [
 
-                    ]
+                    ],
+                    "WorldModel":{
+                        "modelName":"conveyor",
+                        "modelTexture":"conveyorTexture"
+                    }
                 },
                 "conveyor3": {
                     "WorldSprite": {
@@ -281,7 +297,11 @@
                     ],
                     "WorldFloor": [
 
-                    ]
+                    ],
+                    "WorldModel":{
+                        "modelName":"conveyor",
+                        "modelTexture":"conveyorTexture"
+                    }
                 },
                 "chatter": {
                     "WorldSprite": {
