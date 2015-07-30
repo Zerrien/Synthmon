@@ -38,11 +38,13 @@
             "select":"./src/assets/sound/select.wav"
         },
         "models":{
-            "box":"./src/assets/mdl/box.obj",
-            "faceSoft":"./src/assets/mdl/faceSoft.obj",
-            "moneyStack":"./src/assets/mdl/moneyStack.obj",
-            "sphere":"./src/assets/mdl/sphere.obj",
-            "boulder":"./src/assets/mdl/boulder.obj",
+            "groundPlane" : "./src/assets/mdl/plane.obj",
+            "player" : "./src/assets/mdl/person.obj",
+            "box" : "./src/assets/mdl/box.obj",
+            "worldPlane" : "./src/assets/mdl/32plane.obj",
+            "floorPlane" : "./src/assets/mdl/floorPlane.obj",
+            "house" : "./src/assets/mdl/house.obj",
+            "boulder" : "./src/assets/mdl/boulder.obj",
             "conveyor":"./src/assets/mdl/conveyor.obj"
         },
         "textures":{
@@ -52,7 +54,8 @@
             "tex4":"./src/assets/texture/tex4.png",
             "tex5":"./src/assets/texture/tex5.png",
             "boulderTexture":"./src/assets/texture/boulderTexture.png",
-            "conveyorTexture":"./src/assets/texture/conveyorTexture.png"
+            "conveyorTexture":"./src/assets/texture/conveyorTexture.png",
+            "grassGroundTexture":"./src/assets/texture/grass.png"
         }
     },
     "chunks": {
@@ -845,6 +848,10 @@
     "interior": {
         "houseA": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map5.png",
+            "terrain":{
+                "width": 12,
+                "height": 12
+            },
             "objects": {
                 "exitDoor": {
                     "WorldSprite": {
@@ -870,6 +877,10 @@
         },
         "playerUpstairs": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map5.png",
+            "terrain":{
+                "width": 12,
+                "height": 12
+            },
             "objects": {
                 "downstairsDoor": {
                     "WorldSprite": {
@@ -895,6 +906,10 @@
         },
         "playerHouse": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map5.png",
+            "terrain":{
+                "width": 12,
+                "height": 12
+            },
             "objects": {
                 "exitDoor": {
                     "WorldSprite": {

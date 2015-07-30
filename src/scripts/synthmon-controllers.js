@@ -34,23 +34,13 @@ WorldController.prototype = {
 					loadZone(0, forwardX + "," + (pChunkY + i));
 				}
 			} else if (this.lastChunk.y != pChunkY) {
-				/*
 				var diffY = this.lastChunk.y - pChunkY;
 				var distanceY = pChunkY + diffY * 2;
 				var forwardY = pChunkY + (diffY * - 1);
-				if(IS_DEBUG) {
-					for(var i = -2; i <= 2; i++) {
-						unloadChunk(distanceX + "," + (pChunkY + i));
-						loadZone(0, (pChunkX + i) + "," + forwardY);
-					}
-				} else {
-					console.log("???");
-					for(var i = -1; i <= 1; i++) {
-						unloadChunk(distanceX + "," + (pChunkY + i));
-						loadZone(0, (pChunkX + i) + "," + forwardY);
-					}
+				for(var i = -1; i <= 1; i++) {
+					unloadChunk((pChunkX + i) + "," + distanceY);
+					loadZone(0, (pChunkX + i) + "," + forwardY);
 				}
-				*/
 			}
 			this.lastChunk = {x:pChunkX, y:pChunkY};
 			//console.log(_player.c("worldposition").x);

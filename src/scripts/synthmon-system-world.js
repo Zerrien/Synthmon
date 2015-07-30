@@ -45,7 +45,7 @@ function worldNewGame() {
 	player.addComponent(new ECS.Components.WorldCollider());
 	player.addComponent(new ECS.Components.WorldCanPush(1));
 	player.addComponent(new ECS.Components.WorldModel());
-	player.c('worldmodel').model = app.meshes.player;
+	player.c('worldmodel').model = assets.models.player;
 	player.c('worldmodel').texture = assets.textures['tex2'].texture;
 
 	//Control-components
@@ -82,8 +82,8 @@ function tArrayFind(_array, _key) {
 }
 
 function unloadChunk(_coords) {
+	delete terrain[_coords];
 	if(data.chunks[_coords] && data.chunks[_coords].objects) {
-		var splitArray = _coords.split(",");
 		var objectArray = data.chunks[_coords].objects;
 		for(var objKey in objectArray) {
 			var result = tArrayFind(worldEntities, _coords + objKey);
@@ -110,13 +110,21 @@ function loadZone(_zone, _chunk) {
 			xChunk = strSplit[0];
 			yChunk = strSplit[1];
 		}
+		if(!zoneData) {
+			zoneData = {};
+		}
+		zoneData.terrain = {};
+		zoneData.terrain.width = 32;
+		zoneData.terrain.height = 32;
 	} else {
 		worldEntities = [];
 		worldEntities.push(player);
 
 		zoneData = data.interior[_zone];
 		_chunk = _zone;
+		terrain = {};
 	}
+	//terrain = null;
 	if(zoneData) {
 		for(var objName in zoneData.objects) {
 			var object = zoneData.objects[objName];
@@ -132,7 +140,7 @@ function loadZone(_zone, _chunk) {
 						component.x = componentDetail.x + (xChunk ? xChunk * 32 : 0);
 						component.y = componentDetail.y + (yChunk ? yChunk * 32 : 0);
 					} else if (componentName == "WorldModel") {
-						component.model = app.meshes[componentDetail.modelName];
+						component.model = assets.models[componentDetail.modelName];
 						component.texture = assets.textures[componentDetail.modelTexture].texture;
 					} else if (componentName == "Trainer") {
 
@@ -148,19 +156,89 @@ function loadZone(_zone, _chunk) {
 				} else {
 					console.warn("Unable to find component of type:" + componentID)
 				}
-				
 			}
 			entity.sID = (_chunk) + objName;
 			worldEntities.push(entity);
-
 		}
+		constructTerrain(zoneData.terrain, _chunk);
 	} else {
 		console.warn("Warning: No ZoneData of " + _zone + " at chunk " + _chunk);
 	}
 }
 
-ECS.Systems.WorldAI = function WorldAI(_e) {
+function constructTerrain(_data, _chunk) {
+	tMesh = {};
+	tMesh.vNormals = [];
+	tMesh.uvCoords = [];
+	tMesh.vertices = [];
+	tMesh.indices = [];
+	var k = 0;
+	for(var i = 0; i < _data.width; i++) {
+		for(var j = 0; j < _data.height; j++) {
+			tMesh.vNormals.push(1, 1, 1);
+			tMesh.vNormals.push(1, 1, 1);
+			tMesh.vNormals.push(1, 1, 1);
+			tMesh.vNormals.push(1, 1, 1);
+			tMesh.vNormals.push(1, 1, 1);
+			tMesh.vNormals.push(1, 1, 1);
+
+			tMesh.uvCoords.push(0, 0);
+			tMesh.uvCoords.push(0, 1);
+			tMesh.uvCoords.push(1, 1);
+
+			tMesh.uvCoords.push(0, 0);
+			tMesh.uvCoords.push(1, 0);
+			tMesh.uvCoords.push(1, 1);
+
+			tMesh.vertices.push(0 + i, 0, 0 + j);
+			tMesh.vertices.push(1 + i, 0, 0 + j);
+			tMesh.vertices.push(1 + i, 0, 1 + j);
+
+			tMesh.vertices.push(0 + i, 0, 0 + j);
+			tMesh.vertices.push(0 + i, 0, 1 + j);
+			tMesh.vertices.push(1 + i, 0, 1 + j);
+
+			tMesh.indices.push(k++);
+			tMesh.indices.push(k++);
+			tMesh.indices.push(k++);
+
+			tMesh.indices.push(k++);
+			tMesh.indices.push(k++);
+			tMesh.indices.push(k++);
+		}
+	}
+
+	//terrain = {};
+	terrain[_chunk] = {};
+	terrain[_chunk].normalBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, terrain[_chunk].normalBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tMesh.vNormals), gl.STATIC_DRAW);
+	terrain[_chunk].normalBuffer.itemSize = 3;
+	terrain[_chunk].normalBuffer.numItems = tMesh.vNormals.length / 3;
 	
+	terrain[_chunk].textureBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, terrain[_chunk].textureBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tMesh.uvCoords), gl.STATIC_DRAW);
+	terrain[_chunk].textureBuffer.itemSize = 2;
+	terrain[_chunk].textureBuffer.numItems = tMesh.uvCoords.length / 2;
+	
+	terrain[_chunk].vertexBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, terrain[_chunk].vertexBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tMesh.vertices), gl.STATIC_DRAW);
+	terrain[_chunk].vertexBuffer.itemSize = 3;
+	terrain[_chunk].vertexBuffer.numItems = tMesh.vertices.length / 3;
+	
+	terrain[_chunk].indexBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, terrain[_chunk].indexBuffer);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(tMesh.indices), gl.STATIC_DRAW);
+	terrain[_chunk].indexBuffer.itemSize = 1;
+	terrain[_chunk].indexBuffer.numItems = tMesh.indices.length;
+	//return terrain;
+}
+
+var terrain = null;
+
+ECS.Systems.WorldAI = function WorldAI(_e) {
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		if(entity.c("worldconveyor")) {
@@ -289,6 +367,7 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 		}
 	}
 }
+
 ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 	if(player.c("worldkeyboardcontrolled")) {
 		var pP = player.c("worldposition");
@@ -319,6 +398,7 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 		}
 	}
 }
+
 ECS.Systems.WorldCollision = function WorldCollision(_e) {
 	for(var entityID in _e) {
 		var entity = _e[entityID];
@@ -376,6 +456,8 @@ ECS.Systems.WorldCollision = function WorldCollision(_e) {
 		}
 	}
 }
+
+
 ECS.Systems.WorldLogic = function WorldLogic(_e) {
 	world.trackPos(player);
 	for(var entityID in _e) {
@@ -584,7 +666,7 @@ var tctx = tCanvas.getContext('2d');
 ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	var perspectiveMatrix = makePerspective(Math.PI / 4, 800 / 600, 1, 64);
+	var perspectiveMatrix = makePerspective(Math.PI / 4, 800 / 600, 1, 128);
 	var modelMatrix = getIdentity();
 	var viewMatrix = getIdentity();
 
@@ -592,6 +674,7 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 	setUniform("u_mMatrix", modelMatrix);
 	
 	if(camera) {
+		setUniform("u_sampler", assets.textures['grassGroundTexture'].texture, 0);
 		var cP = camera.target.c("worldposition");
 		var cM = camera.target.c("worldmoves");
 		var cShiftX = 0;
@@ -606,25 +689,27 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(-1 * (cP.x + cShiftX), 0, -1 * (cP.y + cShiftY)));
 		viewMatrix = matrixMultiply(viewMatrix, makeXRotation(Math.PI / 4));
 		viewMatrix = matrixMultiply(viewMatrix, makeTranslation(0, 0, -15));
-		if(cP.zone == 0) {
-
-			/*
-			for(var i = -1; i <= 1; i++) {
-				for(var j = -1; j <= 1; j++) {
-					var chunkInfo = ((cP.x >> 5) + i) + "," + ((cP.y >> 5) + j);
-					if(world.images[chunkInfo]) {
-						ctx.drawImage(world.images[chunkInfo], TILE_SIZE * 32 * (i + (cP.x >> 5)), TILE_SIZE * 32 * (j + (cP.y >> 5)));
-					}
+		setUniform("u_vMatrix", viewMatrix);
+		if(terrain != null) {
+		   	for(var chunkName in terrain) {
+		   		modelMatrix = getIdentity();
+		   		var xChunk = 0;
+		   		var yChunk = 0;
+		   		var strSplit = chunkName.split(",");
+		   		if(strSplit.length == 2) {
+					xChunk = strSplit[0];
+					yChunk = strSplit[1];
 				}
-			}
-			*/
-		} else {
-			//ctx.drawImage(world.images.interiors[cP.zone], 0, 0);
-		}
+		   		modelMatrix = matrixMultiply(modelMatrix, makeTranslation(32 * xChunk - 0.5, 0, 32 * yChunk - 0.5));
+		   		setUniform("u_mMatrix", modelMatrix);
+		   		drawApp(terrain[chunkName]);
+		   	}
+	    } else {
+	    }
 	}
-	setUniform("u_vMatrix", viewMatrix);
 
-
+	
+	
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
@@ -651,17 +736,10 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 				drawApp(wMdl.model);
 			} else {
 				setUniform("u_sampler", assets.textures['tex1'].texture, 0);
-				drawApp(app.meshes.box);
+				drawApp(assets.models.box);
 			}
 		}
 	}
-	
-
-
-
-
-
-
 }
 
 

@@ -63,22 +63,13 @@ ECS.Systems.LoadingLogic = function LoadingLogic(_e) {
 				loadingHas = true;
 				break;
 			case 3:
-				OBJ.downloadMeshes({
-					"groundPlane" : "./src/assets/mdl/plane.obj",
-					"player" : "./src/assets/mdl/person.obj",
-					"box" : "./src/assets/mdl/box.obj?",
-					"worldPlane" : "./src/assets/mdl/32plane.obj",
-					"floorPlane" : "./src/assets/mdl/floorPlane.obj",
-					"house" : "./src/assets/mdl/house.obj",
-					"boulder" : "./src/assets/mdl/boulder.obj",
-					"conveyor":"./src/assets/mdl/conveyor.obj?"
-	    		}, function(_meshes) {
-	    			app.meshes = _meshes;
-					for(model in app.meshes) {
-						OBJ.initMeshBuffers(gl, app.meshes[model]);
+				OBJ.downloadMeshes(data.assets.models, function(_meshes) {
+					assets.models = _meshes;
+					for(var model in assets.models) {
+						OBJ.initMeshBuffers(gl, assets.models[model]);
+						loadingState = 4;
+						loadingHas = false;
 					}
-					loadingState = 4;
-					loadingHas = false;
 				});
 				loadingHas = true;
 				break;
