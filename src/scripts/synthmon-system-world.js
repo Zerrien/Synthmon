@@ -395,6 +395,14 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 				pM.destX = pF.facingTile().x;
 				pM.destY = pF.facingTile().y;
 			}
+
+			if(keyboardKeys[32]) {
+				var result = checkCollision(_e, pP.x + pF.faces_xy().x, pP.y + pF.faces_xy().y);
+				if(results) {
+					//Interaction code.
+				}
+			}
+
 		}
 	}
 }
