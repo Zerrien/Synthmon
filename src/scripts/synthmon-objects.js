@@ -21,6 +21,27 @@ var ItemSchema = {
 		"use":{
 
 		}
+	},
+	"revive":{
+		"name":"Revive",
+		"description":"Don't worry, we'll turn that KO into OK!",
+		"use":{
+
+		}
+	},
+	"phxdown":{
+		"name":"Phoenix Down",
+		"description":"Down is a noun, not a verb.",
+		"use":{
+
+		}
+	},
+	"strboost":{
+		"name":"Strength Boost",
+		"description":"ROARAROAOGOAGOGAGOOG",
+		"use":{
+			
+		}
 	}
 }
 
