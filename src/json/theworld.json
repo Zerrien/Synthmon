@@ -45,7 +45,13 @@
             "floorPlane" : "./src/assets/mdl/floorPlane.obj",
             "house" : "./src/assets/mdl/house.obj",
             "boulder" : "./src/assets/mdl/boulder.obj",
-            "conveyor":"./src/assets/mdl/conveyor.obj"
+            "conveyor":"./src/assets/mdl/conveyor.obj",
+            "counter_straight":"./src/assets/mdl/counter_straight.obj",
+            "counter_start":"./src/assets/mdl/counter_start.obj?",
+            "counter_end":"./src/assets/mdl/counter_end.obj",
+            "counter_innerCorner":"./src/assets/mdl/counter_innerCorner.obj",
+            "counter_outerCorner":"./src/assets/mdl/counter_outerCorner.obj",
+            "wall":"./src/assets/mdl/wall.obj"
         },
         "textures":{
             "tex1":"./src/assets/texture/tex1.png",
@@ -54,21 +60,37 @@
             "tex4":"./src/assets/texture/tex4.png",
             "tex5":"./src/assets/texture/tex5.png",
             "boulderTexture":"./src/assets/texture/boulderTexture.png",
-            "conveyorTexture":"./src/assets/texture/conveyorTexture.png",
-            "grassGroundTexture":"./src/assets/texture/grass.png"
+            "conveyorTexture":"./src/assets/texture/conveyorTexture.png?",
+            "grassGroundTexture":"./src/assets/texture/grass.png",
+            "grassGround2Texture":"./src/assets/texture/synthmon_grass1.png"
         }
     },
     "chunks": {
         "0,0": {
             "source": ".\/src\/assets\/img\/chunk_backgrounds\/map2.png",
             "objects": {
+                "shoppeSign": {
+                    "WorldSprite": {
+                        "name": "signpost"
+                    },
+                    "WorldPosition": {
+                        "x": 9,
+                        "y": 1
+                    },
+                    "WorldChatty": {
+                        "saying": "This is a shoppe"
+                    },
+                    "WorldCollider": [
+
+                    ]
+                },
                 "homeSign": {
                     "WorldSprite": {
                         "name": "signpost"
                     },
                     "WorldPosition": {
-                        "x": 2,
-                        "y": 3
+                        "x": 20,
+                        "y": 1
                     },
                     "WorldChatty": {
                         "saying": "You live here."
@@ -135,6 +157,10 @@
                     },
                     "WorldFaces": {
                         "facing": "north"
+                    },
+                    "WorldModel":{
+                        "modelName":"player",
+                        "modelTexture":"tex3"
                     }
                 },
                 "theSoil": {
@@ -322,6 +348,10 @@
                     ],
                     "WorldChatty": {
                         "saying": "Shorts! Shorts! I love shorts!"
+                    },
+                    "WorldModel":{
+                        "modelName":"player",
+                        "modelTexture":"tex3"
                     }
                 },
                 "cliffFace": {
@@ -352,6 +382,10 @@
                     "WorldPosition": {
                         "x": 10,
                         "y": 1
+                    },
+                    "WorldModel":{
+                        "modelName":"house",
+                        "modelTexture":"boulderTexture"
                     },
                     "WorldPortal": {
                         "dest": "houseA",
@@ -395,6 +429,10 @@
                             "y": 11,
                             "facing": "north"
                         }
+                    },
+                    "WorldModel":{
+                        "modelName":"house",
+                        "modelTexture":"boulderTexture"
                     },
                     "WorldSize": {
                         "width": 5,
@@ -853,6 +891,197 @@
                 "height": 12
             },
             "objects": {
+                "shoppeKeeper":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":1,
+                        "y":3
+                    },
+                    "WorldFaces": {
+                        "facing": "east"
+                    },
+                    "WorldModel":{
+                        "modelName":"player",
+                        "modelTexture":"tex3"
+                    }
+                },
+                "shoppeKeeper2":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":4,
+                        "y":1
+                    },
+                    "WorldFaces": {
+                        "facing": "south"
+                    },
+                    "WorldModel":{
+                        "modelName":"player",
+                        "modelTexture":"tex3"
+                    }
+                },
+                "counter001":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":0,
+                        "y":5
+                    },
+                    "WorldCollider":{
+
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_straight",
+                        "modelTexture":"tex3"
+                    },
+                    "WorldFaces":{
+                        "facing":"south"
+                    }
+                },
+                "counter002":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":1,
+                        "y":5
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_straight",
+                        "modelTexture":"tex3"
+                    },
+                    "WorldFaces":{
+                        "facing":"south"
+                    }
+                },
+                "counter003":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":2,
+                        "y":5
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_outerCorner",
+                        "modelTexture":"tex3"
+                    }
+                },
+                "counter004":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":2,
+                        "y":4
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_straight",
+                        "modelTexture":"tex3"
+                    }
+                },
+                "counter005":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":2,
+                        "y":3
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_straight",
+                        "modelTexture":"tex3"
+                    }
+                },
+                "counter006":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":2,
+                        "y":2
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_innerCorner",
+                        "modelTexture":"tex3"
+                    }
+                },
+                "counter007":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":3,
+                        "y":2
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_straight",
+                        "modelTexture":"tex3"
+                    },
+                    "WorldFaces":{
+                        "facing":"south"
+                    }
+                },
+                "counter008":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":4,
+                        "y":2
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_straight",
+                        "modelTexture":"tex3"
+                    },
+                    "WorldFaces":{
+                        "facing":"south"
+                    }
+                },
+                "counter009":{
+                    "WorldSprite":{
+                        "name":"person"
+                    },
+                    "WorldPosition":{
+                        "x":5,
+                        "y":2
+                    },
+                    "WorldCollider":{
+                        
+                    },
+                    "WorldModel":{
+                        "modelName":"counter_straight",
+                        "modelTexture":"tex3"
+                    },
+                    "WorldFaces":{
+                        "facing":"south"
+                    }
+                },
                 "exitDoor": {
                     "WorldSprite": {
                         "name": "door"

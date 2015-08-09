@@ -5,6 +5,7 @@
 		<script src="utility.js"></script>
 
 		<script src="./src/scripts/synthmon-core.js"></script>
+		<script src="./src/scripts/synthmon-gui.js"></script>
 		<script src="./src/scripts/synthmon-components.js"></script>
 		<script src="./src/scripts/synthmon-components-world.js"></script>
 		<script src="./src/scripts/synthmon-components-battle.js"></script>
@@ -28,8 +29,10 @@
 
 			varying float DEPTH ;
 
+
+
 			void main(void) {
-				vec4 a = texture2D(u_sampler, vec2(v_uvCoord.x,v_uvCoord.y * -1.0));
+				vec4 a = texture2D(u_sampler, vec2(v_uvCoord.x, v_uvCoord.y));
 				gl_FragColor = a;
 				//vec3 ambientLight = vec3(0.25, 0.25, 0.25);
     			//vec3 directionalLightColor = vec3(0.75, 0.75, 0.75);

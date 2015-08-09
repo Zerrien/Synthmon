@@ -4,10 +4,17 @@ ECS.Scenes.World = {
 		"WorldControl",
 		"WorldCollision",
 		"WorldLogic",
-		"WorldRender",
-		"WorldRender3D"
+		//"WorldRender",
+		"WorldRender3D",
+		"WorldUI"
 	],
+	"states":[
+		"roaming",
+		"inui"
+	],
+	"curState":"Roaming",
 	"entities":[],
+	"gui":new GUI(),
 	"logic":function() {
 		for(var i = 0 ; i < this.systems.length; i++) {
 			if(this.systems[i]) {
@@ -23,6 +30,7 @@ ECS.Scenes.World = {
 	}
 };
 var worldEntities = ECS.Scenes.World.entities; //Alias
+var worldScene = ECS.Scenes.World;
 
 function worldNewGame() {
 	player = new ECS.Entity();
@@ -68,13 +76,14 @@ function worldNewGame() {
 	camera = new CameraController(player);
 	world = new WorldController();
 
+	worldScene.curState = "roaming";
+
 	loadZone(playerPos.zone);
 }
 
 function tArrayFind(_array, _key) {
 	for(var i = 0; i < _array.length; i++) {
 		if(_array[i].sID == _key) {
-			console.log("???123123");
 			return _array[i];
 		}
 	}
@@ -143,7 +152,12 @@ function loadZone(_zone, _chunk) {
 						component.model = assets.models[componentDetail.modelName];
 						component.texture = assets.textures[componentDetail.modelTexture].texture;
 					} else if (componentName == "Trainer") {
-
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
 					} else if (componentName == "WorldWire") {
 
 					} else {
@@ -166,6 +180,25 @@ function loadZone(_zone, _chunk) {
 	}
 }
 
+
+function getTexel(_x, _y, _x2, _y2, _tCount, _tDimensions) {
+	var u1, v1, u2, v2;
+	u1 = _x + (0.5 / _tDimensions);
+	v1 = _y + (0.5 / _tDimensions);
+
+	u2 = _x2 - (0.5 / _tDimensions);
+	v2 = _y2 - (0.5 / _tDimensions);
+
+
+
+
+
+
+	return {u1: u1, v1: v1, u2: u2, v2: v2};
+
+}
+
+
 function constructTerrain(_data, _chunk) {
 	tMesh = {};
 	tMesh.vNormals = [];
@@ -182,13 +215,20 @@ function constructTerrain(_data, _chunk) {
 			tMesh.vNormals.push(1, 1, 1);
 			tMesh.vNormals.push(1, 1, 1);
 
-			tMesh.uvCoords.push(0, 0);
-			tMesh.uvCoords.push(0, 1);
-			tMesh.uvCoords.push(1, 1);
+			var index = Math.floor(Math.random() * 6);
+			var xPos = index % 4;
+			var yPos = (index - xPos) / 4;
+			var _s = 0.25;
+			var result = getTexel(xPos * _s, yPos * _s, xPos * _s + _s, yPos * _s + _s, null, 16 * 4);
+			//console.log(result.u1);
 
-			tMesh.uvCoords.push(0, 0);
-			tMesh.uvCoords.push(1, 0);
-			tMesh.uvCoords.push(1, 1);
+			tMesh.uvCoords.push(result.u1, result.v1);
+			tMesh.uvCoords.push(result.u2, result.v1);
+			tMesh.uvCoords.push(result.u2, result.v2);
+
+			tMesh.uvCoords.push(result.u1, result.v1);
+			tMesh.uvCoords.push(result.u1, result.v2);
+			tMesh.uvCoords.push(result.u2, result.v2);
 
 			tMesh.vertices.push(0 + i, 0, 0 + j);
 			tMesh.vertices.push(1 + i, 0, 0 + j);
@@ -341,6 +381,7 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 			}
 			*/
 		} else if (entity.c("worldlinearmonitor")) {
+			/*
 			var wP = entity.c("worldposition");
 			var wL = entity.c("worldlinearmonitor");
 			var wF = entity.c("worldfaces");
@@ -364,46 +405,71 @@ ECS.Systems.WorldAI = function WorldAI(_e) {
 					}
 				}
 			}
+			*/
 		}
 	}
 }
 
 ECS.Systems.WorldControl = function WorldKeyboard(_e) {
-	if(player.c("worldkeyboardcontrolled")) {
-		var pP = player.c("worldposition");
-		var pF = player.c("worldfaces");
-		var pM = player.c("worldmoves");
+	if(worldScene.curState == "roaming") {
+		if(player.c("worldkeyboardcontrolled")) {
+			var pP = player.c("worldposition");
+			var pF = player.c("worldfaces");
+			var pM = player.c("worldmoves");
 
-		if(pM.state == "standing") {
-			var isMove = false;
-			if (keyboardKeys[87]) {
-				pF.facing = "north";
-				isMove = true;
-			} else if(keyboardKeys[83]) {
-				pF.facing = "south";
-				isMove = true;
-			} else if(keyboardKeys[65]) {
-				pF.facing = "west";
-				isMove = true;
-			} else if (keyboardKeys[68]) {
-				pF.facing = "east";
-				isMove = true;
-			}
-			if(isMove) {
-				pM.state = "walking";
-				pM.curCycle = 0;
-				pM.destX = pF.facingTile().x;
-				pM.destY = pF.facingTile().y;
-			}
-
-			if(keyboardKeys[32]) {
-				var result = checkCollision(_e, pP.x + pF.faces_xy().x, pP.y + pF.faces_xy().y);
-				if(results) {
-					//Interaction code.
+			if(pM.state == "standing") {
+				var isMove = false;
+				if (keyboardKeys[87]) {
+					pF.facing = "north";
+					isMove = true;
+				} else if(keyboardKeys[83]) {
+					pF.facing = "south";
+					isMove = true;
+				} else if(keyboardKeys[65]) {
+					pF.facing = "west";
+					isMove = true;
+				} else if (keyboardKeys[68]) {
+					pF.facing = "east";
+					isMove = true;
 				}
-			}
+				if(isMove) {
+					pM.state = "walking";
+					pM.curCycle = 0;
+					pM.destX = pF.facingTile().x;
+					pM.destY = pF.facingTile().y;
+				}
 
+				if(keyboardKeys[32]) {
+					keyboardKeys[32] = false;
+					var result = checkCollision(_e, pP.x + pF.facingTile().x, pP.y + pF.facingTile().y);
+					if(result) {
+						if(result.c("worldchatty")) {
+							worldScene.curState = "inui"
+							var dialogBox = new gui_DialogBox(result.c("worldchatty").saying);
+							dialogBox.onInteract = function() {
+								worldScene.gui.removeElement(dialogBox);
+								worldScene.curState = "roaming"
+							}
+							worldScene.gui.addElement(dialogBox, -1);
+						} else if (result.c("worldbattler")) {
+							worldScene.curState = "inui"
+							var dialogBox = new gui_DialogBox(result.c("worldbattler").saying);
+							dialogBox.onInteract = function() {
+								worldScene.gui.removeElement(dialogBox);
+								worldScene.curState = "roaming"
+								BC.configure(player, result)
+								gameState = "Battle";
+
+							}
+							worldScene.gui.addElement(dialogBox, -1);
+						}
+					}
+				}
+
+			}
 		}
+	} else if (worldScene.curState == "inui") {
+		worldScene.gui.control();
 	}
 }
 
@@ -672,6 +738,11 @@ tCanvas.width = 800;
 tCanvas.height = 600;
 var tctx = tCanvas.getContext('2d');
 ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "rgba(0, 0, 0, 0.125)";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "black";
+
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	var perspectiveMatrix = makePerspective(Math.PI / 4, 800 / 600, 1, 128);
@@ -682,7 +753,7 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 	setUniform("u_mMatrix", modelMatrix);
 	
 	if(camera) {
-		setUniform("u_sampler", assets.textures['grassGroundTexture'].texture, 0);
+		setUniform("u_sampler", assets.textures['grassGround2Texture'].texture, 0);
 		var cP = camera.target.c("worldposition");
 		var cM = camera.target.c("worldmoves");
 		var cShiftX = 0;
@@ -713,16 +784,17 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 		   		drawApp(terrain[chunkName]);
 		   	}
 	    } else {
+
 	    }
 	}
-
-	
-	
 	for(var entityID in _e) {
 		var entity = _e[entityID];
 		var wP = entity.c("worldposition");
 		var wS = entity.c("worldsprite");
 		var wMdl = entity.c("worldmodel");
+
+		var wSi = entity.c("worldsize");
+		var wO = entity.c("worldoffset");
 		if(wP && wS) {
 			var wM = entity.c("worldmoves");
 			var wF = entity.c("worldfaces");
@@ -738,6 +810,12 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 			}
 
 			modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wP.x + wShiftX, 0, wP.y + wShiftY));
+
+
+			if(wO) {
+				modelMatrix = matrixMultiply(modelMatrix, makeTranslation(wO.xOffset + 2, 0, wO.yOffset + 2));
+			}
+
 			setUniform("u_mMatrix", modelMatrix);
 			if(wMdl) {
 				setUniform("u_sampler", wMdl.texture, 0);
@@ -748,8 +826,46 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 			}
 		}
 	}
+
+	if(camera.target.c("worldposition").zone != 0) {
+		var curData = data.interior[camera.target.c("worldposition").zone];
+		for(var i = 0; i < curData.terrain.width + 2; i++) {
+			modelMatrix = getIdentity();
+			modelMatrix = makeTranslation(-1 + i, 0, -1)
+			setUniform("u_sampler", assets.textures['tex4'].texture, 0);
+			setUniform("u_mMatrix", modelMatrix);
+			drawApp(assets.models.wall);
+		}
+		for(var i = 1; i < curData.terrain.height + 1; i++) {
+			modelMatrix = getIdentity();
+			modelMatrix = makeTranslation(-1, 0, -1 + i)
+			setUniform("u_sampler", assets.textures['tex4'].texture, 0);
+			setUniform("u_mMatrix", modelMatrix);
+			drawApp(assets.models.wall);
+
+			modelMatrix = getIdentity();
+			modelMatrix = makeTranslation(-1 + curData.terrain.width + 1, 0, -1 + i)
+			setUniform("u_sampler", assets.textures['tex4'].texture, 0);
+			setUniform("u_mMatrix", modelMatrix);
+			drawApp(assets.models.wall);
+		}
+	}
+
+
+	tctx.clearRect(0, 0, 800, 600);
+	tctx.drawImage(canvas, 0, 0);
+
+	ctx.clearRect(0, 0, 800, 600);
+	if(IS_3D) {
+		ctx.drawImage(canvas3D, 0, 0);
+	}
 }
 
+ECS.Systems.WorldUI = function WorldUI(_e) {
+
+	worldScene.gui.draw(ctx);
+	ctx.fillText(1000 / dTime, 20, 20);
+}
 
 
 function checkCollision(_e, _x, _y, _ex) {

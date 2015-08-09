@@ -16,7 +16,7 @@ ECS.Scenes.Battle = {
 		"BattleControl",
 		"BattleLogic",
 		"BattleRender",
-		"WorldUI"
+		"BattleUI"
 	],
 	"entities":[],
 	"logic":function() {
@@ -334,24 +334,24 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 	for(var i = 0; i < 6; i++) {
 		if(proList[i]) {
 			if(proList[i].curHP <= 0) {
-				ctx.drawImage(images.images.dead_drive, 128 / 2 - 16 * 3 + i * 16, 0);
+				ctx.drawImage(assets.images.dead_drive, 128 / 2 - 16 * 3 + i * 16, 0);
 			} else {
-				ctx.drawImage(images.images.alive_drive, 128 / 2 - 16 * 3 + i * 16, 0);
+				ctx.drawImage(assets.images.alive_drive, 128 / 2 - 16 * 3 + i * 16, 0);
 			}
 			
 		} else {
-			ctx.drawImage(images.images.empty_drive, 128 / 2 - 16 * 3 + i * 16, 0);
+			ctx.drawImage(assets.images.empty_drive, 128 / 2 - 16 * 3 + i * 16, 0);
 		}
 
 		if(!BC.type) {
 			if(antList[i]) {
 				if(antList[i].curHP <= 0) {
-					ctx.drawImage(images.images.dead_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
+					ctx.drawImage(assets.images.dead_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
 				} else {
-					ctx.drawImage(images.images.alive_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
+					ctx.drawImage(assets.images.alive_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
 				}
 			} else {
-				ctx.drawImage(images.images.empty_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
+				ctx.drawImage(assets.images.empty_drive, 128 / 2 - 16 * 3 + 128 + i * 16, 128);
 			}
 		}
 	}
@@ -367,6 +367,41 @@ ECS.Systems.BattleRender = function BattleRender(_e) {
 
 	ctx.restore();
 	
+}
+
+ECS.Systems.BattleUI = function BattleUI(_e) {
+	ctx.save();
+	for(var entityID in _e) {
+		var entity = _e[entityID];
+		var uiP = entity.c("uiposition");
+		if(uiP && entity.c("uilist")) {
+			var uiL = entity.c("uilist");
+			ctx.font = "20px Consolas";
+			ctx.textBaseline = "top"
+			ctx.fillStyle = "white"
+			ctx.fillRect(uiP.x - 10, uiP.y - 10, 2000, uiL.options.length * 20 + 20);
+			ctx.strokeStyle = "black";
+			ctx.strokeRect(uiP.x - 10, uiP.y - 10, 2000, uiL.options.length * 20 + 20);
+			for(var i = 0; i < uiL.options.length; i++) {
+				if(uiL.curIndex == i) {
+					ctx.fillStyle = "red";
+				} else {
+					ctx.fillStyle = "black";
+				}
+				ctx.fillText(uiL.options[i].name, uiP.x, uiP.y + i * 20);
+			}
+		} else if (uiP && entity.c("uidialoguebox")) {
+			var uiDB = entity.c("uidialoguebox");
+			ctx.font = "20px Consolas";
+			ctx.textBaseline = "top"
+			ctx.fillStyle = "white"
+			ctx.fillRect(canvas.width / 8, canvas.height * 4 / 5, canvas.width * 6 / 8, canvas.height / 5 - 20);
+			ctx.fillStyle = "black";
+			uiDB.curTime += dTime;
+			ctx.fillText(uiDB.string.substring(0, Math.floor(uiDB.curTime / uiDB.tick)), canvas.width / 8, canvas.height * 4 / 5);
+		}
+ 	}
+ 	ctx.restore();
 }
 
 
@@ -415,7 +450,7 @@ function evaluateTurn() {
 				//console.log("Player won!");
 				var winningDialog = makeUIDialogue("You won!");
 				var winningEvent = new BattleEvent(1000, null, function() {
-					gameState = 0;
+					gameState = "World";
 				});
 				winningEvent.short(winningDialog);
 				winningEvent.queue = true;
@@ -431,7 +466,7 @@ function evaluateTurn() {
 				var losingDialog = makeUIDialogue("You lost....");
 				var losingEvent = new BattleEvent(1000, null, function() {
 					sendPlayerHome();
-					gameState = 0;
+					gameState = "World";
 					
 				});
 				losingEvent.short(losingDialog);
@@ -449,7 +484,7 @@ function evaluateTurn() {
 					var losingDialog = makeUIDialogue("You lost....");
 					var losingEvent = new BattleEvent(1000, null, function() {
 						sendPlayerHome();
-						gameState = 0;
+						gameState = "World";
 						
 					});
 					losingEvent.short(losingDialog);
@@ -461,7 +496,7 @@ function evaluateTurn() {
 				if(outcome == "LOSS") {
 					var winningDialog = makeUIDialogue("You won!");
 					var winningEvent = new BattleEvent(1000, null, function() {
-						gameState = 0;
+						gameState = "World";
 					});
 					winningEvent.short(winningDialog);
 					winningEvent.queue = true;
@@ -497,11 +532,11 @@ function enemyAction() {
 function makeBattleStartEvent() {
 	var playerSprite = new ECS.Entity();
 	playerSprite.addComponent(new ECS.Components.UIPosition(0, 0));
-	playerSprite.addComponent(new ECS.Components.BattleSprite(images.images.player));
+	playerSprite.addComponent(new ECS.Components.BattleSprite(assets.images.player));
 
 	var enemySprite = new ECS.Entity();
 	enemySprite.addComponent(new ECS.Components.UIPosition(128, 0));
-	enemySprite.addComponent(new ECS.Components.BattleSprite(images.images.opponent));
+	enemySprite.addComponent(new ECS.Components.BattleSprite(assets.images.opponent));
 
 	var shortsBattle = makeUIDialogue("Enemy Trainer wants to battle!!!");
 	var firstEvent = new BattleEvent(1000);
@@ -529,12 +564,12 @@ function makeAttackEvent(_who, _action, _dmg) {
 	if(_who == "protagonist") {
 		target = BC.getAntCurrent();
 		targetImg = BC.connections.antMonSprite;
-		abilityImg = images.images.water_attack;
+		abilityImg = assets.images.water_attack;
 		dialogueLine = BC.getProCurrent().name + " used " + _action.name + "!";
 	} else {
 		target = BC.getProCurrent();
 		targetImg = BC.connections.proMonSprite;
-		abilityImg = images.images.water_attack_back;
+		abilityImg = assets.images.water_attack_back;
 		dialogueLine = "Enemy " + BC.getAntCurrent().name + " used " + _action.name + "!";
 	}
 
@@ -625,11 +660,11 @@ function sendSynthmonEvent(_who, _what, _side) {
 	var monSprite = new ECS.Entity();
 	if(_side == "antagonist") {
 		monSprite.addComponent(new ECS.Components.UIPosition(128, 0));
-		monSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_front));
+		monSprite.addComponent(new ECS.Components.BattleSprite(assets.images.piggen_front));
 		BC.connections.antMonSprite = monSprite;
 	} else if (_side == "protagonist") {
 		monSprite.addComponent(new ECS.Components.UIPosition(0, 0));
-		monSprite.addComponent(new ECS.Components.BattleSprite(images.images.piggen_back));
+		monSprite.addComponent(new ECS.Components.BattleSprite(assets.images.piggen_back));
 		BC.connections.proMonSprite = monSprite;
 	}
 
