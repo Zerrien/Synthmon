@@ -13,14 +13,16 @@ var ItemSchema = {
 		"description":"Delicious! Great at healing your Synthmon.",
 		"use":{
 
-		}
+		},
+		"image":"inventory_potion"
 	},
 	"fruitA":{
 		"name":"An Fruit",
 		"description":"An unusual fruit. Filling and healthy!",
 		"use":{
 
-		}
+		},
+		"image":"inventory_potion"
 	},
 	"revive":{
 		"name":"Revive",
@@ -50,9 +52,11 @@ function Item(_item) {
 	if(_item) {
 		this.name = _item.name;
 		this.description = _item.description;
+		this.image = _item.image;
 	} else {
 		this.name = "DEV_ITEM_NAME";
 		this.description = "DEV_ITEM_DESCRIPTION";
+		this.image = "DEV_ITEM_IMAGE_NAME";
 	}
 	this.use = {
 		"ref":this,
