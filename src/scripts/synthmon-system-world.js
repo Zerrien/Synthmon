@@ -61,7 +61,7 @@ function worldNewGame() {
 
 	//Meta-components.
 	player.addComponent(new ECS.Components.Inventory());
-	
+
 	player.c('inventory').items.push(new Item(ItemSchema.fruitA));
 	player.c('inventory').items.push(new Item(ItemSchema.potion));
 	player.c('inventory').items.push(new Item(ItemSchema.potion));
@@ -175,11 +175,6 @@ function loadZone(_zone, _chunk) {
 						component.model = assets.models[componentDetail.modelName];
 						component.texture = assets.textures[componentDetail.modelTexture].texture;
 					} else if (componentName == "Trainer") {
-						component.synthmon.push(new Synthmon());
-						component.synthmon.push(new Synthmon());
-						component.synthmon.push(new Synthmon());
-						component.synthmon.push(new Synthmon());
-						component.synthmon.push(new Synthmon());
 						component.synthmon.push(new Synthmon());
 					} else if (componentName == "WorldWire") {
 

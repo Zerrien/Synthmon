@@ -12,7 +12,14 @@ var ItemSchema = {
 		"name":"Potion",
 		"description":"Delicious! Great at healing your Synthmon.",
 		"use":{
-
+			"worlduse":{
+				"action":"target_synthmon",
+				"effect":{
+					"target":"hp",
+					"type":"add",
+					"amount":10
+				}
+			}
 		},
 		"image":"inventory_potion"
 	},
@@ -20,7 +27,14 @@ var ItemSchema = {
 		"name":"An Fruit",
 		"description":"An unusual fruit. Filling and healthy!",
 		"use":{
-
+			"worlduse":{
+				"action":"target_synthmon",
+				"effect":{
+					"target":"hp",
+					"type":"add",
+					"amount":10
+				}
+			}
 		},
 		"image":"inventory_potion"
 	},
@@ -53,11 +67,15 @@ function Item(_item) {
 		this.name = _item.name;
 		this.description = _item.description;
 		this.image = _item.image;
+		this.use = _item.use;
 	} else {
 		this.name = "DEV_ITEM_NAME";
 		this.description = "DEV_ITEM_DESCRIPTION";
 		this.image = "DEV_ITEM_IMAGE_NAME";
+		this.use = {"type":"DEV_USE"};
 	}
+
+	/*
 	this.use = {
 		"ref":this,
 		//Being held.
@@ -104,6 +122,7 @@ function Item(_item) {
 
 		}
 	};
+	*/
 }
 /*
 	Using placeholder mechanics in the mean time.

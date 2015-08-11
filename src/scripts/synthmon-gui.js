@@ -1,5 +1,7 @@
 function GUI() {
 	this.elements = [];
+	this.x = 0;
+	this.y = 0;
 }
 GUI.prototype = {
 	getHighestIndex : function() {
@@ -30,6 +32,7 @@ GUI.prototype = {
 		if(_index == -1) {
 			_element.zIndex = this.getHighestIndex() + 1;
 		}
+		_element.parent = this;
 		this.elements.push(_element);
 	},
 	removeElement  :function(_element) {
@@ -213,9 +216,7 @@ function gui_List(_list, _x, _y, _w, _h) {
 
 	for(var i = 0; i < this.list.length; i++) {
 		this.addChild(new gui_ListItem(this.list[i].name, i, this.w - 20, 40, function() {
-
-		}, assets.images[this.list[i].image]));
-		console.log(assets.images);
+		}, assets.images[this.list[i].image], this.list[i]));
 	}
 
 	this.parent = null;
@@ -256,13 +257,15 @@ gui_List.prototype = {
 	}
 }
 
-function gui_ListItem(_string, _index, _w, _h, _action, _img) {
+function gui_ListItem(_string, _index, _w, _h, _action, _img, _item) {
 	this.string = _string;
 	this.index = _index;
 	this.w = _w;
 	this.h = _h;
 	this.x = 0;
 	this.y = 0;
+
+	this.itemRef = _item;
 
 	this.img = _img;
 
@@ -273,10 +276,21 @@ gui_ListItem.prototype = {
 		_ctx.save();
 		var offset = getLocalOffset(this);
 
-		var scrollOffset = this.parent.list.length * this.parent.scroll * this.h;
-		scrollOffset = -1 * this.parent.scroll * (this.parent.list.length * this.h - this.parent.h);
+		var scrollOffset = -1 * this.parent.scroll * (this.parent.list.length * this.h - this.parent.h);
 		//-1 * this.curPercentage * (this.list.length * 32 - this.h) + 32 * i
-		_ctx.fillStyle = "black";
+
+		if(this.isDown) {
+			offset.x += 1;
+			offset.y += 1;
+		}
+
+		if(this.isOver) {
+			_ctx.fillStyle = "red";
+			_ctx.strokeStyle = "red";
+		} else {
+			_ctx.fillStyle = "black";
+			_ctx.strokeStyle = "black";
+		}
 
 		_ctx.strokeRect(offset.x, offset.y + this.h * this.index + scrollOffset, this.w, this.h);
 		_ctx.fillText(this.string, offset.x + this.w / 2, offset.y + this.h * this.index + this.h / 2 + scrollOffset);
@@ -285,6 +299,50 @@ gui_ListItem.prototype = {
 		}
 
 		_ctx.restore();
+	},
+	control : function() {
+		var offset = getTrueOffset(this);
+		var scrollOffset = -1 * this.parent.scroll * (this.parent.list.length * this.h - this.parent.h);
+		if(mousePos.x > offset.x && mousePos.x <= offset.x + this.w && mousePos.y > offset.y + this.index * this.h + scrollOffset && mousePos.y <= offset.y + this.h + this.index * this.h + scrollOffset) {
+			if(Math.abs(scrollOffset) <= this.h + this.h * this.index && mousePos.y >= offset.y && mousePos.y <= offset.y + this.parent.h) {
+				this.isOver = true;
+				if(mouseClick) {
+					mouseClick = false;
+					this.isDown = true;
+				} else if (!mouseClick && !mousePress) {
+					if(this.isDown) {
+						if(this.onInteract) {
+							this.onInteract();
+						} else {
+							//console.log(this.itemRef);
+							//For now, they're items.
+
+							//World use, world equip, battle use.
+							if(this.itemRef.use.worlduse) {
+								var use = this.itemRef.use.worlduse;
+								if(use.action == "target_synthmon") {
+									var synthContainer = new gui_Container(40, 40, 400, 400);
+									ECS.Scenes.World.gui.addElement(synthContainer, -1);
+
+
+									synthContainer.addChild(new gui_Text("Use " + this.string + " on who?", 200, 20));
+									synthContainer.addChild(new gui_PlayerSynthmon(20, 40, 400 - 40, 400 - 60));
+
+								}
+							}
+
+						}
+					}
+					this.isDown = false;
+				}
+			} else {
+				this.isOver = false;
+				this.isDown = false;
+			}
+		} else {
+			this.isOver = false;
+			this.isDown = false;
+		}
 	}
 }
 
@@ -341,6 +399,97 @@ gui_Slider.prototype = {
 	}
 }
 
+function gui_Text(_string, _x, _y) {
+	this.string = _string;
+	this.x = _x;
+	this.y = _y;
+	this.parent = null;
+}
+gui_Text.prototype = {
+	draw : function(_ctx) {
+		_ctx.save();
+
+		var offset = getTrueOffset(this);
+
+		_ctx.textAlign = "center";
+		_ctx.textBaseline = "middle";
+
+		_ctx.fillStyle = "black";
+		_ctx.fillText(this.string, offset.x, offset.y);
+
+		_ctx.restore();
+	}
+}
+
+
+function gui_PlayerSynthmon(_x, _y, _w, _h) {
+	this.x = _x;
+	this.y = _y;
+
+	this.w = _w;
+	this.h = _h;
+
+	this.children = [];
+
+	for(var i = 0; i < player.c("trainer").synthmon.length; i++) {
+		this.addChild(new gui_Synthmon(player.c("trainer").synthmon[i], i, this.w / 2, this.h / 3));
+	}
+
+	this.parent = null;
+}
+gui_PlayerSynthmon.prototype = {
+	draw : function(_ctx) {
+		_ctx.save();
+		var offset = getTrueOffset(this);
+
+		_ctx.strokeRect(offset.x, offset.y, this.w, this.h);
+
+		for(var i = 0; i < this.children.length; i++) {
+			if(this.children[i].draw) {
+				this.children[i].draw(_ctx);
+			}
+		}
+		_ctx.restore();
+	},
+	addChild : function(_obj) {
+		this.children.push(_obj);
+		_obj.parent = this;
+	}
+}
+
+function gui_Synthmon(_synthmonRef, _i, _w, _h) {
+	this.x = 0;
+	this.y = 0;
+	this.w = _w;
+	this.h = _h;
+
+	this.index = _i;
+	this.synthmonRef = _synthmonRef;
+}
+gui_Synthmon.prototype = {
+	draw : function(_ctx) {
+		_ctx.save();
+		var offset = getTrueOffset(this);
+		//console.log()
+		_ctx.strokeRect(offset.x + (this.index % 2) * this.w, offset.y + (this.index - (this.index % 2)) / 2 * this.h, this.w, this.h);
+		_ctx.drawImage(assets.images['piggen_front'], offset.x + (this.index % 2) * this.w, offset.y + (this.index - (this.index % 2)) / 2 * this.h + this.h / 4, this.h / 2, this.h / 2);
+		_ctx.fillStyle = "black";
+		_ctx.fillText(this.synthmonRef.name, offset.x + this.h / 2, offset.y + 20);
+		_ctx.fillText(this.synthmonRef.curHP + " / " + this.synthmonRef.maxHP, offset.x + 10, offset.y + this.h - 25)
+
+		_ctx.fillStyle = "red";
+		_ctx.fillRect(offset.x, offset.y + this.h - 20, this.w, 20);
+
+		_ctx.fillStyle = "green";
+		_ctx.fillRect(offset.x, offset.y + this.h - 20, this.w * this.synthmonRef.curHP / this.synthmonRef.maxHP, 20);
+
+		_ctx.restore();
+	},
+	control : function(_ctx) {
+		
+	}
+}
+
 function gui_DialogBox(_string) {
 	this.string = _string;
 	this.zIndex = 0;
@@ -356,5 +505,13 @@ gui_DialogBox.prototype = {
 		_ctx.font = "24px arial"
 		_ctx.fillText(this.string, canvas.width / 8, canvas.height * 2 / 3 + 32);
 		_ctx.restore();
+	},
+	control : function() {
+		if(keyboardKeys[32]) {
+			keyboardKeys[32] = false;
+			if(this.onInteract) {
+				this.onInteract();
+			}
+		}
 	}
 }

@@ -2,7 +2,6 @@ var canvas, ctx, gl;
 var canvas3D;
 var curTime, prevTime, tTime, dTime;
 
-
 var player, world;
 
 var keyPress = [];
@@ -85,8 +84,6 @@ function init() {
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);	
 			
 	    	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 
-
-
 
 	    	initShaders();
 	    	initTextureFramebuffer();
