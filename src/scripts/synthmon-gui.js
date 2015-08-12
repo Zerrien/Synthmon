@@ -34,6 +34,8 @@ GUI.prototype = {
 		}
 		_element.parent = this;
 		this.elements.push(_element);
+		this.sortElements();
+		
 	},
 	removeElement  :function(_element) {
 		for(var i = 0; i < this.elements.length; i++) {
@@ -41,6 +43,7 @@ GUI.prototype = {
 				this.elements.splice(i, 1);
 			}
 		}
+		this.sortElements();
 	},
 	draw : function(_ctx) {
 		for(var i = 0; i < this.elements.length; i++) {
@@ -54,11 +57,33 @@ GUI.prototype = {
 		}
 	},
 	control : function() {
-		for(var i = 0; i < this.elements.length; i++) {
+		for(var i = this.elements.length - 1; i >= 0; i--) {
 			if(this.elements[i].control) {
-				this.elements[i].control();
+				if(this.elements[i].control()) {
+					return;
+				}
 			}
 		}
+	},
+	sortElements : function() {
+		this.elements.sort(function(_a, _b) {
+			if(_a.zIndex && _b.zIndex) {
+				if(_a.zIndex > _b.zIndex) {
+					return 1;
+				} else if (_a.zIndex < _b.zIndex) {
+					return -1;
+				} else {
+					console.log("Two matching zIndexii...")
+					return 0;
+				}
+			} else if (_a.zIndex) {
+				return 1;
+			} else if (_b.zIndex) {
+				return -1;
+			} else {
+				return 0;
+			}
+		});
 	}
 }
 
@@ -91,8 +116,8 @@ function getLocalOffset(_obj) {
 function gui_Container(_x, _y, _w, _h) {
 	this.x = _x;
 	this.y = _y;
-	this.width = _w;
-	this.height = _h;
+	this.w = _w;
+	this.h = _h;
 
 	this.zIndex = 0;
 
@@ -104,8 +129,8 @@ gui_Container.prototype = {
 		_ctx.save();
 		var offset = getTrueOffset(this);
 		_ctx.fillStyle = "white";
-		_ctx.fillRect(offset.x, offset.y, this.width, this.height);
-		_ctx.strokeRect(offset.x, offset.y, this.width, this.height);
+		_ctx.fillRect(offset.x, offset.y, this.w, this.h);
+		_ctx.strokeRect(offset.x, offset.y, this.w, this.h);
 		for(var i = 0; i < this.children.length; i++) {
 			if(this.children[i].draw) {
 				this.children[i].draw(_ctx);
@@ -116,9 +141,19 @@ gui_Container.prototype = {
 	control : function() {
 		for(var i = 0; i < this.children.length; i++) {
 			if(this.children[i].control) {
-				this.children[i].control();
+				if(this.children[i].control()) {
+					return true;
+				}
 			}
 		}
+		var offset = getTrueOffset(this);
+		if(mousePos.x > offset.x && mousePos.x <= offset.x + this.w && mousePos.y > offset.y && mousePos.y <= offset.y + this.h) {
+			if(mouseClick || mousePress) {
+				return true;
+			}
+		}
+
+		return false;
 	},
 	addChild : function(_obj) {
 		this.children.push(_obj);
@@ -175,6 +210,8 @@ gui_Button.prototype = {
 			} else if (!mouseClick && !mousePress) {
 				if(this.isDown) {
 					this.onInteract();
+					this.isDown = false;
+					return true;
 				}
 				this.isDown = false;
 			}
@@ -182,6 +219,7 @@ gui_Button.prototype = {
 			this.isOver = false;
 			this.isDown = false;
 		}
+		return false;
 	}
 }
 
@@ -195,30 +233,10 @@ function gui_List(_list, _x, _y, _w, _h) {
 	this.scroll = 0;
 
 	this.children = [];
+	this.refreshList();
 
-	this.addChild(new gui_Button("^", this.w - 20, 0, 20, 20, function() {
-		console.log("^");
-		this.parent.scroll -= 0.1;
-		if(this.parent.scroll < 0) {
-			this.parent.scroll = 0;
-		}
-	}));
-	this.addChild(new gui_Button("v", this.w - 20, this.h - 20, 20, 20, function() {
-		console.log("v");
-		this.parent.scroll += 0.1;
-		if(this.parent.scroll > 1) {
-			this.parent.scroll = 1;
-		}
-	}));
-	this.addChild(new gui_Slider(this, "scroll", this.w - 20, 20, 20, this.h - 40, function() {
-
-	}))
-
-	for(var i = 0; i < this.list.length; i++) {
-		this.addChild(new gui_ListItem(this.list[i].name, i, this.w - 20, 40, function() {
-		}, assets.images[this.list[i].image], this.list[i]));
-	}
-
+	this.observedLength = this.children.length;
+	console.log(this.observedLength, this.list.length);
 	this.parent = null;
 
 	this.canvas = document.createElement("canvas");
@@ -229,6 +247,11 @@ function gui_List(_list, _x, _y, _w, _h) {
 
 gui_List.prototype = {
 	draw : function(_ctx) {
+		if(this.observedLength - 3 != this.list.length) {
+			this.refreshList();
+			this.observedLength = this.children.length;
+			//console.log("???");
+		}
 		var offset = getTrueOffset(this);
 		var localOffset = getLocalOffset(this);
 
@@ -253,6 +276,33 @@ gui_List.prototype = {
 			if(this.children[i].control) {
 				this.children[i].control();
 			}
+		}
+	},
+	refreshList : function() {
+		this.children = [];
+
+		this.addChild(new gui_Button("^", this.w - 20, 0, 20, 20, function() {
+			console.log("^");
+			this.parent.scroll -= 0.1;
+			if(this.parent.scroll < 0) {
+				this.parent.scroll = 0;
+			}
+		}));
+		this.addChild(new gui_Button("v", this.w - 20, this.h - 20, 20, 20, function() {
+			console.log("v");
+			this.parent.scroll += 0.1;
+			if(this.parent.scroll > 1) {
+				this.parent.scroll = 1;
+			}
+		}));
+		this.addChild(new gui_Slider(this, "scroll", this.w - 20, 20, 20, this.h - 40, function() {
+	
+		}))
+	
+		console.log("Ref: " + this.list.length);
+		for(var i = 0; i < this.list.length; i++) {
+			this.addChild(new gui_ListItem(this.list[i].name, i, this.w - 20, 40, function() {
+			}, assets.images[this.list[i].image], this.list[i]));
 		}
 	}
 }
@@ -320,13 +370,35 @@ gui_ListItem.prototype = {
 							//World use, world equip, battle use.
 							if(this.itemRef.use.worlduse) {
 								var use = this.itemRef.use.worlduse;
+								use.ref = this.itemRef;
 								if(use.action == "target_synthmon") {
 									var synthContainer = new gui_Container(40, 40, 400, 400);
 									ECS.Scenes.World.gui.addElement(synthContainer, -1);
 
+									console.log(use);
 
 									synthContainer.addChild(new gui_Text("Use " + this.string + " on who?", 200, 20));
-									synthContainer.addChild(new gui_PlayerSynthmon(20, 40, 400 - 40, 400 - 60));
+									synthContainer.addChild(new gui_PlayerSynthmon(20, 40, 400 - 40, 400 - 60, function() {
+										switch(use.effect.target) {
+											case "hp":
+												if(use.effect.type == "add") {
+													this.synthmonRef.heal(use.effect.amount);
+												} else if (use.effect.type == "sub") {
+													this.synthmonRef.heal(-1 * use.effect.amount);
+												}
+												break;
+											default:
+												console.warn("Attempting to apply unknown effect target... Debug further.")
+												break;
+										}
+
+										player.c("inventory").removeItem(use.ref);
+
+										ECS.Scenes.World.gui.removeElement(synthContainer);
+									}));
+									synthContainer.addChild(new gui_Button("X", 400 - 20, 0, 20, 20, function() {
+										ECS.Scenes.World.gui.removeElement(synthContainer);
+									}));
 
 								}
 							}
@@ -422,17 +494,24 @@ gui_Text.prototype = {
 }
 
 
-function gui_PlayerSynthmon(_x, _y, _w, _h) {
+function gui_PlayerSynthmon(_x, _y, _w, _h, _func) {
 	this.x = _x;
 	this.y = _y;
 
 	this.w = _w;
 	this.h = _h;
 
+	this.func = _func;
+
 	this.children = [];
 
 	for(var i = 0; i < player.c("trainer").synthmon.length; i++) {
-		this.addChild(new gui_Synthmon(player.c("trainer").synthmon[i], i, this.w / 2, this.h / 3));
+		var synth = new gui_Synthmon(player.c("trainer").synthmon[i], i, this.w / 2, this.h / 3);
+		synth.func = this.func;
+		synth.onInteract = function() {
+			this.func();
+		}
+		this.addChild(synth);
 	}
 
 	this.parent = null;
@@ -454,6 +533,13 @@ gui_PlayerSynthmon.prototype = {
 	addChild : function(_obj) {
 		this.children.push(_obj);
 		_obj.parent = this;
+	},
+	control : function(_obj) {
+		for(var i = 0; i < this.children.length; i++) {
+			if(this.children[i].control) {
+				this.children[i].control();
+			}
+		}
 	}
 }
 
@@ -470,23 +556,52 @@ gui_Synthmon.prototype = {
 	draw : function(_ctx) {
 		_ctx.save();
 		var offset = getTrueOffset(this);
+		if(this.isDown) {
+			offset.x += 1;
+			offset.y += 1;
+		}
 		//console.log()
+		if(this.isOver) {
+			_ctx.strokeStyle = "red";
+		} else {
+			_ctx.strokeStyle = "black";
+		}
 		_ctx.strokeRect(offset.x + (this.index % 2) * this.w, offset.y + (this.index - (this.index % 2)) / 2 * this.h, this.w, this.h);
 		_ctx.drawImage(assets.images['piggen_front'], offset.x + (this.index % 2) * this.w, offset.y + (this.index - (this.index % 2)) / 2 * this.h + this.h / 4, this.h / 2, this.h / 2);
 		_ctx.fillStyle = "black";
-		_ctx.fillText(this.synthmonRef.name, offset.x + this.h / 2, offset.y + 20);
-		_ctx.fillText(this.synthmonRef.curHP + " / " + this.synthmonRef.maxHP, offset.x + 10, offset.y + this.h - 25)
+		_ctx.fillText(this.synthmonRef.name, offset.x + this.h / 2 + (this.index % 2) * this.w, offset.y + 20 + (this.index - (this.index % 2)) / 2 * this.h);
+		_ctx.fillText(this.synthmonRef.curHP + " / " + this.synthmonRef.maxHP, offset.x + 10 + (this.index % 2) * this.w, offset.y + this.h - 25 + (this.index - (this.index % 2)) / 2 * this.h)
 
 		_ctx.fillStyle = "red";
-		_ctx.fillRect(offset.x, offset.y + this.h - 20, this.w, 20);
+		_ctx.fillRect(offset.x + (this.index % 2) * this.w, offset.y + this.h - 20 + (this.index - (this.index % 2)) / 2 * this.h, this.w, 20);
 
 		_ctx.fillStyle = "green";
-		_ctx.fillRect(offset.x, offset.y + this.h - 20, this.w * this.synthmonRef.curHP / this.synthmonRef.maxHP, 20);
+		_ctx.fillRect(offset.x + (this.index % 2) * this.w, offset.y + this.h - 20 + (this.index - (this.index % 2)) / 2 * this.h, this.w * this.synthmonRef.curHP / this.synthmonRef.maxHP, 20);
 
 		_ctx.restore();
 	},
-	control : function(_ctx) {
+	control : function() {
+		var offset = getTrueOffset(this);
 		
+		if(mousePos.x > offset.x + (this.index % 2) * this.w && mousePos.x <= offset.x + (this.index % 2) * this.w + this.w 
+			&& mousePos.y > offset.y + (this.index - (this.index % 2)) / 2 * this.h && mousePos.y <= offset.y + (this.index - (this.index % 2)) / 2 * this.h + this.h) {
+			this.isOver = true;
+			if(mouseClick) {
+				mouseClick = false;
+				this.isDown = true;
+			} else if (!mouseClick && !mousePress) {
+				if(this.isDown) {
+					this.onInteract();
+					this.isDown = false;
+					return true;
+				}
+				this.isDown = false;
+			}
+		} else {
+			this.isOver = false;
+			this.isDown = false;
+		}
+
 	}
 }
 

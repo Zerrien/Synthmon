@@ -25,18 +25,18 @@ var ItemSchema = {
 	},
 	"fruitA":{
 		"name":"An Fruit",
-		"description":"An unusual fruit. Filling and healthy!",
+		"description":"An unusual fruit. Probably toxic and poisonous! Why would you feed this to your Synthmon?",
 		"use":{
 			"worlduse":{
 				"action":"target_synthmon",
 				"effect":{
 					"target":"hp",
 					"type":"add",
-					"amount":10
+					"amount":-10
 				}
 			}
 		},
-		"image":"inventory_potion"
+		"image":"inventory_anfruit"
 	},
 	"revive":{
 		"name":"Revive",
@@ -192,6 +192,14 @@ Synthmon.prototype = {
 	},
 	getEvalDmg : function(_enemy, _ability) {
 		return Math.floor(((2 * this.level + 10) / 250 * (this.getEvalStat("Attack") / _enemy.getEvalStat("Defense")) * _ability.power) + 2);
+	},
+	heal : function(_amount) {
+		this.curHP += _amount;
+		if(this.curHP > this.maxHP) {
+			this.curHP = this.maxHP;
+		} else if (this.curHP <= 0) {
+			this.curHP = 0;
+		}
 	}
 }
 

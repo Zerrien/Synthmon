@@ -30,7 +30,8 @@
             "empty_drive": ".\/src\/assets\/img\/ui\/emptydrive.png",
 
             "inventory_potion":"./src/assets/img/items/potion.png",
-            "inventory_drive":"./src/assets/img/items/SSD.png"
+            "inventory_drive":"./src/assets/img/items/SSD.png",
+            "inventory_anfruit":"./src/assets/img/items/anfruit.png"
         },
         "sounds":{
             "bounce":"./src/assets/sound/bounce.wav",

@@ -63,8 +63,8 @@ function worldNewGame() {
 	player.addComponent(new ECS.Components.Inventory());
 
 	player.c('inventory').items.push(new Item(ItemSchema.fruitA));
-	player.c('inventory').items.push(new Item(ItemSchema.potion));
-	player.c('inventory').items.push(new Item(ItemSchema.potion));
+	//player.c('inventory').items.push(new Item(ItemSchema.potion));
+	//player.c('inventory').items.push(new Item(ItemSchema.potion));
 	player.c('inventory').items.push(new Item(ItemSchema.potion));
 	player.c('inventory').items.push(new Item(ItemSchema.potion));
 	player.c('inventory').items.push(new Item(ItemSchema.potion));
@@ -74,6 +74,8 @@ function worldNewGame() {
 	//player.c('inventory').items.push(new Item());
 	//player.c('inventory').items.push(new Item());
 	player.addComponent(new ECS.Components.Trainer());
+	player.c('trainer').synthmon.push(new Synthmon(true));
+	player.c('trainer').synthmon.push(new Synthmon(true));
 	player.c('trainer').synthmon.push(new Synthmon(true));
 	//player.c('trainer').synthmon.push(new Synthmon(true));
 	//player.c('trainer').synthmon.push(new Synthmon(true));
