@@ -1,5 +1,0 @@
-/*
-	Spin Mania
-	Tap Deluxe
-	Timed Clicker
-*/

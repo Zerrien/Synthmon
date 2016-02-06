@@ -1,4 +1,0 @@
-/*
-	Each part is standalone.	
-*/
-

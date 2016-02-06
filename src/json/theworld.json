@@ -51,7 +51,8 @@
             "counter_end":"./src/assets/mdl/counter_end.obj",
             "counter_innerCorner":"./src/assets/mdl/counter_innerCorner.obj",
             "counter_outerCorner":"./src/assets/mdl/counter_outerCorner.obj",
-            "wall":"./src/assets/mdl/wall.obj"
+            "wall":"./src/assets/mdl/wall.obj",
+            "piggen":"./src/assets/mdl/piggen.obj"
         },
         "textures":{
             "tex1":"./src/assets/texture/tex1.png",
