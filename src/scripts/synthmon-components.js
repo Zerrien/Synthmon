@@ -1,19 +1,6 @@
 ECS.Components.Inventory = function Inventory() {
 	this.items = [];
 }
-ECS.Components.Inventory.prototype = {
-	removeItem : function(_item) {
-
-		for(var i = 0; i < this.items.length; i++) {
-			if(this.items[i] == _item) {
-				console.log(_item);
-				console.log(this.items.length);
-				this.items.splice(i, 1);
-				console.log(this.items.length);
-			}
-		}
-	}
-}
 ECS.Components.Inventory.prototype.name = "inventory";
 
 ECS.Components.Trainer = function Trainer(_name) {

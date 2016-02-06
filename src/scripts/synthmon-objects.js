@@ -12,31 +12,15 @@ var ItemSchema = {
 		"name":"Potion",
 		"description":"Delicious! Great at healing your Synthmon.",
 		"use":{
-			"worlduse":{
-				"action":"target_synthmon",
-				"effect":{
-					"target":"hp",
-					"type":"add",
-					"amount":10
-				}
-			}
-		},
-		"image":"inventory_potion"
+
+		}
 	},
 	"fruitA":{
 		"name":"An Fruit",
-		"description":"An unusual fruit. Probably toxic and poisonous! Why would you feed this to your Synthmon?",
+		"description":"An unusual fruit. Filling and healthy!",
 		"use":{
-			"worlduse":{
-				"action":"target_synthmon",
-				"effect":{
-					"target":"hp",
-					"type":"add",
-					"amount":-10
-				}
-			}
-		},
-		"image":"inventory_anfruit"
+
+		}
 	},
 	"revive":{
 		"name":"Revive",
@@ -66,16 +50,10 @@ function Item(_item) {
 	if(_item) {
 		this.name = _item.name;
 		this.description = _item.description;
-		this.image = _item.image;
-		this.use = _item.use;
 	} else {
 		this.name = "DEV_ITEM_NAME";
 		this.description = "DEV_ITEM_DESCRIPTION";
-		this.image = "DEV_ITEM_IMAGE_NAME";
-		this.use = {"type":"DEV_USE"};
 	}
-
-	/*
 	this.use = {
 		"ref":this,
 		//Being held.
@@ -122,7 +100,6 @@ function Item(_item) {
 
 		}
 	};
-	*/
 }
 /*
 	Using placeholder mechanics in the mean time.
@@ -192,14 +169,6 @@ Synthmon.prototype = {
 	},
 	getEvalDmg : function(_enemy, _ability) {
 		return Math.floor(((2 * this.level + 10) / 250 * (this.getEvalStat("Attack") / _enemy.getEvalStat("Defense")) * _ability.power) + 2);
-	},
-	heal : function(_amount) {
-		this.curHP += _amount;
-		if(this.curHP > this.maxHP) {
-			this.curHP = this.maxHP;
-		} else if (this.curHP <= 0) {
-			this.curHP = 0;
-		}
 	}
 }
 

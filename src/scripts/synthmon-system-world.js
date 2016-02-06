@@ -61,21 +61,12 @@ function worldNewGame() {
 
 	//Meta-components.
 	player.addComponent(new ECS.Components.Inventory());
-
-	player.c('inventory').items.push(new Item(ItemSchema.fruitA));
-	//player.c('inventory').items.push(new Item(ItemSchema.potion));
-	//player.c('inventory').items.push(new Item(ItemSchema.potion));
-	player.c('inventory').items.push(new Item(ItemSchema.potion));
-	player.c('inventory').items.push(new Item(ItemSchema.potion));
-	player.c('inventory').items.push(new Item(ItemSchema.potion));
 	player.c('inventory').items.push(new Item(ItemSchema.potion));
 	player.c('inventory').items.push(new Item(ItemSchema.fruitA));
 	//player.c('inventory').items.push(new Item());
 	//player.c('inventory').items.push(new Item());
 	//player.c('inventory').items.push(new Item());
 	player.addComponent(new ECS.Components.Trainer());
-	player.c('trainer').synthmon.push(new Synthmon(true));
-	player.c('trainer').synthmon.push(new Synthmon(true));
 	player.c('trainer').synthmon.push(new Synthmon(true));
 	//player.c('trainer').synthmon.push(new Synthmon(true));
 	//player.c('trainer').synthmon.push(new Synthmon(true));
@@ -88,22 +79,6 @@ function worldNewGame() {
 	worldScene.curState = "roaming";
 
 	loadZone(playerPos.zone);
-
-
-	var baseContainer = new gui_Container(0, 0, 500, 500);
-	var subContainer = new gui_Container(20, 20, 200, 200);
-	baseContainer.addChild(subContainer);
-
-	baseContainer.addChild(new gui_Button("Hello!", 20, 240, 100, 25, function() {
-		console.log("Hello button")
-	}))
-
-	subContainer.addChild(new gui_Button("Sub-hello!", 20, 20, 100, 25, function() {
-		console.log("Sub hello button");
-	}))
-
-	baseContainer.addChild(new gui_List(player.c("inventory").items, 20, 280, 200, 200));
-	worldScene.gui.addElement(baseContainer, -1);
 }
 
 function tArrayFind(_array, _key) {
@@ -177,6 +152,11 @@ function loadZone(_zone, _chunk) {
 						component.model = assets.models[componentDetail.modelName];
 						component.texture = assets.textures[componentDetail.modelTexture].texture;
 					} else if (componentName == "Trainer") {
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
+						component.synthmon.push(new Synthmon());
 						component.synthmon.push(new Synthmon());
 					} else if (componentName == "WorldWire") {
 
@@ -436,6 +416,7 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 			var pP = player.c("worldposition");
 			var pF = player.c("worldfaces");
 			var pM = player.c("worldmoves");
+
 			if(pM.state == "standing") {
 				var isMove = false;
 				if (keyboardKeys[87]) {
@@ -457,6 +438,7 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 					pM.destX = pF.facingTile().x;
 					pM.destY = pF.facingTile().y;
 				}
+
 				if(keyboardKeys[32]) {
 					keyboardKeys[32] = false;
 					var result = checkCollision(_e, pP.x + pF.facingTile().x, pP.y + pF.facingTile().y);
@@ -482,13 +464,10 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 							worldScene.gui.addElement(dialogBox, -1);
 						}
 					}
-				} else if (keyboardKeys[69]) {
-
 				}
 
 			}
 		}
-		worldScene.gui.control();
 	} else if (worldScene.curState == "inui") {
 		worldScene.gui.control();
 	}

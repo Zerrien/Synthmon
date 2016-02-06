@@ -27,11 +27,7 @@
             "water_attack_back": ".\/src\/assets\/img\/attacks\/water_back.png",
             "alive_drive": ".\/src\/assets\/img\/ui\/alivedrive.png",
             "dead_drive": ".\/src\/assets\/img\/ui\/deaddrive.png",
-            "empty_drive": ".\/src\/assets\/img\/ui\/emptydrive.png",
-
-            "inventory_potion":"./src/assets/img/items/potion.png",
-            "inventory_drive":"./src/assets/img/items/SSD.png",
-            "inventory_anfruit":"./src/assets/img/items/anfruit.png"
+            "empty_drive": ".\/src\/assets\/img\/ui\/emptydrive.png"
         },
         "sounds":{
             "bounce":"./src/assets/sound/bounce.wav",

@@ -2,6 +2,7 @@ var canvas, ctx, gl;
 var canvas3D;
 var curTime, prevTime, tTime, dTime;
 
+
 var player, world;
 
 var keyPress = [];
@@ -26,7 +27,6 @@ var gameState = "Loading";
 
 function initControls() {
 	window.onkeydown = function(_e) {
-		//console.log(_e.keyCode);
 		if(!keyPress[_e.keyCode]) {
 			keyboardKeys[_e.keyCode] = true;
 		}
@@ -84,6 +84,8 @@ function init() {
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);	
 			
 	    	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 
+
+
 
 	    	initShaders();
 	    	initTextureFramebuffer();
