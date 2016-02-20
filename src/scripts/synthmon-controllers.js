@@ -84,7 +84,19 @@ function CameraController(_who) {
 	this.target = _who;
 }
 
-
+var MenuController = {
+	"worldmainmenu":{
+		"make":function() {
+			var menu = createUIElement("div", 200, 200, "absolute");
+			menu.className = "container";
+			var result = createUIElement('button', 0, 0)
+			result.innerHTML = "Click me!";
+			menu.appendChild(result)
+			return menu;
+		}
+	}
+}
+/*
 var MenuController = {
 	"worldmainmenu":{
 		"make":function() {
@@ -234,7 +246,7 @@ var MenuController = {
 		}
 	}
 }
-
+*/
 
 function AssetController() {
 	this.images = {};

@@ -14,7 +14,6 @@ ECS.Scenes.World = {
 	],
 	"curState":"Roaming",
 	"entities":[],
-	"gui":new GUI(),
 	"logic":function() {
 		for(var i = 0 ; i < this.systems.length; i++) {
 			if(this.systems[i]) {
@@ -29,10 +28,22 @@ ECS.Scenes.World = {
 		}
 	}
 };
+
+function initGUI() {
+	var div = document.createElement('div');
+	div.id = "gui";
+	div.style.left = canvas.offsetLeft + "px";
+	div.style.top = canvas.offsetTop + "px";
+	document.body.appendChild(div);
+	worldScene.gui = div;
+}
 var worldEntities = ECS.Scenes.World.entities; //Alias
 var worldScene = ECS.Scenes.World;
 
 function worldNewGame() {
+	initGUI();
+	var buttonA = createUIElement("button", 200, 200);
+	worldScene.gui.appendChild(buttonA);
 	player = new ECS.Entity();
 	player.addComponent(new ECS.Components.WorldSprite(assets.images.explorer));
 	var playerPos = new ECS.Components.WorldPosition(0, 0);
@@ -53,8 +64,8 @@ function worldNewGame() {
 	player.addComponent(new ECS.Components.WorldCollider());
 	player.addComponent(new ECS.Components.WorldCanPush(1));
 	player.addComponent(new ECS.Components.WorldModel());
-	player.c('worldmodel').model = assets.models.player;
-	player.c('worldmodel').texture = assets.textures['tex2'].texture;
+	player.c('worldmodel').model = assets.models.piggen;
+	player.c('worldmodel').texture = assets.textures['piggen_colored'].texture;
 
 	//Control-components
 	player.addComponent(new ECS.Components.WorldKeyboardControlled());
@@ -416,7 +427,6 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 			var pP = player.c("worldposition");
 			var pF = player.c("worldfaces");
 			var pM = player.c("worldmoves");
-
 			if(pM.state == "standing") {
 				var isMove = false;
 				if (keyboardKeys[87]) {
@@ -438,21 +448,33 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 					pM.destX = pF.facingTile().x;
 					pM.destY = pF.facingTile().y;
 				}
-
+				if(keyboardKeys[27]) {
+					keyboardKeys[27] = false;
+					var result = MenuController['worldmainmenu'].make();
+					worldScene.gui.appendChild(result);
+				}
 				if(keyboardKeys[32]) {
 					keyboardKeys[32] = false;
 					var result = checkCollision(_e, pP.x + pF.facingTile().x, pP.y + pF.facingTile().y);
 					if(result) {
 						if(result.c("worldchatty")) {
 							worldScene.curState = "inui"
+							/*
 							var dialogBox = new gui_DialogBox(result.c("worldchatty").saying);
 							dialogBox.onInteract = function() {
 								worldScene.gui.removeElement(dialogBox);
 								worldScene.curState = "roaming"
 							}
 							worldScene.gui.addElement(dialogBox, -1);
+							*/
+
 						} else if (result.c("worldbattler")) {
 							worldScene.curState = "inui"
+							var result = createUIElement("div", 200, 200, true);
+							result.innerHTML = "Ole!";
+							document.body.appendChild(result);
+							//testFunc(worldScene.gui);
+							/*
 							var dialogBox = new gui_DialogBox(result.c("worldbattler").saying);
 							dialogBox.onInteract = function() {
 								worldScene.gui.removeElement(dialogBox);
@@ -462,6 +484,7 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 
 							}
 							worldScene.gui.addElement(dialogBox, -1);
+							*/
 						}
 					}
 				}
@@ -469,7 +492,7 @@ ECS.Systems.WorldControl = function WorldKeyboard(_e) {
 			}
 		}
 	} else if (worldScene.curState == "inui") {
-		worldScene.gui.control();
+		//worldScene.gui.control();
 	}
 }
 
@@ -863,7 +886,9 @@ ECS.Systems.WorldRender3D = function WorldRender3D(_e) {
 
 ECS.Systems.WorldUI = function WorldUI(_e) {
 
-	worldScene.gui.draw(ctx);
+	//worldScene.gui.draw(ctx);
+	//console.log(worldScene.gui.render);
+	//worldScene.gui.render(ctx);
 	ctx.fillText(Math.round(1000 / dTime), 20, 20);
 }
 

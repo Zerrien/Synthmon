@@ -105,7 +105,10 @@ function getIdentity() {
 
 function handleTextureLoaded(_img, _texture) {
 	gl.bindTexture(gl.TEXTURE_2D, _texture);
-	//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	if(_img.name === "piggen_colored") {
+		//This is probably because of a bug.
+		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	}
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _img);
 
 	if(_img.name.indexOf("Ground") != -1) {

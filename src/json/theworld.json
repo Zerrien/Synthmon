@@ -63,7 +63,8 @@
             "boulderTexture":"./src/assets/texture/boulderTexture.png",
             "conveyorTexture":"./src/assets/texture/conveyorTexture.png?",
             "grassGroundTexture":"./src/assets/texture/grass.png",
-            "grassGround2Texture":"./src/assets/texture/synthmon_grass1.png"
+            "grassGround2Texture":"./src/assets/texture/synthmon_grass1.png",
+            "piggen_colored":"./src/assets/texture/piggen_colored.png"
         }
     },
     "chunks": {
@@ -1131,6 +1132,31 @@
                     "WorldCollider": [
 
                     ]
+                },
+                "chatter2": {
+                    "WorldSprite": {
+                        "name": "chatter"
+                    },
+                    "WorldPosition": {
+                        "x": 0,
+                        "y": 1
+                    },
+                    "WorldCollider": [
+                    ],
+                    "Trainer": {
+                        "tName": "Billy Bob"
+                    },
+                    "WorldBattler": {
+                        "saying": "Let's do battle!",
+                        "defeatedSaying": "Aw man!"
+                    },
+                    "WorldFaces": {
+                        "facing": "north"
+                    },
+                    "WorldModel":{
+                        "modelName":"player",
+                        "modelTexture":"tex3"
+                    }
                 }
             }
         },
