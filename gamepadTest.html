@@ -9,9 +9,15 @@
 	var canvas = document.createElement("canvas");
 	canvas.width = canvas.height = 1000;
 	var ctx = canvas.getContext("2d");
+	var pointArray = [];
 	setInterval(function() {
+
 		ctx.clearRect(0, 0, 2000, 2000);
 		GP = navigator.getGamepads();
+		var xy = {x:GP[0].axes[1],y: GP[0].axes[0]};
+
+		var l = Math.sqrt(Math.pow(xy.x,2) + Math.pow(xy.y,2))
+
 		ctx.beginPath();
 		ctx.arc(200, 200, 100, 0, Math.PI * 2);
 		ctx.stroke();
@@ -19,11 +25,27 @@
 		ctx.arc(500, 200, 100, 0, Math.PI * 2);
 		ctx.stroke();
 		ctx.beginPath();
+		pointArray.push({x:GP[0].axes[0], y:GP[0].axes[1]});
+		if(l < 0.15) {
+			pointArray = [];
+		}
 		ctx.arc(200 + GP[0].axes[0] * 100, 200 + GP[0].axes[1] * 100, 5, 0, Math.PI * 2);
 		ctx.stroke();
 		ctx.beginPath();
 		ctx.arc(500 + GP[0].axes[2] * 100, 200 + GP[0].axes[3] * 100, 5, 0, Math.PI * 2);
 		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.moveTo(200, 200);
+		ctx.lineTo(200 + GP[0].axes[0] * 100, 200 + GP[0].axes[1] * 100)
+		ctx.stroke();
+		
+		for(var i = 0; i < pointArray.length; i++) {
+			ctx.beginPath();
+			ctx.arc(200 + pointArray[i].x * 100, 200 + pointArray[i].y * 100, 2, 0, Math.PI * 2);
+			ctx.fill();
+		}
+		
 		ctx.beginPath();
 		ctx.moveTo(200, 0);
 		ctx.lineTo(200, 400);
@@ -33,6 +55,20 @@
 		ctx.moveTo(500, 0);
 		ctx.lineTo(500, 400)
 		ctx.stroke();
+
+
+		ctx.fillText(GP[0].axes[0], 20, 20);
+		ctx.fillText(GP[0].axes[1], 20, 40);
+		ctx.fillText((Math.atan2(GP[0].axes[1], GP[0].axes[0]) * 180 / Math.PI).toFixed(2), 20, 100);
+		
+		//xy.x /= l;
+		//xy.y /= l;
+		ctx.fillText(l.toFixed(2), 20, 120);
+		ctx.fillText(GP[0].axes[2], 20, 60);
+		ctx.fillText(GP[0].axes[3], 20, 80);
+		for(var i = 0; i < GP[0].buttons.length; i++) {
+			ctx.fillText(GP[0].buttons[i].value, 20, 140 + 10 * i);
+		}
 	}, 10);
 
 	document.write("Controller");
