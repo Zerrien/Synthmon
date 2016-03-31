@@ -290,6 +290,18 @@ class Rectangle {
 	constructor() {
 
 	}
+	contains(point) {
+
+	}
+	static From2Corners() {
+
+	}
+	get perimeter() {
+
+	}
+	get area() {
+
+	}
 }
 class Circle {
 	constructor() {
